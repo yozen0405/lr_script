@@ -89,7 +89,6 @@ class Gacha:
                 
                 if len(self.rangers) >= self.target_count:
                     success = True
-                    break
 
         if success:
             self.store_acc()
