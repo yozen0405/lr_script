@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.env
+bin/acc
+bin/tmp
+bin/cache.json

@@ -1,0 +1,195 @@
+import time
+import os
+from adb_runner import adb_cmd
+from logger import log_msg
+from task.login import login_first
+from action import wait_click, exist_click, exist, wait, wait_vanish, extract_text, back, drag, get_pos
+from common.alert import connection_retry
+from common.utils import open_game_with_hacks, on_main_view
+from hack import apply_mode
+from location.pair import positions
+from common.confirm import loop_confirm
+from exceptions import GameError
+from task.close_board import close_board
+from task.main_stage import MainStageTask
+
+class FriendStageTask(MainStageTask):
+    def teach(self):
+        for _ in range(3):
+            wait_click(self.serial, self.FRIEND, wait_time=1.5)
+        if wait_click(self.serial, "skip.png", timeout=25.0):
+            wait_click(self.serial, "confirm_small.png", wait_time=1.0)
+        
+        wait_click(self.serial, "skip.png")
+
+    def select_friend(self):
+        if wait_click(self.serial, "skip.png", timeout=5.0):
+            wait_click(self.serial, "confirm_small.png", wait_time=1.0)
+        wait_click(self.serial, "skip.png", timeout=5.0, wait_time=1.0)
+        wait_click(self.serial, "james_friend_icon.png", timeout=5.0, wait_time=1.0)
+
+def normal_stage(serial, main_stage_task, anime=False, has_next=False, bonus=True, enter_menu=False):
+    if enter_menu:
+        main_stage_task.enter_menu()
+    main_stage_task.enter_stage()
+    main_stage_task.run(anime=anime, has_next=has_next, big_ok=True, bonus=bonus)
+
+def james_friend(serial):
+    on_main_view(serial)
+    if wait_click(serial, "skip.png", timeout=5.0):
+        wait_click(serial, "confirm_small.png", wait_time=3.0)
+    friend = FriendStageTask(serial)
+    friend.enter_menu()
+    friend.enter_stage()
+    friend.run(big_ok=True)
+
+def stage30(serial, main_stage_task):
+    main_stage_task.enter_stage("stage30_btn.png")
+    main_stage_task.run(anime=False, has_next=True, bonus=False)
+
+def do_team_upgrade(serial):
+    if not wait_click(serial, "back.png"):
+        raise GameError("未知狀態")
+    on_main_view(serial)
+    
+    wait_click(serial, "team_icon.png")
+    if not wait(serial, "team_text.png", timeout=30.0):
+        raise GameError("進不去隊伍")
+    wait_click(serial, "leonard_teacher_switch_team.png")
+    wait_click(serial, "leonard_teacher_switch_team2.png", wait_time=2.0)
+    wait_click(serial, "jessica_upgrade_ranger.png", wait_time=1.5)
+    wait_click(serial, "upgrade_btn.png")
+    if not wait(serial, "back.png", timeout=20.0, wait_time=3.0):
+        raise GameError("無法進入升級頁面")
+    for _ in range(2):
+        drag(serial, (449, 605), (449, 357), timeout=10.0)
+    wait_click(serial, "upgrade_lvl_btn.png")
+    if not wait_click(serial, "confirm_small.png", wait_time=3.0):
+        raise GameError("升級失敗")
+    
+    for _ in range(3):
+        if not wait_click(serial, "upgrade_success.png", timeout=5.0, wait_time=1.0):
+            break
+    wait_click(serial, "back.png")
+    wait(serial, "team_text.png", timeout=20.0)
+    wait_click(serial, "back.png", timeout=20.0)
+    
+
+def do_diamond_upgrade(serial):
+    on_main_view(serial)
+    wait_click(serial, "diamond_upgrade_icon.png")
+    wait(serial, "diamond_upgrade_text.png", timeout=30.0)
+    pos = get_pos(serial, "diamond_upgrade_text.png")
+    if pos:
+        x, y = pos
+    else:
+        raise GameError("找不到升級文字")
+
+    wait_click(serial, (x, y + 350))
+    if not wait_click(serial, "diamond_upgrade_max.png"):
+        raise GameError("無法升級")
+    wait_click(serial, "confirm_small.png", wait_time=1.0)
+    wait_click(serial, "back.png")
+
+    for _ in range(3):
+        wait_click(serial, "diamond_upgrade_success.png", timeout=5.0, wait_time=1.0)
+        if wait_click(serial, "back.png"):
+            break
+
+def claim_seven_day(serial):
+    on_main_view(serial)
+
+    wait_click(serial, "7days.png")
+    if not wait(serial, "7day_quest_reward.png", timeout=10.0):
+        raise GameError("無法進入7天登入")
+    pos = get_pos(serial, "7day_quest_reward.png")
+    if pos:
+        x, y = pos
+    else:
+        raise GameError("找不到升級文字")
+
+    wait_click(serial, (x + 500, y), wait_time=1.0)
+    wait_click(serial, "confirm_small.png", timeout=10.0)
+    wait_click(serial, "7day_daily_reward.png", timeout=10.0, wait_time=1.0)
+    wait_click(serial, "confirm_small.png", timeout=10.0)
+    if not wait(serial, "7day_daily_claimed.png"):
+        raise GameError("沒領到扭蛋卷")
+    wait_click(serial, "close_board.png")
+
+def claim_season_pass(serial):
+    on_main_view(serial)
+    wait_click(serial, "season_pass_icon.png", timeout=7.0)
+
+    wait_click(serial, "confirm_small.png", timeout=10.0)
+
+    if not wait_click(serial, "leonard_teacher_circle.png"):
+        raise GameError("並非首次進入季票")
+    wait_click(serial, "leonard_teacher_circle.png")
+    for _ in range(10):
+        wait_click(serial, "season_pass_text.png", wait_time=1.5)
+
+    wait(serial, "season_pass_text.png", timeout=10.0, threshold=0.99)
+    wait_click(serial, "daily_quest_nav.png", timeout=10.0)
+    for _ in range(3):
+        if wait_click(serial, "daily_quest_claim.png", wait_time=2.0):
+            wait_click(serial, "confirm_small.png", wait_time=2.0)
+    wait_click(serial, "weekly_quest_nav.png", timeout=10.0, wait_time=1.0)
+    if wait_click(serial, "daily_quest_claim.png", wait_time=2.0):
+        wait_click(serial, "confirm_small.png", wait_time=2.0)
+
+    if wait(serial, "season_pass_text.png", timeout=10.0, threshold=0.99):
+        wait_click(serial, "season_pass_nav.png", timeout=10.0, wait_time=1.0)
+        wait_click(serial, "season_pass_tickets.png", timeout=10.0, wait_time=2.0)
+        wait_click(serial, "confirm_big.png", wait_time=2.0, threshold=0.65)
+        wait_click(serial, "close_board.png", timeout=10.0)
+    else:
+        raise GameError("季票領取獎勵錯誤")
+    wait_click(serial, "back.png")
+    wait_click(serial, "cancel.png", timeout=25.0)
+
+
+def phase5(serial):
+    main_stage_task = MainStageTask(serial)
+
+    log_msg(serial, "第五階段")
+    try:
+        normal_stage(serial, main_stage_task, enter_menu=True)
+    except GameError as e:
+        raise
+
+    for _ in range(3):
+        try:
+            normal_stage(serial, main_stage_task, enter_menu=False)
+        except GameError as e:
+            raise
+
+    try:
+        james_friend(serial)
+    except GameError as e:
+        raise
+
+    try:
+        stage30(serial, main_stage_task)
+    except GameError as e:
+        raise
+
+    try:
+        do_team_upgrade(serial)
+    except GameError as e:
+        raise
+
+    try:
+        do_diamond_upgrade(serial)
+    except GameError as e:
+        raise
+
+    try:
+        claim_seven_day(serial)
+    except GameError as e:
+        raise
+
+    try:
+        claim_season_pass(serial)
+    except GameError as e:
+        raise
+    
