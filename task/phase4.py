@@ -108,7 +108,7 @@ def phase4(serial):
         raise
 
     try:
-        normal_stage(serial, main_stage_task, enter_menu=False, bonus=False)
+        normal_stage(serial, main_stage_task, enter_menu=False)
     except GameError as e:
         raise
 
