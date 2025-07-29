@@ -73,6 +73,7 @@ def upgrade_equip(serial):
 
 
 def auto_stage(serial):
+    log_msg(serial, "auto stage 開始")
     auto_stage_task = AutoStageTask(serial)
     auto_stage_task.enter_menu()
     auto_stage_task.enter_stage()
@@ -80,7 +81,7 @@ def auto_stage(serial):
 
 def introduce_scene(serial):
     wait_click(serial, "back.png")
-    on_main_view(serial, sign="gacha_skip.png")
+    on_main_view(serial, sign="gacha_skip.png", timeout=40.0)
 
     wait_click(serial, "gacha_skip.png", timeout=5.0, wait_time=2.0)
     evo = EvoMineTask(serial)
@@ -97,6 +98,7 @@ def introduce_scene(serial):
 def phase4(serial):
     main_stage_task = MainStageTask(serial)
     log_msg(serial, "第四階段")
+
     try:
         auto_stage(serial)
     except GameError as e:

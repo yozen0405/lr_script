@@ -20,13 +20,14 @@ class MainStageTask:
             raise GameError("不在主畫面")
 
     def enter_stage(self, custom_stage: str = ""):
-        if not wait(self.serial, "main_stage_text.png", timeout=30.0):
+        if not wait(self.serial, "main_stage_text.png", timeout=30.0, wait_time=2.5):
             raise GameError("不在主要關卡")
         if custom_stage == "":
-            if not wait_click(self.serial, "new_stage_common.png", threshold=0.97, timeout=15.0):
-                if not wait_click(self.serial, "boss_stage.png", timeout=15.0):
-                    if not wait_click(self.serial, "new_stage.png", timeout=15.0):
-                        raise GameError("無法找到關卡")
+            if not wait_click(self.serial, "new_stage_common.png", threshold=0.98, timeout=3.0):
+                if not wait_click(self.serial, "new_stage_evt.png", threshold=0.97, timeout=3.0):
+                    if not wait_click(self.serial, "boss_stage.png", threshold=0.89, timeout=3.0):
+                        if not wait_click(self.serial, "new_stage.png", timeout=3.0):
+                            raise GameError("無法找到關卡")
         else:
             if not wait_click(self.serial, custom_stage, timeout=10.0):
                 raise GameError("無法找到關卡")

@@ -23,12 +23,33 @@ def open_game_with_hacks(serial, mode: str = "main_stage"):
 
     raise GameError(f"嘗試 3 次後仍無法啟動遊戲")
 
-def on_main_view(serial, sign = "settings_btn.png"):
-    if not wait(serial, sign, timeout=25.0, wait_time=4.0):
+def on_main_view(serial, sign="settings_btn.png", timeout=25.0):
+    start_time = time.time()
+    found = False
+
+    while time.time() - start_time < timeout:
+        if exist(serial, sign, wait_time=3.0):
+            found = True
+            break
+        if exist_click(serial, "close_board.png", wait_time=3.0):
+            found = True
+            break
+        if exist_click(serial, "close_to_pvp.png", wait_time=1.0):
+            found = True
+            break
+        if exist_click(serial, "cancel.png", wait_time=3.0):
+            found = True
+            break
+        time.sleep(0.5)
+
+    if exist_click(serial, "close_board.png", wait_time=3.0):
+        found = True
+    if exist_click(serial, "close_to_pvp.png", wait_time=1.0):
+        found = True
+    if exist_click(serial, "cancel.png", wait_time=3.0):
+        found = True
+
+    if not found:
         raise GameError("沒有進入到主畫面")
-
-    exist_click(serial, "close_board.png", wait_time=3.0)
-    exist_click(serial, "close_to_pvp.png", wait_time=1.0)
-    exist_click(serial, "cancel.png", wait_time=3.0)
-
+    
 

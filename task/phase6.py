@@ -32,7 +32,11 @@ def claim_tickets(serial):
         
     wait_click(serial, "confirm_small.png", timeout=15.0, wait_time=3.0)
     wait_click(serial, "confirm_small.png", wait_time=1.5)
-    wait_click(serial, "close_board.png")
+    wait_click(serial, "close_board.png", wait_time=1.5)
+
+    if wait_click(serial, "skip.png", timeout=15.0):
+        wait_click(serial, "confirm_small.png", wait_time=1.0)
+    wait_click(serial, "skip.png", timeout=3.0)
 
 
 def gacha_pull(serial):

@@ -73,7 +73,6 @@ def do_team_upgrade(serial):
     wait_click(serial, "back.png")
     wait(serial, "team_text.png", timeout=20.0)
     wait_click(serial, "back.png", timeout=20.0)
-    
 
 def do_diamond_upgrade(serial):
     on_main_view(serial)
@@ -88,8 +87,10 @@ def do_diamond_upgrade(serial):
     wait_click(serial, (x, y + 350))
     if not wait_click(serial, "diamond_upgrade_max.png"):
         raise GameError("無法升級")
+
+    for _ in range(7):
+        wait_click(serial, "diamond_upgrade_minus.png")
     wait_click(serial, "confirm_small.png", wait_time=1.0)
-    wait_click(serial, "back.png")
 
     for _ in range(3):
         wait_click(serial, "diamond_upgrade_success.png", timeout=5.0, wait_time=1.0)
