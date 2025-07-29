@@ -1,9 +1,10 @@
 import time
-from adb_runner import adb_cmd
-from image_finder import find_template_position
-from image_utils import IMG_DIR
-from logger import log_msg
-from image_utils import get_image_path, get_temp_screen_path, store_screen
+from core.system.adb import adb_cmd
+from core.actions.image_utils import (
+    find_template_position, IMG_DIR,
+    get_image_path, get_temp_screen_path, store_screen
+)
+from core.system.logger import log_msg
 import pytesseract
 from PIL import Image
 import cv2

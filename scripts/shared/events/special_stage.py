@@ -1,9 +1,9 @@
 import time
-from logger import log_msg
-from action import wait_click, exist_click, exist, wait, wait_vanish, get_pos, drag
-from exceptions import GameError
-from location.pair import positions
-from common.alert import connection_retry
+from core.system.logger import log_msg
+from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, get_pos, drag
+from core.base.exceptions import GameError
+from scripts.shared.constants import positions
+from scripts.shared.utils.retry import connection_retry
 
 class SpecialStageTask:
     def __init__(self, serial):

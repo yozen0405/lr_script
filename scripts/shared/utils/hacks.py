@@ -1,6 +1,6 @@
-from adb_runner import adb_cmd
-from logger import log_msg
-from common.alert import liapp_alert
+from core.system.adb import adb_cmd
+from core.system.logger import log_msg
+from scripts.shared.utils.retry import liapp_alert
 
 MODES = {
     "main_stage": ["m1", "m2", "m8"],

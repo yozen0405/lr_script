@@ -1,14 +1,23 @@
 from concurrent.futures import ThreadPoolExecutor
-from adb_runner import connect_all_mumu_instances
-from task_runner import new_acc_farm
+from core.system.adb import connect_all_mumu_instances
+from scripts.custom_scripts.new_acc.main import new_acc_farm
+from core.system.config import Config
 
 if __name__ == "__main__":
-    devices = connect_all_mumu_instances()
-    print("發現裝置:", devices)
+    cfg = Config()
+    single_mode = cfg.is_single_mode()
+    devices = connect_all_mumu_instances(goal=1)
 
+    print("發現裝置:", devices)
     if not devices:
         print("未偵測到任何裝置，請確認裝置已連接並啟動。")
+
+    elif single_mode:
+        print("啟動單機模式")
+        new_acc_farm(devices[0])
+
     else:
+        print("啟動多執行緒模式")
         try:
             with ThreadPoolExecutor(max_workers=len(devices)) as executor:
                 futures = [executor.submit(new_acc_farm, d) for d in devices]

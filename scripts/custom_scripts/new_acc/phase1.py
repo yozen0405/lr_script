@@ -1,15 +1,14 @@
 import time
 import os
-from adb_runner import adb_cmd
-from logger import log_msg
-from task.login import login_first
-from action import wait_click, exist_click, exist, wait, wait_vanish, extract_text, back, drag
-from common.alert import connection_retry
-from hack import apply_mode
-from location.pair import positions
-from common.confirm import loop_confirm
-from exceptions import GameError
-from task.main_stage import MainStageTask
+from core.system.adb import adb_cmd
+from core.system.logger import log_msg
+from scripts.shared.events.login import first_time_login
+from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, extract_text, back, drag
+from scripts.shared.utils.retry import connection_retry
+from scripts.shared.utils.hacks import apply_mode
+from scripts.shared.constants import positions
+from core.base.exceptions import GameError
+from scripts.shared.events.main_stage import MainStageTask
 
 class FirstStageTask(MainStageTask):
     def pre_select(self):
@@ -111,12 +110,17 @@ def first_arrange_team(serial):
     wait_click(serial, "confirm_small.png")
     wait_click(serial, "save_team.png", wait_time=3.0)
     connection_retry(serial, wait_name="settings_btn.png", exception_msg="未進入主畫面，隊伍教學失敗", timeout=35.0)
-    loop_confirm(serial)
+    for _ in range(3):
+        if wait_click(serial, "skip.png", timeout=5, wait_time=1.0):
+            if not exist(serial, "confirm_small.png"):
+                continue
+            wait_click(serial, "confirm_small.png", wait_time=0.5)
+            break
     wait_click(serial, "confirm_small.png", wait_time=0.5)
 
 def phase1(serial):
     try:
-        login_first(serial)
+        first_time_login(serial)
     except GameError as e:
         raise
 

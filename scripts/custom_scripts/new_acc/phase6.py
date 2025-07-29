@@ -1,23 +1,18 @@
 import time
 import os
-from adb_runner import adb_cmd
-from logger import log_msg
-from task.login import login_first
-from action import (
+from core.system.logger import log_msg
+from core.actions.actions import (
     wait_click, exist_click, exist, wait,
     wait_vanish, extract_text, back, drag,
      match_string_from_region, get_clipboard_text,
      pull_account_file, clear_game_storage,
      force_close
 )
-from common.alert import connection_retry
-from common.utils import open_game_with_hacks, on_main_view
-from hack import apply_mode
-from location.pair import positions
-from common.confirm import loop_confirm
-from exceptions import GameError
-from task.close_board import close_board
-from task.gacha import Gacha
+from scripts.shared.utils.retry import connection_retry
+from scripts.shared.utils.game_boot import open_game_with_hacks
+from scripts.shared.utils.game_view import on_main_view
+from scripts.shared.events.gacha import Gacha
+from core.base.exceptions import GameError
 
 def claim_tickets(serial):
     on_main_view(serial)

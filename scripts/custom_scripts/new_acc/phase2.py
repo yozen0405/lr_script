@@ -1,15 +1,14 @@
 import time
 import os
-from adb_runner import adb_cmd
-from logger import log_msg
-from action import wait_click, exist_click, exist, wait, wait_vanish, extract_text, back, drag, force_close
-from task.close_board import close_board
-from task.main_stage import MainStageTask
-from common.alert import connection_retry
-from common.utils import open_game_with_hacks, on_main_view
-from location.pair import positions
-from exceptions import GameError
-from task.login import ultimate_login
+from core.system.logger import log_msg
+from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, extract_text, back, drag, force_close
+from core.base.exceptions import GameError
+from scripts.shared.utils.game_view import close_board
+from scripts.shared.events.main_stage import MainStageTask
+from scripts.shared.utils.retry import connection_retry
+from scripts.shared.utils.game_boot import open_game_with_hacks
+from scripts.shared.utils.game_view import on_main_view
+from scripts.shared.events.login import login_entry
 
 main_stage_task = None
 
@@ -39,11 +38,11 @@ class ThirdStageTask(MainStageTask):
 def login_second(serial):
     log_msg(serial, "二次登入")
 
-    ultimate_login(serial)
+    login_entry(serial)
     wait_click(serial, "confirm_small.png", timeout=60.0)
     connection_retry(serial, "loading_page.png", timeout=900.0)
     if exist(serial, "gameicon.png"):
-        ultimate_login(serial, hacks=True)
+        login_entry(serial, hacks=True)
         wait_click(serial, "confirm_small.png", timeout=40.0)
         connection_retry(serial, "loading_page.png", timeout=900.0)
         if exist(serial, "gameicon.png"):

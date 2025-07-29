@@ -1,15 +1,15 @@
 import os
 import time
 from configparser import ConfigParser
-from fuzzywuzzy import fuzz, process
-from action import (
+from core.system.logger import log_msg
+from core.actions.actions import (
     wait_click, wait, wait_vanish,
     match_string_from_region, drag, back, get_clipboard_text,
     pull_account_file
 )
-from common.utils import open_game_with_hacks, on_main_view
-from exceptions import GameError
-from logger import log_msg
+from scripts.shared.utils.game_boot import open_game_with_hacks
+from scripts.shared.utils.game_view import on_main_view
+from core.base.exceptions import GameError
 
 class Gacha:
     def __init__(self, serial, config_path="./bin/config.ini"):

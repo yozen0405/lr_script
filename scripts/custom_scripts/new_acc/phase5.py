@@ -1,17 +1,19 @@
 import time
 import os
-from adb_runner import adb_cmd
-from logger import log_msg
-from task.login import login_first
-from action import wait_click, exist_click, exist, wait, wait_vanish, extract_text, back, drag, get_pos
-from common.alert import connection_retry
-from common.utils import open_game_with_hacks, on_main_view
-from hack import apply_mode
-from location.pair import positions
-from common.confirm import loop_confirm
-from exceptions import GameError
-from task.close_board import close_board
-from task.main_stage import MainStageTask
+from core.system.logger import log_msg
+from core.actions.actions import (
+    wait_click, exist_click, exist,
+    wait, wait_vanish, extract_text,
+    back, drag, force_close,
+    get_pos
+)
+from core.base.exceptions import GameError
+from scripts.shared.utils.game_view import close_board
+from scripts.shared.events.main_stage import MainStageTask
+from scripts.shared.utils.retry import connection_retry
+from scripts.shared.utils.game_boot import open_game_with_hacks
+from scripts.shared.utils.game_view import on_main_view
+from scripts.shared.events.login import login_entry
 
 class FriendStageTask(MainStageTask):
     def teach(self):
