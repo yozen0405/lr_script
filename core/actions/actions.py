@@ -323,6 +323,7 @@ def pull_account_file(serial: str, uid: str, ranger_list: list, local_path="./bi
     result = adb_cmd(serial, ["pull", remote_tmp, local_tmp])
 
     if result.returncode == 0:
+        adb_cmd(serial, ["shell", "su", "-c", f"rm {remote_tmp}"])
         hero_str = "+".join(ranger_list)
         final_path = os.path.join(local_path, f"{uid}_{hero_str}.xml")
         os.rename(local_tmp, final_path)

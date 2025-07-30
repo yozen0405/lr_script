@@ -9,10 +9,11 @@ from scripts.custom_scripts.new_acc.phase3 import phase3
 from scripts.custom_scripts.new_acc.phase2 import phase2
 from scripts.custom_scripts.new_acc.phase1 import phase1
 
-def new_acc_farm(serial):
-    phase1(serial)
-    phase2(serial)
-    phase3(serial)
-    phase4(serial)
-    phase5(serial)
-    phase6(serial)
+def new_acc_farm(serial, attempts=3):
+    for _ in range(attempts):
+        phase1(serial)
+        phase2(serial)
+        phase3(serial)
+        phase4(serial)
+        phase5(serial)
+        phase6(serial)

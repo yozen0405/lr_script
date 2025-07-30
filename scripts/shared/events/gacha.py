@@ -1,6 +1,7 @@
 import os
 import time
 from configparser import ConfigParser
+from core.system.config import Config
 from core.system.logger import log_msg
 from core.actions.actions import (
     wait_click, wait, wait_vanish,
@@ -14,31 +15,16 @@ from core.base.exceptions import GameError
 class Gacha:
     def __init__(self, serial, config_path="./bin/config.ini"):
         self.serial = serial
-        self.config_path = config_path
-        self.target_count, self.expected_names, self.name_map = self._load_config()
+        config = Config()
+
+        self.target_count = config.target_count
+        self.expected_names = config.expected_names
+        self.name_map = config.name_map
+        self.pool_image = config.get("pool", fallback="gacha_boss_pool.png")
+
         self.matched = []
         self.rangers = []
         self.rangers_short_names = []
-
-    def _load_config(self):
-        config = ConfigParser()
-        config.read(self.config_path, encoding="utf-8")
-
-        target_count = int(config.get("SETTINGS", "herowant", fallback="1"))
-        expected_names = []
-        name_map = {}
-
-        for key in config["SETTINGS"]:
-            if key.startswith("name"):
-                raw = config["SETTINGS"][key]
-                candidates, display_name = raw.split("=")
-                name_parts = candidates.split("+")
-                full_name = " ".join(name_parts)
-                expected_names.append(full_name)
-                name_map[full_name] = display_name
-
-        return target_count, expected_names, name_map
-
 
     def _match_from_region(self, region=None):
         for name in self.expected_names:
@@ -59,13 +45,13 @@ class Gacha:
         if not wait(self.serial, "gacha_text.png", timeout=20.0):
             raise GameError("無法進入扭蛋頁")
 
-    def pull(self, pool: str = "gacha_boss_pool.png", attempts: int = 10):
+    def pull(self, attempts: int = 10):
         log_msg(self.serial, f"開抽扭蛋, 預計要抽到 {self.target_count} 個 ranger 才會留下帳號")
 
         if not wait(self.serial, "gacha_text.png", timeout=20.0):
             raise GameError("不在扭蛋頁")
         for _ in range(5):
-            if wait_click(self.serial, pool, timeout=3.0):
+            if wait_click(self.serial, self.pool_image, timeout=3.0):
                 break
             drag(self.serial, (980, 450), (980, 266), wait_time=1.0)
 

@@ -2,17 +2,25 @@ import time
 import os
 from core.system.adb import adb_cmd
 from core.system.logger import log_msg
-from scripts.shared.events.login import first_time_login
 from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, extract_text, back, drag
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.hacks import apply_mode
 from scripts.shared.constants import positions
 from core.base.exceptions import GameError
 from scripts.shared.events.main_stage import MainStageTask
+from scripts.shared.utils.game_boot import open_game, open_game_with_hacks
+from scripts.shared.events.login import finalize_guest_login
 
 class FirstStageTask(MainStageTask):
     def pre_select(self):
         wait_click(self.serial, "meteor.png", threshold=0.5)
+
+def first_time_login(serial):
+    log_msg(serial, "首次登入流程啟動")
+    open_game_with_hacks(serial, "pre_stage")
+    finalize_guest_login(serial)
+    connection_retry(serial, retry="confirm_small.png", wait_name="english_btn.png", timeout=35.0)
+    wait_click(serial, "confirm_small.png", threshold=0.5, timeout=20.0)
 
 def pre_stage(serial):
     log_msg(serial, "進去前置關卡")
@@ -29,7 +37,7 @@ def pre_stage(serial):
     wait_click(serial, "confirm_small.png", wait_time=0.5)
 
     if wait(serial, "pause.png", threshold=0.5, timeout=15.0):
-        for _ in range(50):
+        for _ in range(60):
             if exist_click(serial, "skip.png", threshold=0.8):
                 break
             wait_click(serial, positions["member1"], wait_time=0)
@@ -38,7 +46,7 @@ def pre_stage(serial):
             wait_click(serial, positions["member4"], wait_time=0)
             wait_click(serial, positions["member5"], wait_time=0)
             wait_click(serial, positions["diamond"], wait_time=0)
-            wait_click(serial, positions["missile"], wait_time=0)
+            wait_click(serial, positions["missile"], wait_time=1.5)
     else:
         raise GameError("無法確認戰鬥狀態，跳出")
     
@@ -52,7 +60,7 @@ def pre_stage(serial):
         wait_click(serial, positions["member3"], wait_time=0)
         wait_click(serial, positions["member4"], wait_time=0)
         wait_click(serial, positions["member5"], wait_time=0)
-        wait_click(serial, positions["missile"], wait_time=0)
+        wait_click(serial, positions["missile"], wait_time=0.5)
     
     if wait_click(serial, "skip.png", timeout=5.0):
         wait_click(serial, "confirm_small.png", wait_time=2)

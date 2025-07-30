@@ -148,7 +148,7 @@ def claim_season_pass(serial):
     else:
         raise GameError("季票領取獎勵錯誤")
     wait_click(serial, "back.png")
-    wait_click(serial, "cancel.png", timeout=25.0)
+    on_main_view(serial)
 
 
 def phase5(serial):

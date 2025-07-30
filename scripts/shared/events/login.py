@@ -80,9 +80,3 @@ def login_entry(serial, hacks=False, load_in=False):
             raise GameError("無法進入遊戲主畫面")
         return
 
-def first_time_login(serial):
-    log_msg(serial, "首次登入流程啟動")
-    open_game(serial)
-    finalize_guest_login(serial)
-    connection_retry(serial, retry="confirm_small.png", wait_name="english_btn.png", timeout=35.0)
-    wait_click(serial, "confirm_small.png", threshold=0.5, timeout=20.0)

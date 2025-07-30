@@ -3,7 +3,8 @@ from core.system.logger import log_msg
 from scripts.shared.utils.retry import liapp_alert
 
 MODES = {
-    "main_stage": ["m1", "m2", "m8"],
+    "main_stage": ["m1", "m2", "m8", "m10"],
+    "pre_stage": ["m10"]
 }
 
 
