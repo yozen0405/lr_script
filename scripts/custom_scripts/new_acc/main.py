@@ -8,8 +8,12 @@ from scripts.custom_scripts.new_acc.phase4 import phase4
 from scripts.custom_scripts.new_acc.phase3 import phase3
 from scripts.custom_scripts.new_acc.phase2 import phase2
 from scripts.custom_scripts.new_acc.phase1 import phase1
+from core.system.config import Config
 
-def new_acc_farm(serial, attempts=3):
+def new_acc_farm(serial):
+    cfg = Config()
+    attempts = cfg.get_cycle_num()
+
     for _ in range(attempts):
         phase1(serial)
         phase2(serial)

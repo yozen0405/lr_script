@@ -42,6 +42,9 @@ class Config:
     def is_single_mode(self):
         return self.get("single_mode", fallback=True)
 
+    def get_cycle_num(self):
+        return self.get("cycle_num", fallback=1)
+
     def _parse_gacha_settings(self):
         target_count = self.get("herowant", fallback=1)
         expected_names = []
