@@ -42,4 +42,4 @@ def apply_mode(serial: str, mode_name: str, flag: bool, esc: bool = True):
     state = "on" if flag else "off"
     for member_id in members:
         toggle(serial, member_id, state)
-    liapp_alert(serial, esc)
+    # liapp_alert(serial, esc)

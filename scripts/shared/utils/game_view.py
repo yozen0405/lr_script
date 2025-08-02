@@ -4,12 +4,15 @@ from core.system.logger import log_msg
 from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, extract_text, back, drag, force_close
 from core.base.exceptions import GameError
 
-def on_main_view(serial, sign="settings_btn.png", timeout=25.0):
+def on_main_view(serial, sign="settings_btn.png", vanish = False, timeout=25.0):
     start_time = time.time()
     found = False
 
     while time.time() - start_time < timeout:
-        if exist(serial, sign, wait_time=3.0):
+        if vanish and wait_vanish(serial, sign, wait_time=3.0):
+            found = True
+            break
+        if not vanish and exist(serial, sign, wait_time=3.0):
             found = True
             break
         if exist_click(serial, "close_board.png", wait_time=3.0):
@@ -23,6 +26,7 @@ def on_main_view(serial, sign="settings_btn.png", timeout=25.0):
             break
         time.sleep(0.5)
 
+    close_board(serial)
     if exist_click(serial, "close_board.png", wait_time=3.0):
         found = True
     if exist_click(serial, "close_to_pvp.png", wait_time=1.0):
@@ -33,9 +37,13 @@ def on_main_view(serial, sign="settings_btn.png", timeout=25.0):
     if not found:
         raise GameError("沒有進入到主畫面")
     
-def close_board(serial, attempts=15):
+def close_board(serial, attempts=25):
     num = 0
     for _ in range(attempts):
+        if wait_click(serial, "board_dont_show.png"):
+            wait_click(serial, "close_board.png")
+            num = 0
+            continue
         if wait_click(serial, "close_board.png"):
             num = 0
             continue

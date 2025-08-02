@@ -20,23 +20,22 @@ class Config:
         self._config.read(self.config_path, encoding="utf-8")
         self.settings = dict(self._config["SETTINGS"]) if "SETTINGS" in self._config else {}
 
-        self._bool_keys = {"single_mode"}
-        self._int_keys = {"herowant"}
-
         self.target_count, self.expected_names, self.name_map = self._parse_gacha_settings()
 
     def get(self, key, fallback=None):
-        if key not in self.settings:
+        value = self.settings.get(key, None)
+        if value is None:
             return fallback
-        value = self.settings[key]
 
-        if key in self._bool_keys:
-            return value.lower() in ("1", "true", "yes", "on")
-        if key in self._int_keys:
-            try:
-                return int(value)
-            except ValueError:
-                return fallback
+        v_lower = value.lower()
+        if v_lower in ("true", "yes", "on"):
+            return True
+        if v_lower in ("false", "no", "off"):
+            return False
+
+        if value.isdigit():
+            return int(value)
+
         return value
 
     def is_single_mode(self):

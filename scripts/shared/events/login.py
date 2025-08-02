@@ -21,13 +21,12 @@ def attempt_guest_login(serial):
         wait(serial, "line_game_text.png", threshold=0.5, timeout=15.0)
 
         for _ in range(15):
-            if exist(serial, "terms_complete.png", threshold=1):
+            if exist(serial, "terms_complete.png", threshold=0.99):
                 break
             exist_click(serial, "terms.png", threshold=0.5)
 
-        if not exist(serial, "terms_complete.png", threshold=1):
-            log_msg(serial, "條款認證失敗，重試登入流程")
-            continue
+        if not exist(serial, "terms_complete.png", threshold=0.99):
+            raise GameError("條款認證失敗")
 
         wait_click(serial, "agreeTerms.png", threshold=0.5)
 
@@ -51,11 +50,11 @@ def finalize_guest_login(serial):
     wait_click(serial, "guest_connect.png", threshold=0.5)
 
     for _ in range(15):
-        if exist(serial, "terms_complete.png", threshold=1):
+        if exist(serial, "terms_complete.png", threshold=0.99):
             break
         exist_click(serial, "terms.png", threshold=0.5)
 
-    if not exist(serial, "terms_complete.png", threshold=1):
+    if not exist(serial, "terms_complete.png", threshold=0.99):
         raise GameError("協議認證失敗")
 
     wait_click(serial, "agreeTerms.png", threshold=0.5)

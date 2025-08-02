@@ -14,6 +14,22 @@ from scripts.shared.utils.game_view import on_main_view
 from scripts.shared.events.gacha import Gacha
 from core.base.exceptions import GameError
 
+class FistGacha(Gacha):
+    def _skip_tutorial(self):
+        for _ in range(5):
+            wait_click(self.serial, "gacha_text.png", wait_time=1.0)
+        wait_click(self.serial, "gacha_equip_nav.png", wait_time=1.0)
+        wait_click(self.serial, "gacha_text.png", wait_time=1.0)
+        wait_click(self.serial, "gacha_gear_gauge.png", wait_time=1.0)
+
+        for _ in range(3):
+            wait_click(self.serial, "close_board.png", wait_time=1.0, threshold=0.5)
+        wait_click(self.serial, "gacha_shop.png", wait_time=1.0)
+        for _ in range(2):
+            wait_click(self.serial, "back.png", wait_time=1.0, threshold=0.5)
+        
+        wait_click(self.serial, "gacha_text.png", wait_time=1.0)
+
 def claim_tickets(serial):
     on_main_view(serial)
 
@@ -35,18 +51,19 @@ def claim_tickets(serial):
 
 
 def gacha_pull(serial):
-    gacha = Gacha(serial)
-    gacha.enter_gacha()
+    gacha = FistGacha(serial)
+    # gacha.enter_gacha()
     gacha.pull()
     force_close(serial)
     clear_game_storage(serial)
 
 def phase6(serial):
     log_msg(serial, "第六階段")
-    try:
-        claim_tickets(serial)
-    except GameError as e:
-        raise
+
+    # try:
+    #     claim_tickets(serial)
+    # except GameError as e:
+    #     raise
 
     try:
         gacha_pull(serial)

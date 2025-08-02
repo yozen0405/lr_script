@@ -49,7 +49,7 @@ def exist(serial, image_name, threshold=SIMILARITY, wait_time=0.0):
         time.sleep(wait_time)
         return True
 
-    # log_msg(serial, f"未找到 {image_name}")
+    log_msg(serial, f"未找到 {image_name}")
     return False
 
 def wait(serial, image_name, threshold=SIMILARITY, timeout=5.0, wait_time=0.1):

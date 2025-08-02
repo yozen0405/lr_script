@@ -32,7 +32,7 @@ def upgrade_rene(serial):
     wait_click(serial, "upgrade_btn.png")
     if not wait(serial, "back.png", timeout=20.0):
         raise GameError("無法進入升級頁面")
-    drag(serial, "rene_drag_start.png", "jakson_drag_end.png", wait_time=3.0, timeout=10.0)
+    drag(serial, (80, 574), (478, 341), wait_time=3.0, timeout=10.0)
     wait_click(serial, "upgrade_lvl_btn.png")
     for _ in range(3):
         wait_click(serial, "upgrade_success.png", timeout=5.0, wait_time=1.0)

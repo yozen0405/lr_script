@@ -37,6 +37,8 @@ def find_template_position(screen_path, template_path, threshold=0.8, region=Non
     res = cv2.matchTemplate(screen, template, cv2.TM_CCOEFF_NORMED)
     _, max_val, _, max_loc = cv2.minMaxLoc(res)
 
+    # print(f"{max_val} >= {threshold}")
+
     if max_val >= threshold:
         h, w = template.shape[:2]
         offset_x, offset_y = (region[0], region[1]) if region else (0, 0)

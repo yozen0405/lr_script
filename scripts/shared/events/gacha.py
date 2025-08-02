@@ -36,14 +36,16 @@ class Gacha:
         if not wait(self.serial, "main_stage_btn.png", timeout=15.0):
             raise GameError("不在主畫面")
 
-        if wait_click(self.serial, "skip.png", timeout=5.0):
-            wait_click(self.serial, "confirm_small.png", wait_time=3.0)
+        self.skip_tutorial()
 
         if not wait(self.serial, "gacha_icon.png", timeout=30.0, threshold=0.97):
             raise GameError("不在主畫面")
         wait_click(self.serial, "gacha_icon.png", timeout=7.0)
         if not wait(self.serial, "gacha_text.png", timeout=20.0):
             raise GameError("無法進入扭蛋頁")
+
+    def _skip_tutorial(self):
+        pass
 
     def pull(self, attempts: int = 10):
         log_msg(self.serial, f"開抽扭蛋, 預計要抽到 {self.target_count} 個 ranger 才會留下帳號")
@@ -61,7 +63,8 @@ class Gacha:
                 break
             wait_click(self.serial, "confirm_small.png", wait_time=2.0)
             wait_click(self.serial, "gacha_skip.png", timeout=20.0, wait_time=2.0)
-        
+    
+            wait_click(self.serial, "confirm_small.png")
             hero = self._match_from_region()
             wait_click(self.serial, "gacha_confirm.png", wait_time=2.0)
             if hero:

@@ -63,6 +63,7 @@ def second_stage(serial):
 
 def claim_treasure(serial, main_stage_task):
     log_msg(serial, "尋找寶物")
+    on_main_view(serial, sign="back.png", vanish=True)
     if wait_click(serial, "skip.png", timeout=20.0):
         wait_click(serial, "confirm_small.png", wait_time=0.5)
     main_stage_task.enter_menu()
@@ -83,8 +84,7 @@ def claim_treasure(serial, main_stage_task):
     third_stage_task.enter_stage()
     third_stage_task.run(anime=False, has_next=False, big_ok=True)
     wait_click(serial, "back.png", timeout=10.0)
-    if not wait(serial, "main_stage_btn.png", timeout=15.0):
-        raise GameError("不在主畫面")
+    on_main_view(serial, sign="back.png", vanish=True)
 
     if wait_click(serial, "skip.png", timeout=5):
         wait_click(serial, "confirm_small.png", wait_time=0.5)
@@ -94,8 +94,7 @@ def claim_treasure(serial, main_stage_task):
 
 def seven_days(serial, main_stage_task):
     wait_click(serial, "back.png")
-    if not wait(serial, "main_stage_btn.png", timeout=15.0):
-        raise GameError("不在主畫面")
+    on_main_view(serial, sign="back.png", vanish=True)
 
     if wait_click(serial, "skip.png", timeout=5):
         wait_click(serial, "confirm_small.png", wait_time=0.5)
@@ -114,8 +113,7 @@ def normal_stage(serial, main_stage_task, enter_menu=False):
     main_stage_task.run(anime=False, has_next=False, big_ok=True)
 
 def upgrade_sheep(serial, main_stage_task):
-    if not wait(serial, "main_stage_btn.png", timeout=15.0):
-        raise GameError("不在主畫面")
+    on_main_view(serial, sign="back.png", vanish=True)
 
     if wait_click(serial, "skip.png", timeout=5.0):
         wait_click(serial, "confirm_small.png", wait_time=3.0)
@@ -124,7 +122,7 @@ def upgrade_sheep(serial, main_stage_task):
     wait_click(serial, "upgrade_btn.png")
     if not wait(serial, "back.png", timeout=20.0):
         raise GameError("無法進入升級頁面")
-    drag(serial, "jakson_drag_start.png", "jakson_drag_end.png", wait_time=3.0, timeout=10.0)
+    drag(serial, (80, 574), (478, 341), wait_time=3.0, timeout=10.0)
     wait_click(serial, "upgrade_lvl_btn.png")
     for _ in range(3):
         wait_click(serial, "upgrade_success.png", timeout=5.0, wait_time=1.0)
@@ -136,7 +134,7 @@ def back_to_close_board(serial):
     if not wait(serial, "main_stage_text.png", timeout=15.0):
         raise GameError("不在主畫面")
     wait_click(serial, "back.png")
-    on_main_view(serial)
+    on_main_view(serial, sign="back.png", vanish=True)
     force_close(serial)
 
 def phase2(serial):
