@@ -23,7 +23,7 @@ class SpecialStageTask:
         if not wait(self.serial, "special_stage_text.png", timeout=30.0):
             raise GameError("不在特殊")
         if custom_stage:
-            region = (350, 90, 840, 470)
+            region = (280, 90, 800, 470)
             for i in range(4):
                 if exist(self.serial, custom_stage):
                     (x, y) = get_pos(self.serial, custom_stage)

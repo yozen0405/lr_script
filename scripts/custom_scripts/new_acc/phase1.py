@@ -85,7 +85,7 @@ def first_stage(serial):
     first_stage_task.run(anime=True, bonus=False, has_next=False)
 
 def first_ranger(serial):
-    if not wait(serial, "gacha_icon.png", timeout=20.0, threshold=0.97):
+    if not wait(serial, "settings_btn.png", timeout=20.0):
         raise GameError("不再主畫面")
     wait_click(serial, "skip.png")
     wait_click(serial, "confirm_small.png")

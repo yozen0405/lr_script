@@ -16,9 +16,9 @@ def new_acc_farm(serial):
     log_msg(serial, f"連續刷號開始，預計逕行 {attempts} 輪")
 
     for _ in range(attempts):
-        # phase1(serial)
-        # phase2(serial)
-        # phase3(serial)
-        # phase4(serial)
-        # phase5(serial)
+        phase1(serial)
+        phase2(serial)
+        phase3(serial)
+        phase4(serial)
+        phase5(serial)
         phase6(serial)

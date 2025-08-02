@@ -36,13 +36,13 @@ class Gacha:
         if not wait(self.serial, "main_stage_btn.png", timeout=15.0):
             raise GameError("不在主畫面")
 
-        self.skip_tutorial()
-
         if not wait(self.serial, "gacha_icon.png", timeout=30.0, threshold=0.97):
             raise GameError("不在主畫面")
         wait_click(self.serial, "gacha_icon.png", timeout=7.0)
         if not wait(self.serial, "gacha_text.png", timeout=20.0):
             raise GameError("無法進入扭蛋頁")
+
+        self._skip_tutorial()
 
     def _skip_tutorial(self):
         pass
