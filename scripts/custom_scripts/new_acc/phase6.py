@@ -12,6 +12,7 @@ from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_boot import open_game_with_hacks
 from scripts.shared.utils.game_view import on_main_view
 from scripts.shared.events.gacha import Gacha
+from scripts.shared.events.url import LinkNavigator
 from core.base.exceptions import GameError
 
 class FirstGacha(Gacha):
@@ -30,12 +31,11 @@ class FirstGacha(Gacha):
         
         wait_click(self.serial, "gacha_text.png", wait_time=1.0)
 
-def claim_tickets(serial):
-    on_main_view(serial)
+def nav_link(serial):
+    link_nav = LinkNavigator(serial)
+    link_nav.run()
 
-    if wait_click(serial, "skip.png", timeout=5.0):
-        wait_click(serial, "confirm_small.png", wait_time=3.0)
-    
+def claim_tickets(serial):
     wait_click(serial, "gift_btn.png", timeout=7.0, wait_time=2.0)
     
     if not wait_click(serial, "accept_all.png", timeout=15.0):
@@ -54,6 +54,11 @@ def gacha_pull(serial):
 
 def phase6(serial):
     log_msg(serial, "第六階段")
+
+    try:
+        nav_link(serial)
+    except GameError as e:
+        raise
 
     try:
         claim_tickets(serial)

@@ -69,6 +69,7 @@ def do_team_upgrade(serial):
     if not wait_click(serial, "confirm_small.png", wait_time=3.0):
         raise GameError("升級失敗")
     
+    wait(serial, "upgrade_success.png", timeout=15.0)
     for _ in range(3):
         if not wait_click(serial, "upgrade_success.png", timeout=5.0, wait_time=1.0):
             break
@@ -153,8 +154,8 @@ def claim_season_pass(serial):
 
 def phase5(serial):
     main_stage_task = MainStageTask(serial)
-
     log_msg(serial, "第五階段")
+    
     try:
         normal_stage(serial, main_stage_task, enter_menu=True)
     except GameError as e:

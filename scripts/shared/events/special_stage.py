@@ -75,7 +75,7 @@ class SpecialStageTask:
         for _ in range(3):
             wait_click(self.serial, self.MEMBER4_POS)
         for _ in range(10):
-            for img in ["acquired.png", "confirm_big.png", "oneReward.png"]:
+            for img in ["acquired.png", "confirm_big.png", "confirm_big2.png", "oneReward.png"]:
                 exist_click(self.serial, img)
             if exist_click(self.serial, "stop.png"):
                 break

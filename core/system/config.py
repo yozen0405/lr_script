@@ -44,6 +44,9 @@ class Config:
     def get_cycle_num(self):
         return self.get("cycle_num", fallback=1)
 
+    def get_link(self):
+        return self.get("link", fallback="")
+
     def _parse_gacha_settings(self):
         target_count = self.get("herowant", fallback=1)
         expected_names = []

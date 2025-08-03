@@ -4,15 +4,25 @@ from core.system.logger import log_msg
 from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, extract_text, back, drag, force_close
 from core.base.exceptions import GameError
 
-def on_main_view(serial, sign="settings_btn.png", vanish = False, timeout=25.0):
+def on_main_view(serial, sign="back.png", vanish=True, skip_included = False, timeout=25.0):
     start_time = time.time()
     found = False
 
     while time.time() - start_time < timeout:
-        if vanish and wait_vanish(serial, sign, wait_time=3.0):
+        if vanish:
+            if exist(serial, sign):
+                if wait_vanish(serial, sign, wait_time=3.0):
+                    found = True
+                    break
+        else:
+            if exist(serial, sign, wait_time=3.0):
+                found = True
+                break
+        
+        if exist(serial, "settings_btn.png", wait_time=3.0):
             found = True
             break
-        if not vanish and exist(serial, sign, wait_time=3.0):
+        if exist_click(serial, "confirm_small.png", wait_time=1.0):
             found = True
             break
         if exist_click(serial, "close_board.png", wait_time=3.0):
@@ -27,6 +37,13 @@ def on_main_view(serial, sign="settings_btn.png", vanish = False, timeout=25.0):
         time.sleep(0.5)
 
     close_board(serial)
+    if skip_included:
+        for _ in range(5):
+            if wait_click(serial, "skip.png", timeout=3.0, wait_time=1.0):
+                wait_click(serial, "confirm_small.png", timeout=1.5)
+            else:
+                break
+
     if exist_click(serial, "close_board.png", wait_time=3.0):
         found = True
     if exist_click(serial, "close_to_pvp.png", wait_time=1.0):
@@ -40,14 +57,14 @@ def on_main_view(serial, sign="settings_btn.png", vanish = False, timeout=25.0):
 def close_board(serial, attempts=25):
     num = 0
     for _ in range(attempts):
-        if wait_click(serial, "board_dont_show.png"):
-            wait_click(serial, "close_board.png")
+        if wait_click(serial, "board_dont_show.png", timeout=3.0):
+            wait_click(serial, "close_board.png", timeout=3.0)
             num = 0
             continue
-        if wait_click(serial, "close_board.png"):
+        if wait_click(serial, "close_board.png", timeout=3.0):
             num = 0
             continue
-        elif wait_click(serial, "confirm_small.png"):
+        elif wait_click(serial, "confirm_small.png", timeout=3.0):
             num = 0
             continue
         else:

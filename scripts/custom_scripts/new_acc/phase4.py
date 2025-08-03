@@ -78,7 +78,7 @@ def auto_stage(serial):
 
 def introduce_scene(serial):
     wait_click(serial, "back.png")
-    on_main_view(serial, sign="gacha_skip.png", timeout=40.0)
+    on_main_view(serial, sign="gacha_skip.png", vanish=False, timeout=40.0)
 
     wait_click(serial, "gacha_skip.png", timeout=5.0, wait_time=2.0)
     evo = EvoMineTask(serial)

@@ -69,10 +69,8 @@ def claim_treasure(serial, main_stage_task):
     main_stage_task.enter_menu()
     if not wait_click(serial, "treasure_icon.png", timeout=40.0):
         raise GameError("無法進入寶物")
-    if not wait_vanish(serial, "treasure_icon.png", timeout=20.0, wait_time=2.0):
-        raise GameError("無法進入寶物")
 
-    if not exist(serial, "treasure_page.png"):
+    if not wait(serial, "treasure_text.png", timeout=30.0):
         raise GameError("不在寶物室，強制停止")
     if wait_click(serial, "skip.png", timeout=20.0):
         wait_click(serial, "confirm_small.png", wait_time=0.5)
@@ -139,6 +137,7 @@ def back_to_close_board(serial):
 
 def phase2(serial):
     main_stage_task = MainStageTask(serial)
+
     try:
         login_second(serial)
     except GameError as e:

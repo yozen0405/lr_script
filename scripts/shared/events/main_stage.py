@@ -90,11 +90,11 @@ class MainStageTask:
                 raise GameError("沒有進入失敗葉面")
             raise GameError("輸了")
 
-        wait(self.serial, "main_stage_settlement_text.png", timeout=25.0)
+        connection_retry(self.serial, wait_name="main_stage_settlement_text.png", retry_text="retry_text2.png", timeout=40.0)
         for _ in range(3):
             wait_click(self.serial, self.MEMBER4_POS)
         for _ in range(10):
-            for img in ["acquired.png", "confirm_big.png", "oneReward.png"]:
+            for img in ["acquired.png", "confirm_big.png", "confirm_big2.png", "oneReward.png"]:
                 exist_click(self.serial, img)
             if exist_click(self.serial, "stop.png"):
                 break

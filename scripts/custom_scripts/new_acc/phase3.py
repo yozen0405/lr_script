@@ -41,7 +41,7 @@ def upgrade_rene(serial):
     wait_click(serial, "back.png")
 
 def gacha_equip(serial, main_stage_task):
-    on_main_view(serial)
+    on_main_view(serial, "close_board.png", vanish=False)
 
     if wait_click(serial, "skip.png", timeout=20.0):
         wait_click(serial, "confirm_small.png", wait_time=3.0)
@@ -49,7 +49,7 @@ def gacha_equip(serial, main_stage_task):
     if not wait(serial, "gacha_icon.png", timeout=20.0, threshold=0.97):
         raise GameError("不再主畫面")
     wait_click(serial, "gacha_icon.png", timeout=7.0)
-    if not wait(serial, "gacha_text.png", timeout=20.0):
+    if not wait(serial, "gacha_text.png", timeout=20.0, threshold=0.5):
         raise GameError("無法進入扭蛋")
     
     if wait_click(serial, "skip.png", timeout=5.0):

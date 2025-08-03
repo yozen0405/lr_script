@@ -2,7 +2,8 @@ import time
 from core.system.adb import adb_cmd
 from core.actions.image_utils import (
     find_template_position, IMG_DIR,
-    get_image_path, get_temp_screen_path, store_screen
+    get_image_path, get_temp_screen_path, store_screen,
+    safe_imread
 )
 from core.system.logger import log_msg
 import pytesseract
@@ -134,7 +135,7 @@ def extract_text(
 ):
     screen_path = get_temp_screen_path(serial)
     store_screen(serial)
-    img = cv2.imread(screen_path)
+    img = safe_imread(screen_path)
 
     if isinstance(region, tuple) and len(region) == 4: 
         x1, y1, x2, y2 = region
@@ -190,7 +191,7 @@ def find_stage_digits(serial, image_name, threshold=0.5):
     x, y = pos
     log_msg(serial, f"找到 {image_name}，座標: {pos}")
 
-    img = cv2.imread(screen_path)
+    img = safe_imread(screen_path)
     y1 = max(0, y - 50)
     y2 = max(0, y - 20)
     x1 = max(0, x - 20)
@@ -207,7 +208,7 @@ def find_stage_digits(serial, image_name, threshold=0.5):
     digit_templates = {}
     for i in range(10):
         path = os.path.join(IMG_DIR, f"num{i}.png")
-        tmpl = cv2.imread(path)
+        tmpl = safe_imread(path)
         digit_templates[str(i)] = tmpl
 
     while cursor < region_width:
@@ -351,3 +352,16 @@ def clear_game_storage(serial: str):
     else:
         log_msg(serial, f"清除失敗：{result.stderr.strip()}")
 
+def open_external_url(serial: str, url: str, wait_time: float = 3.0):
+    log_msg(serial, f"嘗試開啟外部網址：{url}")
+    result = adb_cmd(serial, [
+        "shell", "am", "start", "-a", "android.intent.action.VIEW", "-d", url
+    ])
+
+    if result.returncode == 0:
+        log_msg(serial, f"已成功打開網址 {url}")
+        time.sleep(wait_time)
+        return True
+    else:
+        log_msg(serial, f"打開網址失敗：{result.stderr.strip()}")
+        return False

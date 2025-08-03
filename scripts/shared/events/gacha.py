@@ -30,6 +30,8 @@ class Gacha:
         for name in self.expected_names:
             if match_string_from_region(self.serial, name, region = (630, 216, 950, 300), threshold=0.95):
                 return name
+            if match_string_from_region(self.serial, name, region = (630, 230, 950, 300), threshold=0.95):
+                return name
         return None
 
     def enter_gacha(self):
@@ -89,7 +91,7 @@ class Gacha:
         log_msg(self.serial, f"已抽中足夠的腳色，準備拉帳號檔")
 
         wait_click(self.serial, "back.png")
-        on_main_view(self.serial)
+        on_main_view(self.serial, skip_included=True)
         wait_click(self.serial, "settings_btn.png", timeout=10.0, wait_time=1.5)
         wait_click(self.serial, "settings_account_nav.png")
         wait_click(self.serial, "settings_uid_copy.png")

@@ -1,6 +1,6 @@
 import time
 from core.system.logger import log_msg
-from core.actions.actions import wait_click, exist_click, exist, wait, back, force_close
+from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, extract_text, back, drag, force_close
 from core.base.exceptions import GameError
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_boot import open_game, open_game_with_hacks
@@ -59,7 +59,16 @@ def finalize_guest_login(serial):
 
     wait_click(serial, "agreeTerms.png", threshold=0.5)
 
-def login_entry(serial, hacks=False, load_in=False):
+def _wait_loading_page(serial, hacks, load_in, close):
+    if load_in:
+        if wait_vanish(serial, "loading_page.png", timeout=300.0):
+            if exist(serial, "gameicon.png"):
+                if close:
+                    raise GameError("無法進入遊戲主畫面")
+                login_entry(serial, hacks, load_in, close=True)
+            
+
+def login_entry(serial, hacks=False, load_in=False, close=False):
     if wait(serial, "gameicon.png"):
         if hacks:
             open_game_with_hacks(serial, "main_stage")
@@ -67,15 +76,12 @@ def login_entry(serial, hacks=False, load_in=False):
             open_game(serial)
 
     if not wait(serial, "loading_page.png", timeout=30.0):
-        if exist(serial, "game_waiting_page.png"):
+        if exist(serial, "game_waiting_page.png", threshold=0.5):
             if exist(serial, "auth_failed.png"):
                 wait_click(serial, "confirm_small.png")
                 finalize_guest_login(serial)
-
-                if load_in and not wait(serial, "settings_btn.png", timeout=300.0):
-                    raise GameError("無法進入遊戲主畫面")
+                _wait_loading_page(serial, hacks, load_in, close)
     else:
-        if load_in and not wait(serial, "settings_btn.png", timeout=300.0):
-            raise GameError("無法進入遊戲主畫面")
+        _wait_loading_page(serial, hacks, load_in, close)
         return
 

@@ -19,8 +19,13 @@ def first_time_login(serial):
     log_msg(serial, "首次登入流程啟動")
     open_game_with_hacks(serial, "pre_stage")
     finalize_guest_login(serial)
-    connection_retry(serial, retry="confirm_small.png", wait_name="english_btn.png", timeout=35.0)
-    wait_click(serial, "confirm_small.png", threshold=0.5, timeout=20.0)
+    if wait(serial, "english_btn.png", timeout=30.0):
+        wait_click(serial, "confirm_small.png", threshold=0.5, timeout=20.0)
+    else:
+        if exist(serial, "auth_failed.png"):
+            wait_click(serial, "confirm_small.png")
+            finalize_guest_login(serial)
+
 
 def pre_stage(serial):
     log_msg(serial, "進去前置關卡")
@@ -111,8 +116,8 @@ def first_arrange_team(serial):
     wait_click(serial, "leonard_teacher.png")
 
     if exist(serial, "leonard_teacher.png"):
-        drag(serial, "cony_for_drag.png", "jessica_drag_end.png", wait_time=1.0, timeout=10.0)
-        drag(serial, "jessica_drag_end.png", "drag_end_for_jessica.png", wait_time=1.0, timeout=10.0)
+        drag(serial, (641, 285), (182, 576), wait_time=1.0, timeout=10.0)
+        drag(serial, (182, 576), (641, 285), wait_time=1.0, timeout=10.0)
 
     wait_click(serial, "skip.png")
     wait_click(serial, "confirm_small.png")
