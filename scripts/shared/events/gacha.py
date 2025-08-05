@@ -41,7 +41,7 @@ class Gacha:
         if not wait(self.serial, "gacha_icon.png", timeout=30.0, threshold=0.97):
             raise GameError("不在主畫面")
         wait_click(self.serial, "gacha_icon.png", timeout=7.0)
-        if not wait(self.serial, "gacha_text.png", timeout=20.0):
+        if not wait(self.serial, "gacha_text.png", timeout=40.0):
             raise GameError("無法進入扭蛋頁")
 
         self._skip_tutorial()
@@ -49,7 +49,7 @@ class Gacha:
     def _skip_tutorial(self):
         pass
 
-    def pull(self, attempts: int = 10):
+    def pull(self, attempts: int = 15):
         log_msg(self.serial, f"開抽扭蛋, 預計要抽到 {self.target_count} 個 ranger 才會留下帳號")
 
         if not wait(self.serial, "gacha_text.png", timeout=20.0):
@@ -82,15 +82,24 @@ class Gacha:
                     success = True
 
         if success:
+            self._log_gacha_rangers()
             self.store_acc()
         else:
             wait_click(self.serial, "back.png", timeout=20.0)
             print(f"只抽到 {len(self.rangers)} 名角色，捨棄帳號。")
 
+    def _log_gacha_rangers(self):
+        log_msg(self.serial, "")
+        print("===== Gacha rangers =====")
+        for i, name in enumerate(self.rangers, 1):
+            print(f"{i}. {name}")
+        print("=" * 27)
+
+
     def store_acc(self):
         log_msg(self.serial, f"已抽中足夠的腳色，準備拉帳號檔")
 
-        wait_click(self.serial, "back.png")
+        wait_click(self.serial, "back.png", timeout=20.0)
         on_main_view(self.serial, skip_included=True)
         wait_click(self.serial, "settings_btn.png", timeout=10.0, wait_time=1.5)
         wait_click(self.serial, "settings_account_nav.png")

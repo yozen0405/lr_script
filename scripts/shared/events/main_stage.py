@@ -61,13 +61,6 @@ class MainStageTask:
 
         log_msg(self.serial, "結算中")
         self.settlement()
-        if bonus:
-            if big_ok:
-                wait_click(self.serial, "confirm_big2.png", wait_time=7.0)
-            else:
-                wait_click(self.serial, "confirm_small.png", wait_time=7.0)
-            if not exist(self.serial, "main_stage_text.png"):
-                wait_click(self.serial, "confirm_big2.png", wait_time=4.0)
         log_msg(self.serial, "Main Stage 任務完成")
 
     def teach(self):
@@ -93,10 +86,17 @@ class MainStageTask:
         connection_retry(self.serial, wait_name="main_stage_settlement_text.png", retry_text="retry_text2.png", timeout=40.0)
         for _ in range(3):
             wait_click(self.serial, self.MEMBER4_POS)
-        for _ in range(10):
-            for img in ["acquired.png", "confirm_big.png", "confirm_big2.png", "oneReward.png"]:
-                exist_click(self.serial, img)
-            if exist_click(self.serial, "stop.png"):
+
+        while True:
+            for img in ["acquired.png", "confirm_big.png", "confirm_big2.png", "oneReward.png", "confirm_small.png", "stop.png"]:
+                exist_click(self.serial, img, wait_time=1.5)
+            if exist(self.serial, "retry_text.png"):
+                exist_click(self.serial, "retry.png")
+            if exist(self.serial, "close_board.png"):
+                break
+            if exist(self.serial, "gacha_skip.png"):
+                break
+            if exist(self.serial, "settings_btn.png"):
                 break
             if exist(self.serial, "main_stage_text.png"):
                 break

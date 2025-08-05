@@ -14,15 +14,24 @@ main_stage_task = None
 
 class SecondStageTask(MainStageTask):
     def settlement(self):
-        wait(self.serial, "main_stage_settlement_text.png", timeout=25.0)
+        connection_retry(self.serial, wait_name="main_stage_settlement_text.png", retry_text="retry_text2.png", timeout=40.0)
         for _ in range(3):
-            wait_click(self.serial, self.MEMBER4_POS, wait_time=1.5)
-        for _ in range(10):
-            exist_click(self.serial, "acquired.png")
-            exist_click(self.serial, "confirm_big.png")
+            wait_click(self.serial, self.MEMBER4_POS)
+
+        while True:
+            for img in ["acquired.png", "confirm_big.png", "confirm_big2.png", "oneReward.png", "confirm_small.png", "stop.png"]:
+                exist_click(self.serial, img, wait_time=1.5)
+            if exist(self.serial, "retry_text.png"):
+                exist_click(self.serial, "retry.png")
             if exist_click(self.serial, "skip.png"):
                 wait_click(self.serial, "confirm_small.png", wait_time=0.5)
-            if exist_click(self.serial, "stop.png"):
+            if exist(self.serial, "close_board.png"):
+                break
+            if exist(self.serial, "gacha_skip.png"):
+                break
+            if exist(self.serial, "settings_btn.png"):
+                break
+            if exist(self.serial, "main_stage_text.png"):
                 break
 
 class ThirdStageTask(MainStageTask):
@@ -51,7 +60,8 @@ def login_second(serial):
     if not wait_vanish(serial, "loading_page.png", timeout=2.0):
         raise GameError("無法進入遊戲")
 
-    close_board(serial)
+    if wait(serial, "settings_btn.png", timeout=40.0):
+        close_board(serial)
 
 def second_stage(serial):
     log_msg(serial, "打主要關卡stage2")
@@ -108,7 +118,7 @@ def normal_stage(serial, main_stage_task, enter_menu=False):
     if enter_menu:
         main_stage_task.enter_menu()
     main_stage_task.enter_stage()
-    main_stage_task.run(anime=False, has_next=False, big_ok=True)
+    main_stage_task.run(anime=False, has_next=False)
 
 def upgrade_sheep(serial, main_stage_task):
     on_main_view(serial, sign="back.png", vanish=True)

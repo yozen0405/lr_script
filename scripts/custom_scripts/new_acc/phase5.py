@@ -30,11 +30,11 @@ class FriendStageTask(MainStageTask):
         wait_click(self.serial, "skip.png", timeout=5.0, wait_time=1.0)
         wait_click(self.serial, "james_friend_icon.png", timeout=5.0, wait_time=1.0)
 
-def normal_stage(serial, main_stage_task, anime=False, has_next=False, bonus=True, enter_menu=False):
+def normal_stage(serial, main_stage_task, anime=False, has_next=False, enter_menu=False):
     if enter_menu:
         main_stage_task.enter_menu()
     main_stage_task.enter_stage()
-    main_stage_task.run(anime=anime, has_next=has_next, big_ok=True, bonus=bonus)
+    main_stage_task.run(anime=anime, has_next=has_next)
 
 def james_friend(serial):
     on_main_view(serial)
@@ -47,7 +47,7 @@ def james_friend(serial):
 
 def stage30(serial, main_stage_task):
     main_stage_task.enter_stage("stage30_btn.png")
-    main_stage_task.run(anime=False, has_next=True, bonus=False)
+    main_stage_task.run(anime=False, has_next=True)
 
 def do_team_upgrade(serial):
     if not wait_click(serial, "back.png"):
@@ -80,7 +80,7 @@ def do_team_upgrade(serial):
 def do_diamond_upgrade(serial):
     on_main_view(serial)
     wait_click(serial, "diamond_upgrade_icon.png")
-    wait(serial, "diamond_upgrade_text.png", timeout=30.0)
+    connection_retry(serial, wait_name="diamond_upgrade_text.png", exception_msg="無法進入科技升級", timeout=40.0)
     pos = get_pos(serial, "diamond_upgrade_text.png")
     if pos:
         x, y = pos
@@ -104,8 +104,7 @@ def claim_seven_day(serial):
     on_main_view(serial)
 
     wait_click(serial, "7days.png")
-    if not wait(serial, "7day_quest_reward.png", timeout=10.0):
-        raise GameError("無法進入7天登入")
+    connection_retry(serial, wait_name="7day_quest_reward.png", exception_msg="無法進入7天登入", timeout=40.0)
     pos = get_pos(serial, "7day_quest_reward.png")
     if pos:
         x, y = pos
@@ -123,7 +122,7 @@ def claim_seven_day(serial):
 def claim_season_pass(serial):
     on_main_view(serial)
     wait_click(serial, "season_pass_icon.png", timeout=7.0)
-
+    connection_retry(serial, wait_name="confirm_small.png", exception_msg="無法進入季票", timeout=40.0)
     wait_click(serial, "confirm_small.png", timeout=10.0)
 
     if not wait_click(serial, "leonard_teacher_circle.png"):

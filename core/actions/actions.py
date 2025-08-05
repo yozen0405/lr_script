@@ -301,6 +301,27 @@ def force_close(serial):
     else:
         log_msg(serial, f"關閉失敗：{result.stderr.decode().strip()}")
 
+def force_close_all_apps(serial, timeout: float = 10.0, delay: float = 0.5):
+    start = time.time()
+    closed_total = 0
+
+    allow_list = {
+        "com.android.browser",
+        "com.android.vending",
+        "com.linecorp.LGRGS"
+    }
+
+    while time.time() - start < timeout:
+        for pkg in allow_list:
+            r = adb_cmd(serial, ["shell", "am", "force-stop", pkg])
+            if r.returncode == 0:
+                log_msg(serial, f"已關閉：{pkg}")
+                closed_total += 1
+            else:
+                log_msg(serial, f"無法關閉：{pkg}")
+            time.sleep(delay)
+
+    log_msg(serial, f"共關閉 {closed_total} 個 App")
 
 def launch_game(serial, wait_time=1.0):
     log_msg(serial, f"啟動遊戲 {PACKAGE_NAME}")

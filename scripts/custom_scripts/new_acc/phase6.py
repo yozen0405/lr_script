@@ -6,7 +6,7 @@ from core.actions.actions import (
     wait_vanish, extract_text, back, drag,
      match_string_from_region, get_clipboard_text,
      pull_account_file, clear_game_storage,
-     force_close
+     force_close, force_close_all_apps
 )
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_boot import open_game_with_hacks
@@ -49,12 +49,12 @@ def gacha_pull(serial):
     gacha = FirstGacha(serial)
     gacha.enter_gacha()
     gacha.pull()
-    force_close(serial)
+    force_close_all_apps(serial)
     clear_game_storage(serial)
 
 def phase6(serial):
     log_msg(serial, "第六階段")
-
+    
     try:
         nav_link(serial)
     except GameError as e:

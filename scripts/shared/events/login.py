@@ -6,8 +6,12 @@ from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_boot import open_game, open_game_with_hacks
 
 def attempt_guest_login(serial):
-    for attempt in range(1, 3):
+    for attempt in range(1, 5):
         log_msg(serial, f"訪客登入嘗試第 {attempt} 次")
+
+        if 3 <= attempt:
+            force_close(serial)
+            open_game(serial)
 
         connection_retry(serial, retry="confirm_small.png", wait_name="game_waiting_page.png")
 
@@ -15,7 +19,7 @@ def attempt_guest_login(serial):
             return True
 
         if not wait(serial, "login_line.png", timeout=10.0):
-            raise GameError("⚠️ 找不到 Login with Line，遊戲可能崩潰")
+            raise GameError("找不到 Login with Line，遊戲崩潰")
 
         wait_click(serial, "login_line.png")
         wait(serial, "line_game_text.png", threshold=0.5, timeout=15.0)
@@ -66,6 +70,8 @@ def _wait_loading_page(serial, hacks, load_in, close):
                 if close:
                     raise GameError("無法進入遊戲主畫面")
                 login_entry(serial, hacks, load_in, close=True)
+            else:
+                wait(serial, "settings_btn.png", timeout=40.0)
             
 
 def login_entry(serial, hacks=False, load_in=False, close=False):
@@ -80,6 +86,10 @@ def login_entry(serial, hacks=False, load_in=False, close=False):
             if exist(serial, "auth_failed.png"):
                 wait_click(serial, "confirm_small.png")
                 finalize_guest_login(serial)
+                _wait_loading_page(serial, hacks, load_in, close)
+            elif exist(serial, "retry_text.png"):
+                wait_click(serial, "confirm_small.png", wait_time=2.0)
+                wait_click(serial, "game_waiting_play_btn.png")
                 _wait_loading_page(serial, hacks, load_in, close)
     else:
         _wait_loading_page(serial, hacks, load_in, close)

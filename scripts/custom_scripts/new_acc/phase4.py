@@ -33,11 +33,11 @@ class EvoMineTask(SpecialStageTask):
         wait_click(self.serial, "leonard_teacher_circle_special_stage.png", wait_time=1.5)
         wait_click(self.serial, "leonard_teacher_circle_special_stage.png", wait_time=1.5)
 
-def normal_stage(serial, main_stage_task, anime=False, has_next=False, bonus=True, enter_menu=False):
+def normal_stage(serial, main_stage_task, anime=False, has_next=False, enter_menu=False):
     if enter_menu:
         main_stage_task.enter_menu()
     main_stage_task.enter_stage()
-    main_stage_task.run(anime=anime, has_next=has_next, big_ok=True, bonus=bonus)
+    main_stage_task.run(anime=anime, has_next=has_next)
 
 def upgrade_equip(serial):
     log_msg(serial, "升級裝備")

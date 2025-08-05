@@ -19,7 +19,7 @@ def normal_stage(serial, main_stage_task, enter_menu=False):
     if enter_menu:
         main_stage_task.enter_menu()
     main_stage_task.enter_stage()
-    main_stage_task.run(anime=False, has_next=False, big_ok=True)
+    main_stage_task.run(anime=False, has_next=False)
 
 def upgrade_rene(serial):
     log_msg(serial, "升級炳妮")
@@ -59,7 +59,7 @@ def gacha_equip(serial, main_stage_task):
     wait_click(serial, "gacha_skip.png")
     if not wait_click(serial, "gacha_confirm.png"):
         raise GameError("無法進行扭蛋")
-    if not wait_click(serial, "back.png"):
+    if not wait_click(serial, "back.png", timeout=20.0):
         raise GameError("找不到返回鍵")
     if wait_click(serial, "skip.png", timeout=20.0):
         wait_click(serial, "confirm_small.png", wait_time=3.0)

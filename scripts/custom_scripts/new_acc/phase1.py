@@ -25,7 +25,9 @@ def first_time_login(serial):
         if exist(serial, "auth_failed.png"):
             wait_click(serial, "confirm_small.png")
             finalize_guest_login(serial)
-
+        elif exist(serial, "retry_text.png"):
+            connection_retry(serial, wait_name="english_btn.png", retry="confirm_small.png", timeout=60.0)
+            wait_click(serial, "confirm_small.png", wait_time=2.0)
 
 def pre_stage(serial):
     log_msg(serial, "進去前置關卡")
@@ -75,8 +77,7 @@ def pre_stage(serial):
 
 def first_stage(serial):
     log_msg(serial, "遊戲開場介紹")
-    if not wait(serial, "settings_btn.png", timeout=40.0):
-        raise GameError("不在主畫面")
+    connection_retry(serial, wait_name="settings_btn.png", timeout=40.0)
 
     if wait_click(serial, "skip.png", timeout=5.0):
         wait_click(serial, "confirm_small.png", wait_time=2)

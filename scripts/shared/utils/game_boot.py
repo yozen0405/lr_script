@@ -11,7 +11,7 @@ def open_game(serial):
     wait(serial, "open_game.png", threshold=0.5, timeout=15.0)
     
     for i in range(3):
-        if wait_vanish(serial, "open_game.png", threshold=0.5, timeout=15.0, wait_time=2.0):
+        if wait_vanish(serial, "open_game.png", threshold=0.5, timeout=15.0):
             wait_click(serial, "confirm_perm.png", threshold=0.5, timeout=7.0)
             return True
 

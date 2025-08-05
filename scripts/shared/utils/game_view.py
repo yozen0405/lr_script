@@ -64,12 +64,13 @@ def close_board(serial, attempts=25):
         if wait_click(serial, "close_board.png", timeout=3.0):
             num = 0
             continue
-        elif wait_click(serial, "confirm_small.png", timeout=3.0):
+        elif wait(serial, "board_end2.png", timeout=3.0, threshold=0.9):
+            wait_click(serial, "confirm_small.png", wait_time=2.5)
             num = 0
             continue
         else:
             num += 1
-            if num == 2:
+            if num == 1:
                 break
 
 
