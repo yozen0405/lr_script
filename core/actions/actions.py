@@ -323,6 +323,24 @@ def force_close_all_apps(serial, timeout: float = 10.0, delay: float = 0.5):
 
     log_msg(serial, f"共關閉 {closed_total} 個 App")
 
+def force_close_line(serial, timeout: float = 5.0, delay: float = 0.5):
+    target_pkg = "jp.naver.line.android"
+    start = time.time()
+    closed = False
+
+    while time.time() - start < timeout:
+        r = adb_cmd(serial, ["shell", "am", "force-stop", target_pkg])
+        if r.returncode == 0:
+            log_msg(serial, f"已關閉 LINE：{target_pkg}")
+            closed = True
+        else:
+            log_msg(serial, f"無法關閉 LINE：{target_pkg}")
+        time.sleep(delay)
+
+    if not closed:
+        log_msg(serial, "未發現 LINE 或已經關閉")
+    return closed
+
 def launch_game(serial, wait_time=1.0):
     log_msg(serial, f"啟動遊戲 {PACKAGE_NAME}")
     result = adb_cmd(serial, [

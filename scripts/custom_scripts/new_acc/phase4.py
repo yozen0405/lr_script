@@ -49,8 +49,7 @@ def upgrade_equip(serial):
     wait_click(serial, "rene.png", timeout=7.0, wait_time=2.0)
     wait_click(serial, "rene_go_equip.png", timeout=10.0)
 
-    if not wait(serial, "equip_text.png", timeout=20.0):
-        raise GameError("沒進去裝備頁面")
+    connection_retry(serial, wait_name="equip_text.png", exception_msg="沒進去裝備頁面", timeout=40.0)
 
     wait_click(serial, "skip.png", timeout=5.0, wait_time=1.2)
     wait_click(serial, "equip_shield_icon.png", timeout=5.0, wait_time=1.2)
@@ -87,8 +86,7 @@ def introduce_scene(serial):
     evo.run(bonus=False)
 
     wait_click(serial, "back.png", timeout=20.0)
-    if not wait(serial, "evo_mine.png", timeout=15.0):
-        raise GameError("無法回去特殊關卡選單")
+    connection_retry(serial, wait_name="evo_mine.png", exception_msg="無法回去特殊關卡選單", timeout=40.0)
     wait_click(serial, "back.png", wait_time=2.0)
     
 

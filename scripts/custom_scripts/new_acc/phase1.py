@@ -77,7 +77,7 @@ def pre_stage(serial):
 
 def first_stage(serial):
     log_msg(serial, "遊戲開場介紹")
-    connection_retry(serial, wait_name="settings_btn.png", timeout=40.0)
+    connection_retry(serial, wait_name="settings_btn.png", timeout=120.0)
 
     if wait_click(serial, "skip.png", timeout=5.0):
         wait_click(serial, "confirm_small.png", wait_time=2)
@@ -91,12 +91,12 @@ def first_stage(serial):
     first_stage_task.run(anime=True, bonus=False, has_next=False)
 
 def first_ranger(serial):
-    if not wait(serial, "settings_btn.png", timeout=20.0):
+    if not wait(serial, "settings_btn.png", timeout=40.0):
         raise GameError("不再主畫面")
     wait_click(serial, "skip.png")
     wait_click(serial, "confirm_small.png")
     wait_click(serial, "gacha_icon.png", timeout=7.0)
-    if not wait(serial, "gacha_text.png", timeout=20.0):
+    if not wait(serial, "gacha_text.png", timeout=40.0):
         raise GameError("無法進入扭蛋")
     wait_click(serial, "skip.png", timeout=1.5)
     wait_click(serial, "gacha_jessica.png")

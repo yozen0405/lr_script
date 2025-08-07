@@ -55,27 +55,26 @@ def do_team_upgrade(serial):
     on_main_view(serial)
     
     wait_click(serial, "team_icon.png")
-    if not wait(serial, "team_text.png", timeout=30.0):
-        raise GameError("進不去隊伍")
+    connection_retry(serial, wait_name="team_text.png", exception_msg="進不去隊伍", timeout=40.0)
     wait_click(serial, "leonard_teacher_switch_team.png")
     wait_click(serial, "leonard_teacher_switch_team2.png", wait_time=2.0)
     wait_click(serial, "jessica_upgrade_ranger.png", wait_time=1.5)
     wait_click(serial, "upgrade_btn.png")
-    if not wait(serial, "back.png", timeout=20.0, wait_time=3.0):
-        raise GameError("無法進入升級頁面")
+    connection_retry(serial, wait_name="back.png", exception_msg="無法進入升級頁面", timeout=40.0, wait_time=3.0)
     for _ in range(2):
         drag(serial, (449, 605), (449, 357), timeout=10.0)
     wait_click(serial, "upgrade_lvl_btn.png")
     if not wait_click(serial, "confirm_small.png", wait_time=3.0):
         raise GameError("升級失敗")
     
-    wait(serial, "upgrade_success.png", timeout=15.0)
+    connection_retry(serial, wait_name="upgrade_success.png", exception_msg="無法升級", timeout=40.0)
     for _ in range(3):
         if not wait_click(serial, "upgrade_success.png", timeout=5.0, wait_time=1.0):
             break
     wait_click(serial, "back.png")
     wait(serial, "team_text.png", timeout=20.0)
     wait_click(serial, "back.png", timeout=20.0)
+    connection_retry(serial, image_name="back.png", timeout=40.0)
 
 def do_diamond_upgrade(serial):
     on_main_view(serial)
@@ -99,6 +98,7 @@ def do_diamond_upgrade(serial):
         wait_click(serial, "diamond_upgrade_success.png", timeout=5.0, wait_time=1.0)
         if wait_click(serial, "back.png"):
             break
+    connection_retry(serial, image_name="back.png", timeout=40.0)
 
 def claim_seven_day(serial):
     on_main_view(serial)
@@ -144,10 +144,14 @@ def claim_season_pass(serial):
         wait_click(serial, "season_pass_nav.png", timeout=10.0, wait_time=1.0)
         wait_click(serial, "season_pass_tickets.png", timeout=10.0, wait_time=2.0)
         wait_click(serial, "confirm_big.png", wait_time=2.0, threshold=0.65)
-        wait_click(serial, "close_board.png", timeout=10.0)
+        if wait(serial, "season_pass_level1_text.png", timeout=60.0):
+            wait_click(serial, "close_board.png", timeout=10.0)
+        else:
+            raise GameError("季票領取獎勵錯誤")
     else:
         raise GameError("季票領取獎勵錯誤")
     wait_click(serial, "back.png")
+    connection_retry(serial, image_name="back.png", timeout=40.0)
     on_main_view(serial)
 
 

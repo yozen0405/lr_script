@@ -12,10 +12,8 @@ class SpecialStageTask:
         self.MEMBER4_POS = positions["member4"]
 
     def enter_menu(self):
-        if wait(self.serial, "special_stage_btn.png", timeout=20.0, wait_time=1.0):
-            wait_click(self.serial, "special_stage_btn.png")
-        else:
-            raise GameError("不在主畫面")
+        wait_click(self.serial, "special_stage_btn.png")
+        connection_retry(self.serial, image_name="special_stage_btn.png", exception_msg="不在主畫面", timeout=40.0)
 
     def enter_stage(self, custom_stage: str = "", stage_num: int = 0, anime=False):
         if anime:

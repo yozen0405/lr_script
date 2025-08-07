@@ -30,8 +30,7 @@ def upgrade_rene(serial):
 
     wait_click(serial, "rene.png", timeout=7.0, wait_time=2.0)
     wait_click(serial, "upgrade_btn.png")
-    if not wait(serial, "back.png", timeout=20.0):
-        raise GameError("無法進入升級頁面")
+    connection_retry(serial, wait_name="back.png", exception_msg="無法進入升級頁面", timeout=40.0)
     drag(serial, (80, 574), (478, 341), wait_time=3.0, timeout=10.0)
     wait_click(serial, "upgrade_lvl_btn.png")
     for _ in range(3):
@@ -39,6 +38,7 @@ def upgrade_rene(serial):
     if wait_click(serial, "skip.png", timeout=15.0):
         wait_click(serial, "confirm_small.png")
     wait_click(serial, "back.png")
+    connection_retry(serial, image_name="back.png", timeout=40.0)
 
 def gacha_equip(serial, main_stage_task):
     on_main_view(serial, "close_board.png", vanish=False)
@@ -49,8 +49,7 @@ def gacha_equip(serial, main_stage_task):
     if not wait(serial, "gacha_icon.png", timeout=20.0, threshold=0.97):
         raise GameError("不再主畫面")
     wait_click(serial, "gacha_icon.png", timeout=7.0)
-    if not wait(serial, "gacha_text.png", timeout=20.0, threshold=0.5):
-        raise GameError("無法進入扭蛋")
+    connection_retry(serial, wait_name="gacha_text.png", timeout=40.0)
     
     if wait_click(serial, "skip.png", timeout=5.0):
         wait_click(serial, "confirm_small.png", wait_time=3.0)
@@ -61,7 +60,7 @@ def gacha_equip(serial, main_stage_task):
         raise GameError("無法進行扭蛋")
     if not wait_click(serial, "back.png", timeout=20.0):
         raise GameError("找不到返回鍵")
-    if wait_click(serial, "skip.png", timeout=20.0):
+    if wait_click(serial, "skip.png", timeout=30.0):
         wait_click(serial, "confirm_small.png", wait_time=3.0)
     wait_click(serial, "rene.png", timeout=7.0, wait_time=4.0)
     if wait_click(serial, "skip.png", timeout=10.0):
@@ -69,8 +68,7 @@ def gacha_equip(serial, main_stage_task):
     wait_click(serial, "skip.png", timeout=10.0, wait_time=2.0)
     wait_click(serial, "rene_go_equip.png", timeout=10.0)
 
-    if not wait(serial, "equip_text.png", timeout=20.0):
-        raise GameError("沒進去裝備頁面")
+    connection_retry(serial, wait_name="equip_text.png", exception_msg="沒進去裝備頁面", timeout=40.0)
     if wait_click(serial, "skip.png", timeout=5.0):
         wait_click(serial, "confirm_small.png", wait_time=3.0)
     wait_click(serial, "leonard_teacher_equip.png", wait_time=3)
@@ -82,6 +80,7 @@ def gacha_equip(serial, main_stage_task):
     wait_click(serial, "skip.png", timeout=3.0, wait_time=3.0)
     wait_click(serial, "back.png")
 
+    connection_retry(serial, image_name="back.png", timeout=40.0)
     on_main_view(serial)
     main_stage_task.enter_menu()
     wait_click(serial, "back.png")
