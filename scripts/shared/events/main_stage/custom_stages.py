@@ -47,4 +47,5 @@ class FriendStage(BaseMainStage):
         if wait_click(self.serial, "skip.png", timeout=5.0):
             wait_click(self.serial, "confirm_small.png", wait_time=1.0)
         wait_click(self.serial, "skip.png", timeout=5.0, wait_time=1.0)
-        wait_click(self.serial, "james_friend_icon.png", timeout=5.0, wait_time=1.0)
+        (x, y) = get_pos(self.serial, "james_friend_icon.png")
+        wait_click(self.serial, (x, y - 50), wait_time=1.0)

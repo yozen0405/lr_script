@@ -103,6 +103,8 @@ class BaseMainStage:
             if wait(self.serial, "main_stage_pre_start_text.png", timeout=5.5):
                 self._handle_loop_stage_tutorial()
                 return self.get_current_stage()
+            elif exist(self.serial, "retry_text.png"):
+                exist_click(self.serial, "retry.png")
             else:
                 wait_click(self.serial, "stage_anime.png", threshold=0.6, wait_time=2.0)
                 continue
