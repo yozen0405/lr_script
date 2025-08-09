@@ -8,7 +8,7 @@ from scripts.shared.events.main_stage import MainStageTask
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_boot import open_game_with_hacks
 from scripts.shared.utils.game_view import on_main_view
-from scripts.shared.events.login import login_entry
+from scripts.shared.events.login import guest_login
 
 main_stage_task = None
 
@@ -44,53 +44,9 @@ class ThirdStageTask(MainStageTask):
         if not wait_click(self.serial, "speed_up_btn_on.png"):
             raise GameError("無法點擊x2")
 
-def _into_loading_page(serial, timeout: float = 60.0):
-    login_entry(serial, hacks=True)
-    start = time.time()
-
-    while time.time() - start < timeout:
-        if wait(serial, "confirm_small.png", timeout=3.0):
-            if not exist(serial, "loading_page_download.png"):
-                wait_click(serial, "confirm_small.png")
-                wait_click(serial, "game_waiting_play_btn.png", timeout=25.0)
-                start = time.time()
-                continue 
-            else:
-                wait_click(serial, "confirm_small.png")
-                return
-        elif wait(serial, "retry_text.png", timeout=3.0):
-            wait_click(serial, "retry.png", wait_time=1.0)
-            start = time.time()
-            continue
-
-        time.sleep(1.0)
-
-    raise GameError("找不到下載資源按鈕")
-
-def _on_loading_page(serial, timeout: float = 900.0):
-    start = time.time()
-
-    while time.time() - start < timeout:
-        if wait(serial, "gameicon.png", timeout=3.0):
-            _into_loading_page(serial, timeout=240.0)
-            start = time.time()
-            continue
-        elif wait(serial, "retry_text.png", timeout=3.0):
-            wait_click(serial, "retry.png", wait_time=1.0)
-            start = time.time()
-            continue
-        elif not wait(serial, "loading_page.png", timeout=3.0):
-            if not exist(serial, "gameicon.png"):
-                return
-
-        time.sleep(1.0)
-
-    raise GameError("找不到下載資源按鈕")
-
 def login_second(serial):
     log_msg(serial, "二次登入")
-    _into_loading_page(serial)
-    _on_loading_page(serial)
+    guest_login(serial, load_in=True)
 
     if wait(serial, "settings_btn.png", timeout=40.0):
         close_board(serial)

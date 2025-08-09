@@ -9,7 +9,6 @@ from scripts.shared.events.special_stage import SpecialStageTask
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_boot import open_game_with_hacks
 from scripts.shared.utils.game_view import on_main_view
-from scripts.shared.events.login import login_entry
 
 class AutoStageTask(MainStageTask):
     def teach(self):

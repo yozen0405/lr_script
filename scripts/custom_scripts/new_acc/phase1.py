@@ -9,7 +9,7 @@ from scripts.shared.constants import positions
 from core.base.exceptions import GameError
 from scripts.shared.events.main_stage import MainStageTask
 from scripts.shared.utils.game_boot import open_game, open_game_with_hacks
-from scripts.shared.events.login import finalize_guest_login
+from scripts.shared.events.login import first_guest_login
 
 class FirstStageTask(MainStageTask):
     def pre_select(self):
@@ -17,17 +17,7 @@ class FirstStageTask(MainStageTask):
 
 def first_time_login(serial):
     log_msg(serial, "首次登入流程啟動")
-    open_game_with_hacks(serial, "pre_stage")
-    finalize_guest_login(serial)
-    if wait(serial, "english_btn.png", timeout=30.0):
-        wait_click(serial, "confirm_small.png", threshold=0.5, timeout=20.0)
-    else:
-        if exist(serial, "auth_failed.png"):
-            wait_click(serial, "confirm_small.png")
-            finalize_guest_login(serial)
-        elif exist(serial, "retry_text.png"):
-            connection_retry(serial, wait_name="english_btn.png", retry="confirm_small.png", timeout=60.0)
-            wait_click(serial, "confirm_small.png", wait_time=2.0)
+    first_guest_login(serial)
 
 def pre_stage(serial):
     log_msg(serial, "進去前置關卡")
@@ -100,10 +90,10 @@ def first_ranger(serial):
         raise GameError("無法進入扭蛋")
     wait_click(serial, "skip.png", timeout=1.5)
     wait_click(serial, "gacha_jessica.png")
-    wait_click(serial, "gacha_skip.png")
+    wait_click(serial, "gacha_skip.png", timeout=40.0)
     wait_click(serial, "confirm_small.png")
     wait_click(serial, "gacha_confirm.png")
-    wait_click(serial, "skip.png")
+    wait_click(serial, "skip.png", timeout=40.0)
     wait_click(serial, "confirm_small.png")
 
 
@@ -112,8 +102,8 @@ def first_arrange_team(serial):
     if wait_click(serial, "skip.png", timeout=3):
         wait_click(serial, "confirm_small.png", wait_time=0.5)
     wait_click(serial, "team_icon.png")
-    if not wait_click(serial, "leonard_teacher.png", timeout=20):
-        raise GameError("找不到隊伍教學")
+    connection_retry(serial, wait_name="leonard_teacher.png", exception_msg="找不到隊伍教學", timeout=35.0)
+    wait_click(serial, "leonard_teacher.png")
     wait_click(serial, "leonard_teacher.png")
 
     if exist(serial, "leonard_teacher.png"):

@@ -5,95 +5,129 @@ from core.base.exceptions import GameError
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_boot import open_game, open_game_with_hacks
 
-def attempt_guest_login(serial):
-    for attempt in range(1, 5):
-        log_msg(serial, f"訪客登入嘗試第 {attempt} 次")
+class BaseLoginFlow:
+    def __init__(self, serial):
+        self.serial = serial
 
-        if 3 <= attempt:
-            force_close(serial)
-            open_game(serial)
-
-        connection_retry(serial, retry="confirm_small.png", wait_name="game_waiting_page.png")
-
-        if exist_click(serial, "guest_login.png", threshold=0.5):
-            return True
-
-        if not wait(serial, "login_line.png", timeout=10.0):
-            raise GameError("找不到 Login with Line，遊戲崩潰")
-
-        wait_click(serial, "login_line.png")
-        wait(serial, "line_game_text.png", threshold=0.5, timeout=30.0)
+    def _agree_terms(self):
+        wait(self.serial, "line_game_text.png", threshold=0.5, timeout=30.0)
 
         for _ in range(15):
-            if exist(serial, "terms_complete.png", threshold=0.99):
+            if exist(self.serial, "terms_complete.png", threshold=0.99):
                 break
-            exist_click(serial, "terms.png", threshold=0.5)
+            exist_click(self.serial, "terms.png", threshold=0.5)
 
-        if not exist(serial, "terms_complete.png", threshold=0.99):
+        if not exist(self.serial, "terms_complete.png", threshold=0.99):
             raise GameError("條款認證失敗")
 
-        wait_click(serial, "agreeTerms.png", threshold=0.5)
+        wait_click(self.serial, "agreeTerms.png", threshold=0.5)
 
-        if not force_close_line(serial, timeout=3.0):
-            for _ in range(3):
-                back(serial)
+    def _trigger_guest_btn(self):
+        for attempt in range(1, 5):
+            log_msg(self.serial, f"訪客登入嘗試第 {attempt} 次")
 
-        wait_click(serial, "gameicon.png", threshold=0.5)
-        if wait_click(serial, "guest_login.png", threshold=0.5):
-            log_msg(serial, "訪客登入成功")
-            return True
-        else:
-            log_msg(serial, "找不到訪客登入，重試")
-    
-    raise GameError("多次嘗試訪客登入仍失敗")
+            if 3 <= attempt:
+                force_close(self.serial)
+                open_game(self.serial)
 
-def finalize_guest_login(serial):
-    if not wait_click(serial, "game_waiting_page.png", timeout=10.0, threshold=0.5):
-        raise GameError("無法進行訪客登入")
+            connection_retry(self.serial, retry="confirm_small.png", wait_name="game_waiting_page.png")
+            if exist_click(self.serial, "guest_login.png", threshold=0.5):
+                return True
 
-    attempt_guest_login(serial)
-    wait_click(serial, "guest_connect.png", threshold=0.5)
+            if not wait(self.serial, "login_line.png", timeout=10.0):
+                raise GameError("找不到 Login with Line，遊戲崩潰")
 
-    wait(serial, "line_game_text.png", threshold=0.5, timeout=30.0)
-    for _ in range(15):
-        if exist(serial, "terms_complete.png", threshold=0.99):
-            break
-        exist_click(serial, "terms.png", threshold=0.5)
+            wait_click(self.serial, "login_line.png")
+            self._agree_terms()
 
-    if not exist(serial, "terms_complete.png", threshold=0.99):
-        raise GameError("協議認證失敗")
+            if not force_close_line(self.serial, timeout=3.0):
+                for _ in range(3):
+                    back(self.serial)
 
-    wait_click(serial, "agreeTerms.png", threshold=0.5)
-
-def _wait_loading_page(serial, hacks, load_in, close):
-    if load_in:
-        if wait_vanish(serial, "loading_page.png", timeout=300.0):
-            if exist(serial, "gameicon.png"):
-                if close:
-                    raise GameError("無法進入遊戲主畫面")
-                login_entry(serial, hacks, load_in, close=True)
+            wait_click(self.serial, "gameicon.png", threshold=0.5)
+            if wait_click(self.serial, "guest_login.png", threshold=0.5):
+                log_msg(self.serial, "訪客登入成功")
+                return True
             else:
-                wait(serial, "settings_btn.png", timeout=40.0)
-            
+                log_msg(self.serial, "找不到訪客登入，重試")
+        
+        raise GameError("多次嘗試訪客登入仍失敗")
 
-def login_entry(serial, hacks=False, load_in=False, close=False):
-    if wait(serial, "gameicon.png"):
-        if hacks:
-            open_game_with_hacks(serial, "main_stage")
+    def _open_game(self, mode):
+        log_msg(self.serial, "開啟遊戲中")
+        if wait(self.serial, "gameicon.png"):
+            if mode:
+                open_game_with_hacks(self.serial, mode)
+            else:
+                open_game(self.serial)
+
+    def _on_loading_page(self, timeout: float = 900.0):
+        start = time.time()
+
+        while time.time() - start < timeout:
+            if wait(self.serial, "loading_page.png", timeout=3.0):
+                if exist(self.serial, "confirm_small.png"):
+                    if not exist(self.serial, "loading_page_download.png"):
+                        wait_click(self.serial, "confirm_small.png")
+                        wait_click(self.serial, "game_waiting_play_btn.png", timeout=25.0)
+                        start = time.time()
+                        continue 
+                    else:
+                        wait_click(self.serial, "confirm_small.png")
+                elif exist(self.serial, "retry_text.png"):
+                    wait_click(self.serial, "retry.png", wait_time=1.0)
+                    start = time.time()
+                    continue
+            else:
+                if exist(self.serial, "gameicon.png"):
+                    return False
+                else:
+                    return True
+
+            time.sleep(1.0)
+        raise GameError("正在 login, 但未知狀態")
+
+    def _guest_login(self, mode: str = None, load_in: bool = False, first=False):
+        for _ in range(10):
+            if wait(self.serial, "gameicon.png", timeout=3.0):
+                self._open_game(mode)
+
+            if wait(self.serial, "game_waiting_page.png", timeout=3.0):
+                if exist(self.serial, "auth_failed.png"):
+                    wait_click(self.serial, "confirm_small.png")
+
+                if exist(self.serial, "retry_text.png"):
+                    wait_click(self.serial, "confirm_small.png", wait_time=2.0)
+                    wait_click(self.serial, "game_waiting_play_btn.png", timeout=3.0)
+
+                if wait(self.serial, "login_line.png"):
+                    self._trigger_guest_btn()
+                    if wait_click(self.serial, "guest_connect.png", threshold=0.5):
+                        self._agree_terms()
+
+                    if first:
+                        if wait(self.serial, "english_btn.png", timeout=20.0):
+                            wait_click(self.serial, "confirm_small.png")
+                    else:
+                        wait_click(self.serial, "confirm_small.png")
+
+            if wait(self.serial, "loading_page.png", timeout=25.0):
+                if not load_in:
+                    return
+                if self._on_loading_page():
+                    return
+        raise GameError("無法訪客登入")
+                
+    def general_guest_login(self, mode: str = "main_stage", load_in=False, first=False):
+        if mode == "":
+            self._guest_login(load_in=load_in, first=first)
         else:
-            open_game(serial)
+            self._guest_login(mode=mode, load_in=load_in, first=first)
 
-    if not wait(serial, "loading_page.png", timeout=30.0):
-        if exist(serial, "game_waiting_page.png", threshold=0.5):
-            if exist(serial, "auth_failed.png"):
-                wait_click(serial, "confirm_small.png")
-                finalize_guest_login(serial)
-                _wait_loading_page(serial, hacks, load_in, close)
-            elif exist(serial, "retry_text.png"):
-                wait_click(serial, "confirm_small.png", wait_time=2.0)
-                wait_click(serial, "game_waiting_play_btn.png")
-                _wait_loading_page(serial, hacks, load_in, close)
-    else:
-        _wait_loading_page(serial, hacks, load_in, close)
-        return
-
+def first_guest_login(serial):
+    login_flow = BaseLoginFlow(serial)
+    login_flow.general_guest_login(mode="pre_stage", load_in=False, first=True)
+            
+def guest_login(serial, mode: str = "main_stage", load_in=False):
+    login_flow = BaseLoginFlow(serial)
+    login_flow.general_guest_login(mode=mode, load_in=load_in)

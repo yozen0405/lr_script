@@ -8,11 +8,11 @@ from scripts.shared.events.main_stage import MainStageTask
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_boot import open_game_with_hacks
 from scripts.shared.utils.game_view import on_main_view
-from scripts.shared.events.login import login_entry
+from scripts.shared.events.login import guest_login
 
 def claim_board(serial):
     log_msg(serial, "第三階段")
-    login_entry(serial, hacks=True, load_in=True)
+    guest_login(serial, load_in=True)
     close_board(serial)
 
 def normal_stage(serial, main_stage_task, enter_menu=False):

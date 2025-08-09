@@ -1,7 +1,7 @@
 import time
 import os
 from core.system.logger import log_msg
-from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, extract_text, back, drag, force_close
+from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, back, drag, force_close
 from core.base.exceptions import GameError
 
 def connection_retry(

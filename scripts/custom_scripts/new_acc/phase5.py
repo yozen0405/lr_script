@@ -13,7 +13,6 @@ from scripts.shared.events.main_stage import MainStageTask
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_boot import open_game_with_hacks
 from scripts.shared.utils.game_view import on_main_view
-from scripts.shared.events.login import login_entry
 
 class FriendStageTask(MainStageTask):
     def teach(self):
