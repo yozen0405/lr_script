@@ -4,3 +4,4 @@ __pycache__/
 bin/acc
 bin/tmp
 bin/cache.json
+debug_output.png
