@@ -7,6 +7,7 @@ from scripts.shared.utils.game_view import close_board
 from scripts.shared.events.special_stage import SpecialStageTask
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_view import on_main_view
+from scripts.shared.events.main_stage.selector import main_stage_finish_new, main_stage_enter_menu
 
 class EvoMineTask(SpecialStageTask):
     def pre_anime(self):
@@ -19,12 +20,6 @@ class EvoMineTask(SpecialStageTask):
     def teach(self):
         wait_click(self.serial, "leonard_teacher_circle_special_stage.png", wait_time=1.5)
         wait_click(self.serial, "leonard_teacher_circle_special_stage.png", wait_time=1.5)
-
-def normal_stage(serial, main_stage_task, anime=False, has_next=False, enter_menu=False):
-    if enter_menu:
-        main_stage_task.enter_menu()
-    main_stage_task.enter_stage()
-    main_stage_task.run(anime=anime, has_next=has_next)
 
 def upgrade_equip(serial):
     log_msg(serial, "升級裝備")
@@ -54,14 +49,6 @@ def upgrade_equip(serial):
         wait_click(serial, "confirm_small.png", wait_time=3.0)
     wait_click(serial, "back.png")
 
-
-def auto_stage(serial):
-    log_msg(serial, "auto stage 開始")
-    auto_stage_task = AutoStageTask(serial)
-    auto_stage_task.enter_menu()
-    auto_stage_task.enter_stage()
-    auto_stage_task.run(anime=True, has_next=False, big_ok=True)
-
 def introduce_scene(serial):
     wait_click(serial, "back.png")
     on_main_view(serial, sign="gacha_skip.png", vanish=False, timeout=40.0)
@@ -78,21 +65,20 @@ def introduce_scene(serial):
     
 
 def phase4(serial):
-    main_stage_task = MainStageTask(serial)
     log_msg(serial, "第四階段")
 
     try:
-        auto_stage(serial)
+        main_stage_finish_new(enter_menu=True)
     except GameError as e:
         raise
 
     try:
-        normal_stage(serial, main_stage_task, enter_menu=False)
+        main_stage_finish_new(enter_menu=False)
     except GameError as e:
         raise
 
     try:
-        normal_stage(serial, main_stage_task, enter_menu=False)
+        main_stage_finish_new(enter_menu=False)
     except GameError as e:
         raise
 
@@ -102,20 +88,15 @@ def phase4(serial):
         raise
 
     try:
-        normal_stage(serial, main_stage_task, enter_menu=True)
+        main_stage_finish_new(enter_menu=True)
     except GameError as e:
         raise
 
-    for _ in range(8):
+    for _ in range(9):
         try:
-            normal_stage(serial, main_stage_task, enter_menu=False)
+            main_stage_finish_new(enter_menu=False)
         except GameError as e:
             raise
-
-    try:
-        normal_stage(serial, main_stage_task, anime=True, enter_menu=False)
-    except GameError as e:
-        raise
 
     try:
         introduce_scene(serial)

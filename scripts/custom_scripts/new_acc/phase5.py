@@ -12,25 +12,16 @@ from scripts.shared.utils.game_view import close_board
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_boot import open_game_with_hacks
 from scripts.shared.utils.game_view import on_main_view
-
-def normal_stage(serial, main_stage_task, anime=False, has_next=False, enter_menu=False):
-    if enter_menu:
-        main_stage_task.enter_menu()
-    main_stage_task.enter_stage()
-    main_stage_task.run(anime=anime, has_next=has_next)
+from scripts.shared.events.main_stage.selector import main_stage_finish_new, main_stage_finish_custom
 
 def james_friend(serial):
     on_main_view(serial)
     if wait_click(serial, "skip.png", timeout=5.0):
         wait_click(serial, "confirm_small.png", wait_time=3.0)
-    friend = FriendStageTask(serial)
-    friend.enter_menu()
-    friend.enter_stage()
-    friend.run(big_ok=True)
+    main_stage_finish_new(enter_menu=True)
 
-def stage30(serial, main_stage_task):
-    main_stage_task.enter_stage("stage30_btn.png")
-    main_stage_task.run(anime=False, has_next=True)
+def stage30(serial):
+    main_stage_finish_custom(serial, custom_stage="stage30_btn.png")
 
 def do_team_upgrade(serial):
     if not wait_click(serial, "back.png"):
@@ -139,17 +130,16 @@ def claim_season_pass(serial):
 
 
 def phase5(serial):
-    main_stage_task = MainStageTask(serial)
     log_msg(serial, "第五階段")
     
     try:
-        normal_stage(serial, main_stage_task, enter_menu=True)
+        main_stage_finish_new(serial, enter_menu=True)
     except GameError as e:
         raise
 
     for _ in range(3):
         try:
-            normal_stage(serial, main_stage_task, enter_menu=False)
+            main_stage_finish_new(serial, enter_menu=False)
         except GameError as e:
             raise
 
@@ -159,7 +149,7 @@ def phase5(serial):
         raise
 
     try:
-        stage30(serial, main_stage_task)
+        stage30(serial)
     except GameError as e:
         raise
 

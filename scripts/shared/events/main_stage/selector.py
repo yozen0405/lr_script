@@ -6,15 +6,21 @@ from scripts.shared.events.main_stage.custom_stages import (
     AutoStage, FriendStage
 )
 from core.base.exceptions import GameError
+from typing import Optional
 
 class MainStageTask:
     def __init__(self, serial):
         self.serial = serial
         self.base_stage = BaseMainStage(serial)
 
-    def battle(self, enter_menu: bool = False):
-        stage = self._proccess_stage()
+    def battle(self, custom_stage: Optional[str] = None, enter_menu: bool = False):
+        if enter_menu:
+            self.base_stage.enter_menu()
+        stage = self._proccess_stage(custom_stage=custom_stage)
         stage.enter_battle()
+
+    def enter_menu(self):
+        self.base_stage.enter_menu()
 
     def _map_stage_to_class(self, stage_num: int) -> BaseMainStage:
         stage_class = None
@@ -33,10 +39,20 @@ class MainStageTask:
             stage_class = self.base_stage
         return stage_class
 
-    def _proccess_stage(self) -> BaseMainStage:
-        stage_num = self.base_stage.enter_stage()
+    def _proccess_stage(self, custom_stage: Optional[str] = None) -> BaseMainStage:
+        stage_num = self.base_stage.enter_stage(custom_stage=custom_stage)
         stage_class = self._map_stage_to_class(stage_num)
         return stage_class
 
-        
-    
+def main_stage_finish_new(serial, enter_menu: bool = False):
+    main_stage_task = MainStageTask(serial)
+    main_stage_task.battle(enter_menu=enter_menu)
+
+def main_stage_enter_menu(serial):
+    main_stage_task = MainStageTask(serial)
+    main_stage_task.enter_menu()
+
+def main_stage_finish_custom(serial, custom_stage: str, enter_menu: bool = False):
+    main_stage_task = MainStageTask(serial)
+    main_stage_task.battle(enter_menu=enter_menu, custom_stage=custom_stage)
+

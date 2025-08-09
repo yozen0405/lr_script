@@ -1,5 +1,3 @@
-import time
-import os
 from core.system.logger import log_msg
 from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, back, drag, force_close
 from core.base.exceptions import GameError
@@ -7,6 +5,7 @@ from scripts.shared.utils.game_view import close_board
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_view import on_main_view
 from scripts.shared.events.login import guest_login
+from scripts.shared.events.main_stage.selector import main_stage_finish_new, main_stage_enter_menu
 
 main_stage_task = None
 
@@ -20,17 +19,14 @@ def login_second(serial):
 def second_stage(serial):
     log_msg(serial, "打主要關卡stage2")
     wait_click(serial, "skip.png", timeout=3.0)
-    second_stage_task = SecondStageTask(serial)
-    second_stage_task.enter_menu()
-    second_stage_task.enter_stage()
-    second_stage_task.run(anime=False, has_next=False, big_ok=True)
+    main_stage_finish_new(serial, enter_menu=True)
 
-def claim_treasure(serial, main_stage_task):
+def claim_treasure(serial):
     log_msg(serial, "尋找寶物")
     on_main_view(serial, sign="back.png", vanish=True)
     if wait_click(serial, "skip.png", timeout=20.0):
         wait_click(serial, "confirm_small.png", wait_time=0.5)
-    main_stage_task.enter_menu()
+    main_stage_enter_menu(serial)
     if not wait_click(serial, "treasure_icon.png", timeout=40.0):
         raise GameError("無法進入寶物")
 
@@ -42,9 +38,7 @@ def claim_treasure(serial, main_stage_task):
     if wait_click(serial, "back.png", timeout=20.0):
         wait_click(serial, "confirm_small.png", wait_time=0.5)
 
-    third_stage_task = ThirdStageTask(serial)
-    third_stage_task.enter_stage()
-    third_stage_task.run(anime=False, has_next=False, big_ok=True)
+    main_stage_finish_new(serial)
     wait_click(serial, "back.png", timeout=10.0)
     on_main_view(serial, sign="back.png", vanish=True)
 
@@ -54,7 +48,7 @@ def claim_treasure(serial, main_stage_task):
     wait_click(serial, "long_quest.png", timeout=7.0)
     wait_click(serial, "close_board.png", timeout=10.0)
 
-def seven_days(serial, main_stage_task):
+def seven_days(serial):
     wait_click(serial, "back.png")
     on_main_view(serial, sign="back.png", vanish=True)
 
@@ -67,14 +61,8 @@ def seven_days(serial, main_stage_task):
     wait_click(serial, "7days_info.png", timeout=7.0)
     wait_click(serial, "close_board.png", timeout=10.0, wait_time=1.0)
     wait_click(serial, "close_board.png", timeout=10.0)
-    
-def normal_stage(serial, main_stage_task, enter_menu=False):
-    if enter_menu:
-        main_stage_task.enter_menu()
-    main_stage_task.enter_stage()
-    main_stage_task.run(anime=False, has_next=False)
 
-def upgrade_sheep(serial, main_stage_task):
+def upgrade_sheep(serial):
     on_main_view(serial, sign="back.png", vanish=True)
 
     if wait_click(serial, "skip.png", timeout=5.0):
@@ -100,8 +88,6 @@ def back_to_close_board(serial):
     force_close(serial)
 
 def phase2(serial):
-    main_stage_task = MainStageTask(serial)
-
     try:
         login_second(serial)
     except GameError as e:
@@ -115,7 +101,7 @@ def phase2(serial):
     except GameError as e:
         raise
     try:
-        normal_stage(serial, main_stage_task, enter_menu=True)
+        main_stage_finish_new(serial, enter_menu=True)
     except GameError as e:
         raise
     
@@ -124,7 +110,7 @@ def phase2(serial):
     except GameError as e:
         raise
     try:
-        normal_stage(serial, main_stage_task, enter_menu=True)
+        main_stage_finish_new(serial, enter_menu=True)
     except GameError as e:
         raise
     try:
@@ -132,7 +118,7 @@ def phase2(serial):
     except GameError as e:
         raise
     try:
-        normal_stage(serial, main_stage_task, enter_menu=True)
+        main_stage_finish_new(serial, enter_menu=True)
     except GameError as e:
         raise
     try:

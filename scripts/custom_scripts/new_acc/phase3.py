@@ -1,10 +1,10 @@
 import time
 import os
 from core.system.logger import log_msg
-from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, extract_text, back, drag, force_close
+from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, back, drag, force_close
 from core.base.exceptions import GameError
 from scripts.shared.utils.game_view import close_board
-from scripts.shared.events.main_stage import MainStageTask
+from scripts.shared.events.main_stage.selector import main_stage_enter_menu, main_stage_finish_new
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_boot import open_game_with_hacks
 from scripts.shared.utils.game_view import on_main_view
@@ -14,12 +14,6 @@ def claim_board(serial):
     log_msg(serial, "第三階段")
     guest_login(serial, load_in=True)
     close_board(serial)
-
-def normal_stage(serial, main_stage_task, enter_menu=False):
-    if enter_menu:
-        main_stage_task.enter_menu()
-    main_stage_task.enter_stage()
-    main_stage_task.run(anime=False, has_next=False)
 
 def upgrade_rene(serial):
     log_msg(serial, "升級炳妮")
@@ -40,7 +34,7 @@ def upgrade_rene(serial):
     wait_click(serial, "back.png")
     connection_retry(serial, image_name="back.png", timeout=40.0)
 
-def gacha_equip(serial, main_stage_task):
+def gacha_equip(serial):
     on_main_view(serial, "close_board.png", vanish=False)
 
     if wait_click(serial, "skip.png", timeout=20.0):
@@ -82,34 +76,33 @@ def gacha_equip(serial, main_stage_task):
 
     connection_retry(serial, image_name="back.png", timeout=40.0)
     on_main_view(serial)
-    main_stage_task.enter_menu()
+    main_stage_enter_menu(serial)
     wait_click(serial, "back.png")
     
 
 def phase3(serial):
-    main_stage_task = MainStageTask(serial)
     try:
         claim_board(serial)
     except GameError as e:
         raise
 
     try:
-        normal_stage(serial, main_stage_task, enter_menu=True)
+        main_stage_finish_new(serial, enter_menu=True)
     except GameError as e:
         raise
 
     try:
-        normal_stage(serial, main_stage_task, enter_menu=False)
+        main_stage_finish_new(serial, enter_menu=False)
     except GameError as e:
         raise
 
     try:
-        normal_stage(serial, main_stage_task, enter_menu=False)
+        main_stage_finish_new(serial, enter_menu=False)
     except GameError as e:
         raise
 
     try:
-        normal_stage(serial, main_stage_task, enter_menu=False)
+        main_stage_finish_new(serial, enter_menu=False)
     except GameError as e:
         raise
 
@@ -119,16 +112,16 @@ def phase3(serial):
         raise
 
     try:
-        normal_stage(serial, main_stage_task, enter_menu=True)
+        main_stage_finish_new(serial, enter_menu=True)
     except GameError as e:
         raise
 
     try:
-        normal_stage(serial, main_stage_task, enter_menu=False)
+        main_stage_finish_new(serial, enter_menu=False)
     except GameError as e:
         raise
 
     try:
-        gacha_equip(serial, main_stage_task)
+        gacha_equip(serial)
     except GameError as e:
         raise

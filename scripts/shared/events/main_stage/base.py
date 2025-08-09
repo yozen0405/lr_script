@@ -5,6 +5,7 @@ from core.actions.ocr import get_main_stage_num
 from core.base.exceptions import GameError
 from scripts.shared.constants import positions
 from scripts.shared.utils.retry import connection_retry
+from typing import Optional
 
 class BaseMainStage:
     def __init__(self, serial):
@@ -89,12 +90,14 @@ class BaseMainStage:
     def get_current_stage(self) -> int:
         return get_main_stage_num(self.serial)
 
-    def enter_stage(self) -> int:
+    def enter_stage(self, custom_stage: Optional[str] = None) -> int:
         if not wait(self.serial, "main_stage_text.png", timeout=30.0, wait_time=2.5):
             raise GameError("不在主要關卡")
-
-        if not self._check_stage_on_screen():
+        
+        if custom_stage is None and not self._check_stage_on_screen():
             self._find_stage()
+        if custom_stage is not None:
+            wait_click(self.serial, custom_stage)
 
         for _ in range(10):
             if wait(self.serial, "main_stage_pre_start_text.png", timeout=5.5):
