@@ -152,6 +152,7 @@ def get_main_stage_num(serial):
     return img_proccesser.get_main_stage_num()
 
 def match_string_from_region(
+        serial,
         target_text: str,
         region: tuple = None,
         threshold: float = 0.75
