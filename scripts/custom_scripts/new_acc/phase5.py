@@ -3,31 +3,15 @@ import os
 from core.system.logger import log_msg
 from core.actions.actions import (
     wait_click, exist_click, exist,
-    wait, wait_vanish, extract_text,
+    wait, wait_vanish,
     back, drag, force_close,
     get_pos
 )
 from core.base.exceptions import GameError
 from scripts.shared.utils.game_view import close_board
-from scripts.shared.events.main_stage import MainStageTask
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_boot import open_game_with_hacks
 from scripts.shared.utils.game_view import on_main_view
-
-class FriendStageTask(MainStageTask):
-    def teach(self):
-        for _ in range(3):
-            wait_click(self.serial, self.FRIEND, wait_time=1.5)
-        if wait_click(self.serial, "skip.png", timeout=25.0):
-            wait_click(self.serial, "confirm_small.png", wait_time=1.0)
-        
-        wait_click(self.serial, "skip.png")
-
-    def select_friend(self):
-        if wait_click(self.serial, "skip.png", timeout=5.0):
-            wait_click(self.serial, "confirm_small.png", wait_time=1.0)
-        wait_click(self.serial, "skip.png", timeout=5.0, wait_time=1.0)
-        wait_click(self.serial, "james_friend_icon.png", timeout=5.0, wait_time=1.0)
 
 def normal_stage(serial, main_stage_task, anime=False, has_next=False, enter_menu=False):
     if enter_menu:

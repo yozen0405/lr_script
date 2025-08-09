@@ -3,8 +3,8 @@ import os
 from core.system.logger import log_msg
 from core.actions.actions import (
     wait_click, exist_click, exist, wait,
-    wait_vanish, extract_text, back, drag,
-     match_string_from_region, get_clipboard_text,
+    wait_vanish, back, drag,
+     get_clipboard_text,
      pull_account_file, clear_game_storage,
      force_close, force_close_all_apps
 )

@@ -1,24 +1,12 @@
 import time
 import os
 from core.system.logger import log_msg
-from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, extract_text, back, drag, force_close
+from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, back, drag, force_close
 from core.base.exceptions import GameError
 from scripts.shared.utils.game_view import close_board
-from scripts.shared.events.main_stage import MainStageTask
 from scripts.shared.events.special_stage import SpecialStageTask
 from scripts.shared.utils.retry import connection_retry
-from scripts.shared.utils.game_boot import open_game_with_hacks
 from scripts.shared.utils.game_view import on_main_view
-
-class AutoStageTask(MainStageTask):
-    def teach(self):
-        time.sleep(1.0)
-        if not wait_click(self.serial, "auto_btn_on.png", wait_time=3.0):
-            raise GameError("無法點擊 auto")
-        if not wait_click(self.serial, "auto_btn_off.png"):
-            raise GameError("無法點擊 auto")
-        if not wait_click(self.serial, "auto_btn_off.png"):
-            raise GameError("無法點擊 auto")
 
 class EvoMineTask(SpecialStageTask):
     def pre_anime(self):

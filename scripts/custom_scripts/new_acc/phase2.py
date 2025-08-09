@@ -1,48 +1,14 @@
 import time
 import os
 from core.system.logger import log_msg
-from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, extract_text, back, drag, force_close
+from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, back, drag, force_close
 from core.base.exceptions import GameError
 from scripts.shared.utils.game_view import close_board
-from scripts.shared.events.main_stage import MainStageTask
 from scripts.shared.utils.retry import connection_retry
-from scripts.shared.utils.game_boot import open_game_with_hacks
 from scripts.shared.utils.game_view import on_main_view
 from scripts.shared.events.login import guest_login
 
 main_stage_task = None
-
-class SecondStageTask(MainStageTask):
-    def settlement(self):
-        connection_retry(self.serial, wait_name="main_stage_settlement_text.png", retry_text="retry_text2.png", timeout=40.0)
-        for _ in range(3):
-            wait_click(self.serial, self.MEMBER4_POS)
-
-        while True:
-            for img in ["acquired.png", "confirm_big.png", "confirm_big2.png", "oneReward.png", "confirm_small.png", "stop.png"]:
-                exist_click(self.serial, img, wait_time=1.5)
-            if exist(self.serial, "retry_text.png"):
-                exist_click(self.serial, "retry.png")
-            if exist_click(self.serial, "skip.png"):
-                wait_click(self.serial, "confirm_small.png", wait_time=0.5)
-            if exist(self.serial, "close_board.png"):
-                break
-            if exist(self.serial, "gacha_skip.png"):
-                break
-            if exist(self.serial, "settings_btn.png"):
-                break
-            if exist(self.serial, "main_stage_text.png"):
-                break
-
-class ThirdStageTask(MainStageTask):
-    def teach(self):
-        time.sleep(1.0)
-        if not wait_click(self.serial, "speed_up_btn_off.png", wait_time=3.0):
-            raise GameError("無法點擊x2")
-        if not wait_click(self.serial, "speed_up_btn_on.png"):
-            raise GameError("無法點擊x2")
-        if not wait_click(self.serial, "speed_up_btn_on.png"):
-            raise GameError("無法點擊x2")
 
 def login_second(serial):
     log_msg(serial, "二次登入")

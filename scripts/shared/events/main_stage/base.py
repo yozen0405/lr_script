@@ -1,6 +1,7 @@
 import time
 from core.system.logger import log_msg
 from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
+from core.actions.ocr import get_main_stage_num
 from core.base.exceptions import GameError
 from scripts.shared.constants import positions
 from scripts.shared.utils.retry import connection_retry
@@ -85,10 +86,10 @@ class BaseMainStage:
 
                 drag(self.serial, tuple(start_pos), tuple(end_pos))
 
-    def get_current_stage(self):
-        pass
+    def get_current_stage(self) -> int:
+        return get_main_stage_num(self.serial)
 
-    def enter_stage(self):
+    def enter_stage(self) -> int:
         if not wait(self.serial, "main_stage_text.png", timeout=30.0, wait_time=2.5):
             raise GameError("不在主要關卡")
 
@@ -96,13 +97,13 @@ class BaseMainStage:
             self._find_stage()
 
         for _ in range(10):
-            if wait(self.serial, "main_stage_enter_text.png", timeout=5.5):
-                # 判斷是第幾關
-                # (221, 15), (328, 58)
-                continue
+            if wait(self.serial, "main_stage_pre_start_text.png", timeout=5.5):
+                self.handle_loop_stage_tutorial()
+                return self.get_current_stage()
             else:
                 wait_click(self.serial, "stage_anime.png", threshold=0.6, wait_time=2.0)
                 continue
+        raise GameError("未知的主要關卡")
 
     def run(self, anime=True, has_next=True, big_ok=False):
         log_msg(self.serial, "Main Stage 戰鬥開始")
@@ -135,14 +136,17 @@ class BaseMainStage:
         self.settlement()
         log_msg(self.serial, "Main Stage 任務完成")
 
-    def _pre_start_page(self):
+    def _handle_loop_stage_tutorial(self):
+        pass
+
+    def _on_pre_start_page(self):
         pass
 
     def _on_start_page(self):
         pass
 
-    def _use_skip(self):
-        return False
+    def _on_settlement_page(self):
+        pass
 
     def settlement(self):
         if wait_click(self.serial, "cancel_lose.png", wait_time=10.0):
@@ -163,8 +167,7 @@ class BaseMainStage:
             if exist(self.serial, "retry_text.png"):
                 exist_click(self.serial, "retry.png")
 
-            if self._use_skip() and exist_click(self.serial, "skip.png"):
-                wait_click(self.serial, "confirm_small.png", wait_time=0.5)
+            self._on_settlement_page()
             
             if exist(self.serial, "close_board.png"):
                 if exist(self.serial, "retry_text.png"):
