@@ -5,7 +5,7 @@ import time
 from core.base.exceptions import GameError
 
 class FirstStage(BaseMainStage):
-    def _on_pre_start_page(self):
+    def _on_pre_start_page_prev(self):
         wait_click(self.serial, "meteor.png", threshold=0.5)
 
 class SecondStage(BaseMainStage):
@@ -42,14 +42,8 @@ class FriendStage(BaseMainStage):
         
         wait_click(self.serial, "skip.png")
 
-    def _on_pre_start_page(self):
+    def _on_pre_start_page_next(self):
         if wait_click(self.serial, "skip.png", timeout=5.0):
             wait_click(self.serial, "confirm_small.png", wait_time=1.0)
         wait_click(self.serial, "skip.png", timeout=5.0, wait_time=1.0)
         wait_click(self.serial, "james_friend_icon.png", timeout=5.0, wait_time=1.0)
-
-class AgainStage(BaseMainStage):
-    def _on_settlement_page(self):
-        # 圖片名稱要確定
-        exist_click(self.serial, "settlement_next.png")
-        exist_click(self.serial, "settlement_again.png")

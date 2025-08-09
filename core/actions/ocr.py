@@ -111,7 +111,7 @@ class ImageProcceser:
 
         digit_templates = {}
         for i in range(10):
-            path = os.path.join(IMG_DIR, f"num{i}.png")
+            path = os.path.join(IMG_DIR, f"pre_start_num{i}.png")
             tmpl = safe_imread(path)
             digit_templates[str(i)] = tmpl
 
@@ -143,10 +143,9 @@ class ImageProcceser:
             else:
                 cursor += 1
 
-        log_msg(self.serial, f"辨識結果: {number}")
+        log_msg(self.serial, f"正在第 {number} 關")
         return number
 
 
 def get_main_stage_num(serial):
     img_proccesser = ImageProcceser(serial)
-    log_msg(serial, img_proccesser.get_main_stage_num())

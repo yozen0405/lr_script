@@ -27,7 +27,7 @@ class BaseMainStage:
             ("boss_stage.png", 0.92),
             ("new_stage.png", 0.85),
         ]:
-            if wait(self.serial, image, threshold=threshold, timeout=timeout):
+            if wait_click(self.serial, image, threshold=threshold, timeout=timeout):
                 connection_retry(self.serial, image_name="main_stage_text.png", retry_text="retry_text2.png", timeout=40.0)
                 return True
         return False
@@ -98,28 +98,19 @@ class BaseMainStage:
 
         for _ in range(10):
             if wait(self.serial, "main_stage_pre_start_text.png", timeout=5.5):
-                self.handle_loop_stage_tutorial()
+                self._handle_loop_stage_tutorial()
                 return self.get_current_stage()
             else:
                 wait_click(self.serial, "stage_anime.png", threshold=0.6, wait_time=2.0)
                 continue
         raise GameError("未知的主要關卡")
 
-    def run(self, anime=True, has_next=True, big_ok=False):
+    def enter_battle(self):
         log_msg(self.serial, "Main Stage 戰鬥開始")
 
-        wait_vanish(self.serial, "main_stage_text.png", timeout=20.0)
-
-        if anime:
-            time.sleep(2.0)
-            for _ in range(3):
-                if not wait_click(self.serial, "stage_anime.png", wait_time=1.0, threshold=0.6):
-                    break
-
-        if has_next:
-            wait_click(self.serial, "next.png")
-
-        self._pre_start_page()
+        self._on_pre_start_page_prev()
+        wait_click(self.serial, "next.png", timeout=3.0)
+        self._on_pre_start_page_next()
 
         wait_click(self.serial, "start.png")
         connection_retry(self.serial, image_name="start.png", timeout=60.0)
@@ -137,9 +128,19 @@ class BaseMainStage:
         log_msg(self.serial, "Main Stage 任務完成")
 
     def _handle_loop_stage_tutorial(self):
-        pass
+        if not wait(self.serial, "pre_start_multiplier_text.png", timeout=3.0):
+            return
+        wait_click(self.serial, "pre_start_again.png", wait_time=2.5)
+        wait_click(self.serial, "leonard_teacher_equip.png", wait_time=2.5)
+        wait_click(self.serial, "pre_start_multiplier_dark_btn.png", wait_time=1.0)
+        wait_click(self.serial, "pre_start_multiplier_light_btn.png", wait_time=1.0)
+        wait_click(self.serial, "leonard_teacher_equip2.png", wait_time=1.0)
 
-    def _on_pre_start_page(self):
+
+    def _on_pre_start_page_prev(self):
+        pass
+    
+    def _on_pre_start_page_next(self):
         pass
 
     def _on_start_page(self):
@@ -147,6 +148,13 @@ class BaseMainStage:
 
     def _on_settlement_page(self):
         pass
+
+    def _on_settlement_next_feature(self):
+        if not wait(self.serial, "main_stage_settlement_next_feature_text.png", timeout=3.0):
+            return
+        wait_click(self.serial, "main_stage_settlement_again.png", wait_time=1.2)
+        wait_click(self.serial, "main_stage_settlement_next.png")
+
 
     def settlement(self):
         if wait_click(self.serial, "cancel_lose.png", wait_time=10.0):
@@ -168,6 +176,7 @@ class BaseMainStage:
                 exist_click(self.serial, "retry.png")
 
             self._on_settlement_page()
+            self._on_settlement_next_feature()
             
             if exist(self.serial, "close_board.png"):
                 if exist(self.serial, "retry_text.png"):
