@@ -1,6 +1,6 @@
 import time
 from core.system.logger import log_msg
-from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, extract_text, back, drag, force_close, force_close_line
+from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, back, drag, force_close, force_close_line
 from core.base.exceptions import GameError
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_boot import open_game, open_game_with_hacks

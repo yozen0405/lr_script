@@ -7,6 +7,7 @@ from scripts.shared.events.main_stage.custom_stages import (
 )
 from core.base.exceptions import GameError
 from typing import Optional
+from core.system.logger import log_msg
 
 class MainStageTask:
     def __init__(self, serial):

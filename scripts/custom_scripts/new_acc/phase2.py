@@ -97,7 +97,7 @@ def phase2(serial):
     except GameError as e:
         raise
     try:
-        claim_treasure(serial, main_stage_task)
+        claim_treasure(serial)
     except GameError as e:
         raise
     try:
@@ -106,7 +106,7 @@ def phase2(serial):
         raise
     
     try:
-        seven_days(serial, main_stage_task)
+        seven_days(serial)
     except GameError as e:
         raise
     try:
@@ -114,7 +114,7 @@ def phase2(serial):
     except GameError as e:
         raise
     try:
-        upgrade_sheep(serial, main_stage_task)
+        upgrade_sheep(serial)
     except GameError as e:
         raise
     try:

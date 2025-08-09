@@ -3,6 +3,7 @@ from core.actions.actions import wait_click, exist_click, exist, wait, wait_vani
 from scripts.shared.utils.retry import connection_retry
 import time
 from core.base.exceptions import GameError
+from core.system.logger import log_msg
 
 class FirstStage(BaseMainStage):
     def _on_pre_start_page_prev(self):

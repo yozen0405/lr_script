@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from core.system.adb import connect_all_mumu_instances
-# from scripts.custom_scripts.new_acc.main import new_acc_farm
-from scripts.custom_scripts.main_stage_test.main import normal_stage
+from scripts.custom_scripts.new_acc.main import new_acc_farm
+# from scripts.custom_scripts.main_stage_test.main import normal_stage
 from core.system.config import Config
 
 if __name__ == "__main__":
@@ -15,13 +15,13 @@ if __name__ == "__main__":
 
     elif single_mode:
         print("啟動單機模式")
-        normal_stage(devices[0])
+        new_acc_farm(devices[0])
 
     else:
         print("啟動多執行緒模式")
         try:
             with ThreadPoolExecutor(max_workers=len(devices)) as executor:
-                futures = [executor.submit(normal_stage, d) for d in devices]
+                futures = [executor.submit(new_acc_farm, d) for d in devices]
                 for future in futures:
                     future.result()
 

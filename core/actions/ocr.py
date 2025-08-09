@@ -144,8 +144,17 @@ class ImageProcceser:
                 cursor += 1
 
         log_msg(self.serial, f"正在第 {number} 關")
-        return number
+        return int(number)
 
 
 def get_main_stage_num(serial):
     img_proccesser = ImageProcceser(serial)
+    return img_proccesser.get_main_stage_num()
+
+def match_string_from_region(
+        target_text: str,
+        region: tuple = None,
+        threshold: float = 0.75
+    ):
+    img_proccesser = ImageProcceser(serial)
+    return img_proccesser.match_string_from_region(target_text=target_text, region=region, threshold=threshold)

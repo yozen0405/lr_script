@@ -5,9 +5,10 @@ from core.system.config import Config
 from core.system.logger import log_msg
 from core.actions.actions import (
     wait_click, wait, wait_vanish,
-    match_string_from_region, drag, back, get_clipboard_text,
+    drag, back, get_clipboard_text,
     pull_account_file
 )
+from core.actions.ocr import match_string_from_region
 from scripts.shared.utils.game_boot import open_game_with_hacks
 from scripts.shared.utils.game_view import on_main_view
 from core.base.exceptions import GameError
