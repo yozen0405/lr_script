@@ -66,7 +66,7 @@ def first_stage(serial):
     
     wait_click(serial, "skip.png", timeout=5.0)
 
-    apply_mode(serial, "main_stage", True, True)
+    apply_mode(serial, mode_name="main_stage", state="on")
     main_stage_finish_new(serial)
 
 def first_ranger(serial):

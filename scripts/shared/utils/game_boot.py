@@ -28,7 +28,7 @@ def open_game(serial):
 def open_game_with_hacks(serial, mode: str = "main_stage"):
     for attempt in range(1, 3):
         open_game(serial)
-        apply_mode(serial, mode, True, False)
+        apply_mode(serial, mode_name=mode, state="on")
         time.sleep(3)
 
         if wait(serial, "loading_page.png", threshold=0.5, timeout=5.0):

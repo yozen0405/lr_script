@@ -1,6 +1,5 @@
 from core.system.adb import adb_cmd
 from core.system.logger import log_msg
-from scripts.shared.utils.retry import liapp_alert
 
 MODES = {
     "main_stage": ["m1", "m2", "m8", "m10"],
@@ -33,13 +32,11 @@ def toggle(serial: str, member_id: str, state: str):
         _instance_cache[serial] = ModManager(serial)
     return _instance_cache[serial].toggle_member(member_id, state)
 
-def apply_mode(serial: str, mode_name: str, flag: bool, esc: bool = True):
+def apply_mode(serial: str, mode_name: str, state: str):
     members = MODES.get(mode_name)
     if members is None:
         raise ValueError(f"模式「{mode_name}」不存在")
 
-    log_msg(serial, f"套用模式：{mode_name}({'開啟' if flag else '關閉'})")
-    state = "on" if flag else "off"
+    log_msg(serial, f"套用模式：{mode_name}({state})")
     for member_id in members:
         toggle(serial, member_id, state)
-    # liapp_alert(serial, esc)
