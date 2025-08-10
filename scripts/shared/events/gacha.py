@@ -3,7 +3,7 @@ import time
 from configparser import ConfigParser
 from core.system.config import Config
 from core.system.logger import log_msg
-from core.actions.actions import (
+from core.actions.screen import (
     wait_click, wait, wait_vanish,
     drag, back, get_clipboard_text,
     pull_account_file

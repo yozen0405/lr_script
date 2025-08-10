@@ -1,8 +1,8 @@
 from core.system.logger import log_msg
-from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, back, drag
+from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, back, drag
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.hacks import apply_mode
-from scripts.shared.constants import positions
+from scripts.shared.constants.positions import positions
 from core.base.exceptions import GameError
 from scripts.shared.events.main_stage.selector import main_stage_finish_new
 from scripts.shared.events.login import first_guest_login

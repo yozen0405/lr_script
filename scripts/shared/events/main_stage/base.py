@@ -1,9 +1,9 @@
 import time
 from core.system.logger import log_msg
-from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
+from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
 from core.actions.ocr import get_main_stage_num
 from core.base.exceptions import GameError
-from scripts.shared.constants import positions
+from scripts.shared.constants.positions import positions
 from scripts.shared.utils.retry import connection_retry
 from typing import Optional
 

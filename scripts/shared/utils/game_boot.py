@@ -1,8 +1,9 @@
 import time
 from core.system.logger import log_msg
-from core.actions.actions import (
-    wait_click, exist_click, exist, wait, wait_vanish, back, drag, force_close
+from core.actions.screen import (
+    wait_click, exist_click, exist, wait, wait_vanish, back, drag
 )
+from core.actions.system import force_close
 from core.base.exceptions import GameError
 from scripts.shared.utils.hacks import apply_mode
 

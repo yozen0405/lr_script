@@ -1,7 +1,7 @@
 import time
 import os
 from core.system.logger import log_msg
-from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, back, drag, force_close
+from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, back, drag, force_close
 from core.base.exceptions import GameError
 from scripts.shared.utils.game_view import close_board
 from scripts.shared.events.special_stage.selector import special_stage_single_game

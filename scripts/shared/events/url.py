@@ -1,4 +1,4 @@
-from core.actions.actions import wait, drag, exist, exist_click, log_msg, open_external_url, launch_game
+from core.actions.screen import wait, drag, exist, exist_click, log_msg, open_external_url, launch_game
 from core.system.config import Config
 
 class LinkNavigator:

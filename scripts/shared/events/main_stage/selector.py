@@ -1,5 +1,5 @@
 from scripts.shared.events.main_stage.base import BaseMainStage
-from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
+from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.events.main_stage.custom_stages import (
     FirstStage, SecondStage, ThirdStage, 
