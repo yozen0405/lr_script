@@ -4,6 +4,7 @@ from core.system.logger import log_msg
 MODES = {
     "main_stage": ["m1", "m2", "m8", "m10"],
     "special_stage": ["m1", "m2", "m8", "m10"],
+    "pvp": ["m3", "m4", "m7", "m9", "m11"],
     "pre_stage": ["m10"]
 }
 

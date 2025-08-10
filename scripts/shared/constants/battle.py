@@ -11,3 +11,4 @@ class Battle(str, Enum):
     ANIME = "stage_anime.png"
     AUTO_BTN_OFF = "auto_btn_off.png"
     AUTO_BTN_OFF2 = "auto_btn_off2.png"
+    NO_FEATHER = "no_feather_text.png"
