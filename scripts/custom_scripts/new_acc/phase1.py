@@ -70,7 +70,7 @@ class Phase1:
 
     def _first_stage(self):
         log_msg(self.serial, "遊戲開場介紹")
-        if not exist(self.serial, "phase1_lvl1_text.png"):
+        if not exist(self.serial, "phase1_lvl1_text.png", threshold=0.9):
             return
 
         if wait_click(self.serial, "skip.png", timeout=5.0):
@@ -83,7 +83,8 @@ class Phase1:
 
     def _first_ranger(self):
         if not exist(self.serial, "phase1_new_friend_text.png"):
-            return
+            if not exist(self.serial, "phase1_lvl2_text.png", threshold=0.9999) or not exist(self.serial, "team_icon_dark.png", threshold=0.9999):
+                return
 
         wait_click(self.serial, "skip.png")
         wait_click(self.serial, "confirm_small.png")
@@ -129,6 +130,8 @@ class Phase1:
         self._pre_stage()
 
         if exist(self.serial, "long_quest.png", threshold=0.65):
+            return
+        if exist(self.serial, "close_board.png"):
             return
 
         self._first_stage()

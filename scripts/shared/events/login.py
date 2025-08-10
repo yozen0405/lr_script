@@ -53,14 +53,6 @@ class BaseLoginFlow:
         
         raise GameError("多次嘗試訪客登入仍失敗")
 
-    def _open_game(self, mode):
-        log_msg(self.serial, "開啟遊戲中")
-        if wait(self.serial, "gameicon.png"):
-            if mode:
-                open_game_with_hacks(self.serial, mode)
-            else:
-                open_game(self.serial)
-
     def _on_loading_page(self, timeout: float = 900.0):
         start = time.time()
 
@@ -88,7 +80,7 @@ class BaseLoginFlow:
         raise GameError("正在 login, 但未知狀態")
 
     def _guest_login(self, mode: str = None):
-        self._open_game(mode)
+        open_game(self.serial, mode)
 
         for _ in range(10):
             in_game = False
