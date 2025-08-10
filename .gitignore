@@ -4,4 +4,6 @@ __pycache__/
 bin/acc
 bin/tmp
 bin/cache.json
+bin/.DS_Store
 debug_output.png
+.DS_Store
