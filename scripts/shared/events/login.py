@@ -87,7 +87,7 @@ class BaseLoginFlow:
             time.sleep(1.0)
         raise GameError("正在 login, 但未知狀態")
 
-    def _guest_login(self, mode: str = None, load_in: bool = False, first=False):
+    def _guest_login(self, mode: str = None):
         for _ in range(10):
             if wait(self.serial, "gameicon.png", timeout=3.0):
                 self._open_game(mode)
@@ -100,34 +100,34 @@ class BaseLoginFlow:
                     wait_click(self.serial, "confirm_small.png", wait_time=2.0)
                     wait_click(self.serial, "game_waiting_play_btn.png", timeout=3.0)
 
+                timeout_count = 5.0
                 if wait(self.serial, "login_line.png"):
+                    timeout_count = 25.0
                     self._trigger_guest_btn()
                     if wait_click(self.serial, "guest_connect.png", threshold=0.5):
                         self._agree_terms()
 
-                    if first:
-                        if wait(self.serial, "english_btn.png", timeout=20.0):
-                            wait_click(self.serial, "confirm_small.png")
+                if wait(self.serial, "confirm_small.png", timeout=timeout_count):
+                    if exist(self.serial, "english_btn.png"):
+                        exist_click(self.serial, "confirm_small.png")
                     else:
-                        wait_click(self.serial, "confirm_small.png")
+                        exist_click(self.serial, "confirm_small.png")
 
             if wait(self.serial, "loading_page.png", timeout=25.0):
-                if not load_in:
-                    return
                 if self._on_loading_page():
                     return
         raise GameError("無法訪客登入")
                 
-    def general_guest_login(self, mode: str = "main_stage", load_in=False, first=False):
+    def general_guest_login(self, mode: str = "main_stage"):
         if mode == "":
-            self._guest_login(load_in=load_in, first=first)
+            self._guest_login()
         else:
-            self._guest_login(mode=mode, load_in=load_in, first=first)
+            self._guest_login(mode=mode)
 
 def first_guest_login(serial):
     login_flow = BaseLoginFlow(serial)
-    login_flow.general_guest_login(mode="pre_stage", load_in=False, first=True)
+    login_flow.general_guest_login(mode="pre_stage")
             
-def guest_login(serial, mode: str = "main_stage", load_in=False):
+def guest_login(serial, mode: str = "main_stage"):
     login_flow = BaseLoginFlow(serial)
-    login_flow.general_guest_login(mode=mode, load_in=load_in)
+    login_flow.general_guest_login(mode=mode)

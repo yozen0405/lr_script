@@ -11,7 +11,7 @@ main_stage_task = None
 
 def login_second(serial):
     log_msg(serial, "二次登入")
-    guest_login(serial, load_in=True)
+    guest_login(serial)
 
     if wait(serial, "settings_btn.png", timeout=40.0):
         close_board(serial)

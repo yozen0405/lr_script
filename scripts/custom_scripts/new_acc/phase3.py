@@ -12,7 +12,7 @@ from scripts.shared.events.login import guest_login
 
 def claim_board(serial):
     log_msg(serial, "第三階段")
-    guest_login(serial, load_in=True)
+    guest_login(serial)
     close_board(serial)
 
 def upgrade_rene(serial):
