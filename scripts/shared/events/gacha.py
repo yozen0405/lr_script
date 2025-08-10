@@ -9,7 +9,6 @@ from core.actions.actions import (
     pull_account_file
 )
 from core.actions.ocr import match_string_from_region
-from scripts.shared.utils.game_boot import open_game_with_hacks
 from scripts.shared.utils.game_view import on_main_view
 from core.base.exceptions import GameError
 

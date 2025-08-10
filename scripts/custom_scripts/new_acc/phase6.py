@@ -9,7 +9,6 @@ from core.actions.actions import (
      force_close, force_close_all_apps
 )
 from scripts.shared.utils.retry import connection_retry
-from scripts.shared.utils.game_boot import open_game_with_hacks
 from scripts.shared.utils.game_view import on_main_view
 from scripts.shared.events.gacha import Gacha
 from scripts.shared.events.url import LinkNavigator

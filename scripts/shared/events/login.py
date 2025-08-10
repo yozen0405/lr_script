@@ -3,7 +3,7 @@ from core.system.logger import log_msg
 from core.actions.actions import wait_click, exist_click, exist, wait, wait_vanish, back, drag, force_close, force_close_line
 from core.base.exceptions import GameError
 from scripts.shared.utils.retry import connection_retry
-from scripts.shared.utils.game_boot import open_game, open_game_with_hacks
+from scripts.shared.utils.game_boot import open_game
 
 class BaseLoginFlow:
     def __init__(self, serial):
@@ -88,12 +88,10 @@ class BaseLoginFlow:
         raise GameError("正在 login, 但未知狀態")
 
     def _guest_login(self, mode: str = None):
+        self._open_game(mode)
+
         for _ in range(10):
             in_game = False
-            if wait(self.serial, "gameicon.png", timeout=3.0):
-                in_game = True
-                self._open_game(mode)
-            else: # apply hacks
 
             if wait(self.serial, "game_waiting_page.png", timeout=3.0):
                 in_game = True
@@ -115,10 +113,10 @@ class BaseLoginFlow:
                     in_game = True
                     if exist(self.serial, "english_btn.png"):
                         exist_click(self.serial, "confirm_small.png")
-                    else:
+                    elif exist(self.serial, "cancel.png"):
                         exist_click(self.serial, "confirm_small.png")
 
-            if wait(self.serial, "loading_page.png", timeout=25.0):
+            if wait(self.serial, "loading_page.png", timeout=3.0):
                 in_game = True
                 if self._on_loading_page():
                     return
