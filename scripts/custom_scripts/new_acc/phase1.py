@@ -125,12 +125,16 @@ class Phase1:
         wait_click(self.serial, "confirm_small.png", wait_time=0.5)
 
     def run(self):
-        self.first_time_login()
-        self.pre_stage()
+        self._first_time_login()
+        self._pre_stage()
 
         if exist(self.serial, "long_quest.png", threshold=0.65):
             return
 
-        self.first_stage()
-        self.first_ranger()
-        self.first_arrange_team()
+        self._first_stage()
+        self._first_ranger()
+        self._first_arrange_team()
+
+def phase1(serial):
+    runner = Phase1(serial)
+    runner.run()

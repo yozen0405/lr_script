@@ -93,6 +93,7 @@ class BaseLoginFlow:
             if wait(self.serial, "gameicon.png", timeout=3.0):
                 in_game = True
                 self._open_game(mode)
+            else: # apply hacks
 
             if wait(self.serial, "game_waiting_page.png", timeout=3.0):
                 in_game = True

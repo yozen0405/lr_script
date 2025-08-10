@@ -17,8 +17,8 @@ def new_acc_farm(serial):
 
     for _ in range(attempts):
         phase1(serial)
-        phase2(serial)
-        phase3(serial)
-        phase4(serial)
-        phase5(serial)
-        phase6(serial)
+        # phase2(serial)
+        # phase3(serial)
+        # phase4(serial)
+        # phase5(serial)
+        # phase6(serial)
