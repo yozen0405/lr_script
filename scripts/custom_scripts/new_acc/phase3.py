@@ -87,22 +87,22 @@ def phase3(serial):
         raise
 
     try:
-        main_stage_finish_new(serial, enter_menu=True)
+        main_stage_finish_new(serial)
     except GameError as e:
         raise
 
     try:
-        main_stage_finish_new(serial, enter_menu=False)
+        main_stage_finish_new(serial)
     except GameError as e:
         raise
 
     try:
-        main_stage_finish_new(serial, enter_menu=False)
+        main_stage_finish_new(serial)
     except GameError as e:
         raise
 
     try:
-        main_stage_finish_new(serial, enter_menu=False)
+        main_stage_finish_new(serial)
     except GameError as e:
         raise
 
@@ -112,12 +112,12 @@ def phase3(serial):
         raise
 
     try:
-        main_stage_finish_new(serial, enter_menu=True)
+        main_stage_finish_new(serial)
     except GameError as e:
         raise
 
     try:
-        main_stage_finish_new(serial, enter_menu=False)
+        main_stage_finish_new(serial)
     except GameError as e:
         raise
 

@@ -50,17 +50,17 @@ def phase4(serial):
     log_msg(serial, "第四階段")
 
     try:
-        main_stage_finish_new(serial, enter_menu=True)
+        main_stage_finish_new(serial)
     except GameError as e:
         raise
 
     try:
-        main_stage_finish_new(serial, enter_menu=False)
+        main_stage_finish_new(serial)
     except GameError as e:
         raise
 
     try:
-        main_stage_finish_new(serial, enter_menu=False)
+        main_stage_finish_new(serial)
     except GameError as e:
         raise
 
@@ -70,13 +70,13 @@ def phase4(serial):
         raise
 
     try:
-        main_stage_finish_new(serial, enter_menu=True)
+        main_stage_finish_new(serial)
     except GameError as e:
         raise
 
     for _ in range(9):
         try:
-            main_stage_finish_new(serial, enter_menu=False)
+            main_stage_finish_new(serial)
         except GameError as e:
             raise
 

@@ -15,6 +15,9 @@ class BaseMainStage:
         self.FRIEND = positions["friend"]
 
     def enter_menu(self):
+        if exist(self.serial, "main_stage_text.png"):
+            return
+
         if wait(self.serial, "main_stage_btn.png", timeout=20.0, wait_time=1.0):
             wait_click(self.serial, "main_stage_btn.png")
             connection_retry(self.serial, wait_name="main_stage_text.png", timeout=60.0)

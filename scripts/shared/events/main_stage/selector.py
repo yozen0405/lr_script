@@ -14,9 +14,8 @@ class MainStageTask:
         self.serial = serial
         self.base_stage = BaseMainStage(serial)
 
-    def battle(self, custom_stage: Optional[str] = None, enter_menu: bool = False):
-        if enter_menu:
-            self.base_stage.enter_menu()
+    def battle(self, custom_stage: Optional[str] = None):
+        self.base_stage.enter_menu()
         stage = self._proccess_stage(custom_stage=custom_stage)
         stage.enter_battle()
 
@@ -45,15 +44,15 @@ class MainStageTask:
         stage_class = self._map_stage_to_class(stage_num)
         return stage_class
 
-def main_stage_finish_new(serial, enter_menu: bool = False):
+def main_stage_finish_new(serial):
     main_stage_task = MainStageTask(serial)
-    main_stage_task.battle(enter_menu=enter_menu)
+    main_stage_task.battle()
 
 def main_stage_enter_menu(serial):
     main_stage_task = MainStageTask(serial)
     main_stage_task.enter_menu()
 
-def main_stage_finish_custom(serial, custom_stage: str, enter_menu: bool = False):
+def main_stage_finish_custom(serial, custom_stage: str):
     main_stage_task = MainStageTask(serial)
-    main_stage_task.battle(enter_menu=enter_menu, custom_stage=custom_stage)
+    main_stage_task.battle(custom_stage=custom_stage)
 

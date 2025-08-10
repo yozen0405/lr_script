@@ -67,7 +67,7 @@ def first_stage(serial):
     wait_click(serial, "skip.png", timeout=5.0)
 
     apply_mode(serial, "main_stage", True, True)
-    main_stage_finish_new(serial, enter_menu=True)
+    main_stage_finish_new(serial)
 
 def first_ranger(serial):
     if not wait(serial, "settings_btn.png", timeout=40.0):

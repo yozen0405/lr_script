@@ -18,7 +18,7 @@ def james_friend(serial):
     on_main_view(serial)
     if wait_click(serial, "skip.png", timeout=5.0):
         wait_click(serial, "confirm_small.png", wait_time=3.0)
-    main_stage_finish_new(serial, enter_menu=True)
+    main_stage_finish_new(serial)
 
 def stage30(serial):
     main_stage_finish_custom(serial, custom_stage="stage30_btn.png")
@@ -131,15 +131,10 @@ def claim_season_pass(serial):
 
 def phase5(serial):
     log_msg(serial, "第五階段")
-    
-    try:
-        main_stage_finish_new(serial, enter_menu=True)
-    except GameError as e:
-        raise
 
-    for _ in range(3):
+    for _ in range(4):
         try:
-            main_stage_finish_new(serial, enter_menu=False)
+            main_stage_finish_new(serial)
         except GameError as e:
             raise
 

@@ -19,7 +19,7 @@ def login_second(serial):
 def second_stage(serial):
     log_msg(serial, "打主要關卡stage2")
     wait_click(serial, "skip.png", timeout=3.0)
-    main_stage_finish_new(serial, enter_menu=True)
+    main_stage_finish_new(serial)
 
 def claim_treasure(serial):
     log_msg(serial, "尋找寶物")
@@ -101,7 +101,7 @@ def phase2(serial):
     except GameError as e:
         raise
     try:
-        main_stage_finish_new(serial, enter_menu=True)
+        main_stage_finish_new(serial)
     except GameError as e:
         raise
     
@@ -110,7 +110,7 @@ def phase2(serial):
     except GameError as e:
         raise
     try:
-        main_stage_finish_new(serial, enter_menu=True)
+        main_stage_finish_new(serial)
     except GameError as e:
         raise
     try:
@@ -118,7 +118,7 @@ def phase2(serial):
     except GameError as e:
         raise
     try:
-        main_stage_finish_new(serial, enter_menu=True)
+        main_stage_finish_new(serial)
     except GameError as e:
         raise
     try:
