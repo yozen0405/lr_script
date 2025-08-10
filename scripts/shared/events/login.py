@@ -89,10 +89,13 @@ class BaseLoginFlow:
 
     def _guest_login(self, mode: str = None):
         for _ in range(10):
+            in_game = False
             if wait(self.serial, "gameicon.png", timeout=3.0):
+                in_game = True
                 self._open_game(mode)
 
             if wait(self.serial, "game_waiting_page.png", timeout=3.0):
+                in_game = True
                 if exist(self.serial, "auth_failed.png"):
                     wait_click(self.serial, "confirm_small.png")
 
@@ -108,14 +111,19 @@ class BaseLoginFlow:
                         self._agree_terms()
 
                 if wait(self.serial, "confirm_small.png", timeout=timeout_count):
+                    in_game = True
                     if exist(self.serial, "english_btn.png"):
                         exist_click(self.serial, "confirm_small.png")
                     else:
                         exist_click(self.serial, "confirm_small.png")
 
             if wait(self.serial, "loading_page.png", timeout=25.0):
+                in_game = True
                 if self._on_loading_page():
                     return
+                
+            if in_game == False:
+                return # 已經在遊戲內了
         raise GameError("無法訪客登入")
                 
     def general_guest_login(self, mode: str = "main_stage"):

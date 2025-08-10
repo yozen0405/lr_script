@@ -7,133 +7,130 @@ from core.base.exceptions import GameError
 from scripts.shared.events.main_stage.selector import main_stage_finish_new
 from scripts.shared.events.login import first_guest_login
 
-def first_time_login(serial):
-    log_msg(serial, "首次登入流程啟動")
-    first_guest_login(serial)
+class Phase1:
+    def __init__(self, serial):
+        self.serial = serial
+        self.MEMBER1 = positions["member1"]
+        self.MEMBER2 = positions["member2"]
+        self.MEMBER3 = positions["member3"]
+        self.MEMBER4 = positions["member4"]
+        self.MEMBER5 = positions["member5"]
+        self.DIAMOND = positions["diamond"]
+        self.MISSILE = positions["missile"]
 
-def pre_stage(serial):
-    log_msg(serial, "進去前置關卡")
-    connection_retry(serial, retry="retry.png", wait_name="nickname_setup.png", timeout=400)
+    def _first_time_login(self):
+        log_msg(self.serial, "首次登入流程啟動")
+        first_guest_login(self.serial)
 
-    if not wait(serial, "nickname_setup.png", threshold=0.5, timeout=20):
-        raise GameError("非新手教學")
-    
-    wait_click(serial, "confirm_small.png")
-    wait_click(serial, "confirm_small.png")
-    wait_click(serial, "confirm_small.png")
+    def _spam_click_members(self):
+        wait_click(self.serial, self.MEMBER1, wait_time=0.0)
+        wait_click(self.serial, self.MEMBER2, wait_time=0.0)
+        wait_click(self.serial, self.MEMBER3, wait_time=0.0)
+        wait_click(self.serial, self.MEMBER4, wait_time=0.0)
+        wait_click(self.serial, self.MEMBER5, wait_time=0.0)
+        wait_click(self.serial, self.DIAMOND, wait_time=0.0)
+        wait_click(self.serial, self.MISSILE, wait_time=1.0)
 
-    wait_click(serial, "skip.png")
-    wait_click(serial, "confirm_small.png", wait_time=0.5)
+    def _pre_stage(self):
+        log_msg(self.serial, "進去前置關卡")
 
-    if wait(serial, "pause.png", threshold=0.5, timeout=15.0):
-        for _ in range(60):
-            if exist_click(serial, "skip.png", threshold=0.8):
+        if wait(self.serial, "nickname_setup.png"):
+            wait_click(self.serial, "confirm_small.png")
+            wait_click(self.serial, "confirm_small.png")
+            wait_click(self.serial, "confirm_small.png")
+        elif wait(self.serial, "pre_stage_text.png", timeout=2.0):
+            pass
+        else:
+            return
+        
+        wait_click(self.serial, "skip.png")
+        wait_click(self.serial, "confirm_small.png", wait_time=0.5)
+
+        if wait(self.serial, "pause.png", threshold=0.5, timeout=15.0):
+            for _ in range(60):
+                if exist_click(self.serial, "skip.png", threshold=0.8):
+                    break
+                self._spam_click_members()
+        else:
+            raise GameError("無法確認戰鬥狀態，跳出")
+        
+        wait_click(self.serial, "confirm_small.png", wait_time=3)
+
+        for _ in range(30):
+            if not exist(self.serial, "pause.png", threshold=0.8):
                 break
-            wait_click(serial, positions["member1"], wait_time=0)
-            wait_click(serial, positions["member2"], wait_time=0)
-            wait_click(serial, positions["member3"], wait_time=0)
-            wait_click(serial, positions["member4"], wait_time=0)
-            wait_click(serial, positions["member5"], wait_time=0)
-            wait_click(serial, positions["diamond"], wait_time=0)
-            wait_click(serial, positions["missile"], wait_time=1.5)
-    else:
-        raise GameError("無法確認戰鬥狀態，跳出")
-    
-    wait_click(serial, "confirm_small.png", wait_time=3)
+            self._spam_click_members()
+        
+        if wait_click(self.serial, "skip.png", timeout=5.0):
+            wait_click(self.serial, "confirm_small.png", wait_time=2)
 
-    for _ in range(30):
-        if not exist(serial, "pause.png", threshold=0.8):
-            break
-        wait_click(serial, positions["member1"], wait_time=0)
-        wait_click(serial, positions["member2"], wait_time=0)
-        wait_click(serial, positions["member3"], wait_time=0)
-        wait_click(serial, positions["member4"], wait_time=0)
-        wait_click(serial, positions["member5"], wait_time=0)
-        wait_click(serial, positions["missile"], wait_time=0.5)
-    
-    if wait_click(serial, "skip.png", timeout=5.0):
-        wait_click(serial, "confirm_small.png", wait_time=2)
+        if wait_click(self.serial, "skip.png", timeout=5.0):
+            wait_click(self.serial, "confirm_small.png", wait_time=2)
+        connection_retry(self.serial, wait_name="settings_btn.png", timeout=120.0)
 
-    if wait_click(serial, "skip.png", timeout=5.0):
-        wait_click(serial, "confirm_small.png", wait_time=2)
+    def _first_stage(self):
+        log_msg(self.serial, "遊戲開場介紹")
+        if not exist(self.serial, "phase1_lvl1_text.png"):
+            return
 
-def first_stage(serial):
-    log_msg(serial, "遊戲開場介紹")
-    connection_retry(serial, wait_name="settings_btn.png", timeout=120.0)
+        if wait_click(self.serial, "skip.png", timeout=5.0):
+            wait_click(self.serial, "confirm_small.png", wait_time=2)
+        
+        wait_click(self.serial, "skip.png", timeout=5.0)
 
-    if wait_click(serial, "skip.png", timeout=5.0):
-        wait_click(serial, "confirm_small.png", wait_time=2)
-    
-    wait_click(serial, "skip.png", timeout=5.0)
+        apply_mode(self.serial, mode_name="main_stage", state="on")
+        main_stage_finish_new(self.serial)
 
-    apply_mode(serial, mode_name="main_stage", state="on")
-    main_stage_finish_new(serial)
+    def _first_ranger(self):
+        if not exist(self.serial, "phase1_new_friend_text.png"):
+            return
 
-def first_ranger(serial):
-    if not wait(serial, "settings_btn.png", timeout=40.0):
-        raise GameError("不再主畫面")
-    wait_click(serial, "skip.png")
-    wait_click(serial, "confirm_small.png")
-    wait_click(serial, "gacha_icon.png", timeout=7.0)
-    if not wait(serial, "gacha_text.png", timeout=40.0):
-        raise GameError("無法進入扭蛋")
-    wait_click(serial, "skip.png", timeout=1.5)
-    wait_click(serial, "gacha_jessica.png")
-    wait_click(serial, "gacha_skip.png", timeout=40.0)
-    wait_click(serial, "confirm_small.png")
-    wait_click(serial, "gacha_confirm.png")
-    wait_click(serial, "skip.png", timeout=40.0)
-    wait_click(serial, "confirm_small.png")
+        wait_click(self.serial, "skip.png")
+        wait_click(self.serial, "confirm_small.png")
+        wait_click(self.serial, "gacha_icon.png", timeout=7.0)
+        if not wait(self.serial, "gacha_text.png", timeout=40.0):
+            raise GameError("無法進入扭蛋")
+        wait_click(self.serial, "skip.png", timeout=1.5)
+        wait_click(self.serial, "gacha_jessica.png")
+        wait_click(self.serial, "gacha_skip.png", timeout=40.0)
+        wait_click(self.serial, "confirm_small.png")
+        wait_click(self.serial, "gacha_confirm.png")
+        wait_click(self.serial, "skip.png", timeout=40.0)
+        wait_click(self.serial, "confirm_small.png")
+        connection_retry(self.serial, wait_name="settings_btn.png", timeout=35.0)
 
 
-def first_arrange_team(serial):
-    connection_retry(serial, wait_name="settings_btn.png", timeout=35.0)
-    if wait_click(serial, "skip.png", timeout=3):
-        wait_click(serial, "confirm_small.png", wait_time=0.5)
-    wait_click(serial, "team_icon.png")
-    connection_retry(serial, wait_name="leonard_teacher.png", exception_msg="找不到隊伍教學", timeout=35.0)
-    wait_click(serial, "leonard_teacher.png")
-    wait_click(serial, "leonard_teacher.png")
+    def _first_arrange_team(self):
+        if wait_click(self.serial, "skip.png", timeout=3):
+            wait_click(self.serial, "confirm_small.png")
+        wait_click(self.serial, "team_icon.png")
+        connection_retry(self.serial, wait_name="leonard_teacher.png", exception_msg="找不到隊伍教學", timeout=35.0)
+        wait_click(self.serial, "leonard_teacher.png")
+        wait_click(self.serial, "leonard_teacher.png")
 
-    if exist(serial, "leonard_teacher.png"):
-        drag(serial, (641, 285), (182, 576), wait_time=1.0, timeout=10.0)
-        drag(serial, (182, 576), (641, 285), wait_time=1.0, timeout=10.0)
+        if exist(self.serial, "leonard_teacher.png"):
+            drag(self.serial, (641, 285), (182, 576), wait_time=1.0, timeout=10.0)
+            drag(self.serial, (182, 576), (641, 285), wait_time=1.0, timeout=10.0)
 
-    wait_click(serial, "skip.png")
-    wait_click(serial, "confirm_small.png")
-    wait_click(serial, "save_team.png", wait_time=3.0)
-    connection_retry(serial, wait_name="settings_btn.png", exception_msg="未進入主畫面，隊伍教學失敗", timeout=35.0)
-    for _ in range(3):
-        if wait_click(serial, "skip.png", timeout=5, wait_time=1.0):
-            if not exist(serial, "confirm_small.png"):
-                continue
-            wait_click(serial, "confirm_small.png", wait_time=0.5)
-            break
-    wait_click(serial, "confirm_small.png", wait_time=0.5)
+        wait_click(self.serial, "skip.png")
+        wait_click(self.serial, "confirm_small.png")
+        wait_click(self.serial, "save_team.png", wait_time=3.0)
+        connection_retry(self.serial, wait_name="settings_btn.png", exception_msg="未進入主畫面，隊伍教學失敗", timeout=35.0)
+        for _ in range(3):
+            if wait_click(self.serial, "skip.png", timeout=5, wait_time=1.0):
+                if not exist(self.serial, "confirm_small.png"):
+                    continue
+                wait_click(self.serial, "confirm_small.png", wait_time=0.5)
+                break
+        wait_click(self.serial, "confirm_small.png", wait_time=0.5)
 
-def phase1(serial):
-    try:
-        first_time_login(serial)
-    except GameError as e:
-        raise
+    def run(self):
+        self.first_time_login()
+        self.pre_stage()
 
-    try:
-        pre_stage(serial)
-    except GameError as e:
-        raise
+        if exist(self.serial, "long_quest.png", threshold=0.65):
+            return
 
-    try:
-        first_stage(serial)
-    except GameError as e:
-        raise
-
-    try:
-        first_ranger(serial)
-    except GameError as e:
-        raise
-
-    try:
-        first_arrange_team(serial)
-    except GameError as e:
-        raise
-    
+        self.first_stage()
+        self.first_ranger()
+        self.first_arrange_team()
