@@ -13,7 +13,7 @@ class BasePvP:
         self.serial = serial
 
     def enter_menu(self):
-        if exist(self.serial, PvP.TEXT):
+        if exist(self.serial, PvP.TEXT, threshold=0.9):
             return
         
         for _ in range(5):
@@ -72,7 +72,7 @@ class BasePvP:
         while True:
             if not exist(self.serial, PvP.SETTLEMENT_TEXT):
                 time.sleep(2.0)
-                wait(self.serial, PvP.TEXT, timeout=40.0, wait_time=3.0)
+                wait(self.serial, PvP.TEXT, timeout=40.0, wait_time=3.0, threshold=0.9)
                 exist_click(self.serial, PvP.LVL_UP, wait_time=2.0)
                 return
             if exist(self.serial, Retry.TEXT1):
