@@ -1,5 +1,6 @@
 from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
-from scripts.shared.constants import Settlement, Confirm, Battle, Retry
+from scripts.shared.constants import Settlement, Confirm, Battle, Retry, MainView
+from scripts.shared.events.main_stage.enum import MainStage
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.events.pvp.enum import PvP
 from core.base.exceptions import GameError
@@ -20,7 +21,7 @@ class BasePvP:
                 connection_retry(self.serial, image_name=PvP.BTN, exception_msg="不在主畫面", timeout=40.0)
                 # 判賽季結算(或聯盟初始化) 跟 pvp介紹 跟 屬性關卡介紹 跟 降級
                 return
-            elif exist(self.serial, "main_stage_btn.png"):
+            elif exist(self.serial, MainStage.BTN):
                 drag(self.serial, (800, 400), (200, 400))
                 drag(self.serial, (800, 400), (200, 400))
 
@@ -37,9 +38,9 @@ class BasePvP:
         connection_retry(self.serial, wait_name=Battle.NEXT, timeout=40.0)
 
     def _cancel_match_up(self):
-        wait_click(self.serial, "cancel.png")
-        wait_click(self.serial, "back.png")
-        wait_click(self.serial, "back.png")
+        wait_click(self.serial, Confirm.CANCEL)
+        wait_click(self.serial, MainView.BACK)
+        wait_click(self.serial, MainView.BACK)
         connection_retry(self.serial, wait_name=PvP.TEXT, timeout=40.0)
 
     def run(self):
@@ -71,7 +72,8 @@ class BasePvP:
         while True:
             if not exist(self.serial, PvP.SETTLEMENT_TEXT):
                 time.sleep(2.0)
-                # 判晉級
+                wait(self.serial, PvP.TEXT, timeout=40.0, wait_time=3.0)
+                exist_click(self.serial, PvP.LVL_UP, wait_time=2.0)
                 return
             if exist(self.serial, Retry.TEXT1):
                 exist_click(self.serial, Retry.TEXT1)

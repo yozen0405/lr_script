@@ -9,3 +9,6 @@ class Settlement(str, Enum):
     TEXT = "main_stage_settlement_text.png"
     CANCEL_LOSE = "cancel_lose.png"
     CLOSE_LOSE_TIPS = "close_lose_tips.png"
+    AGAIN = "main_stage_settlement_again.png"
+    NEXT = "main_stage_settlement_next.png"
+    NEXT_FEATURE_TEXT = "main_stage_settlement_next_feature_text.png"

@@ -3,7 +3,8 @@ from core.system.logger import log_msg
 from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, get_pos, drag
 from core.base.exceptions import GameError
 from scripts.shared.constants.positions import positions
-from scripts.shared.constants import Settlement, Confirm, Battle, Retry
+from scripts.shared.constants import Settlement, Confirm, Battle, Retry, MainView
+from scripts.shared.events.main_stage.enum import MainStage
 from scripts.shared.events.special_stage.enum import SpecialStage
 from scripts.shared.utils.retry import connection_retry
 from typing import Optional, Tuple
@@ -23,7 +24,7 @@ class BaseSpecialStage:
                 connection_retry(self.serial, image_name=SpecialStage.BTN, exception_msg="不在主畫面", timeout=40.0)
                 self._on_pre_anime()
                 return
-            elif exist(self.serial, "main_stage_btn.png"):
+            elif exist(self.serial, MainStage.BTN):
                 drag(self.serial, (800, 400), (200, 400))
 
         raise GameError("無法進入特殊關卡")
@@ -70,7 +71,7 @@ class BaseSpecialStage:
                     return True
                 elif exist(self.serial, SpecialStage.LIMITED):
                     exist_click(self.serial, Confirm.SMALL, wait_time=2.0)
-                    wait_click(self.serial, "back.png")
+                    wait_click(self.serial, MainView.BACK)
                     connection_retry(self.serial, wait_name=SpecialStage.LAB, exception_msg="回不去特殊關卡主畫面", timeout=40.0)
                     return False
         else:
@@ -94,7 +95,7 @@ class BaseSpecialStage:
         log_msg(self.serial, "結算中")
         self.settlement()
 
-        wait_click(self.serial, "back.png", timeout=20.0)
+        wait_click(self.serial, MainView.BACK, timeout=20.0)
         connection_retry(self.serial, wait_name=SpecialStage.LAB, exception_msg="回不去特殊關卡主畫面", timeout=40.0)
         
         log_msg(self.serial, "Special Stage 任務完成")

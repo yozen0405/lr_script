@@ -1,0 +1,30 @@
+from enum import Enum
+
+class MainView(str, Enum):    
+    GACHA_SKIP = "gacha_skip.png"
+    SETTINGS = "settings_btn.png"
+    CLOSE_BOARD = "close_board.png"
+    CLOSE_PVP = "close_to_pvp.png"
+    SKIP = "skip.png"
+    BOARD_DONT_SHOW = "board_dont_show.png"
+    BOARD_END = "board_end2.png"
+    BACK = "back.png"
+
+class GameView(str, Enum):
+    GAME_OPENED = "open_game.png"
+    ICON = "gameicon.png"
+    LINE_STUDIO_TEXT = "open_game_line_studio_text.png"
+    LOADING = "loading_page.png"
+    WAITING = "game_waiting_page.png"
+    PLAY_BTN = "game_waiting_play_btn.png"
+    DOWNLOAD_TEXT = "loading_page_download.png"
+    LINE_GAME_TEXT = "line_game_text.png"
+    LOGIN_LINE = "login_line.png"
+    GUEST_LOGIN = "guest_login.png"
+    GUEST_CONNECT = "guest_connect.png"
+    TERMS_COMPLETE = "terms_complete.png"
+    TERMS = "terms.png"
+    AGREE_TERMS = "agree_terms.png"
+    ENG_BTN = "english_btn.png"
+    PERM = "confirm_perm.png"
+    AUTH_FAILED = "auth_failed.png"

@@ -3,13 +3,14 @@ import os
 from core.system.logger import log_msg
 from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, back, drag
 from core.base.exceptions import GameError
+from scripts.shared.constants import Retry
 
 def connection_retry(
     serial,
     image_name=None,
     wait_name=None,
-    retry="retry.png",
-    retry_text="retry_text.png",
+    retry=Retry.BTN,
+    retry_text=Retry.TEXT1,
     exception_msg="等待畫面失敗",
     timeout=15.0,
     wait_time=0.0
@@ -27,10 +28,3 @@ def connection_retry(
         time.sleep(0.5)
 
     raise GameError(exception_msg)
-    
-
-def liapp_alert(serial, esc=True):
-    if wait(serial, "liapp_icon.png", timeout=10.0):
-        wait_click(serial, "liapp_confirm.png")
-    if esc and wait(serial, "gameicon.png", timeout=5.0):
-        raise GameError("出現liapp alert, 強制退出")

@@ -11,8 +11,8 @@ def normal_stage(serial):
     # for _ in range(5):
     #     if not pvp_loop_battle(serial):
     #         break
-    # apply_mode(serial, mode_name="pvp", state="off")
-    # apply_mode(serial, mode_name="special_stage", state="on")
-    # wait(serial, "back.png")
-    # connection_retry(serial, wait_name="main_stage_btn.png", timeout=40.0)
+    apply_mode(serial, mode_name="pvp", state="off")
+    apply_mode(serial, mode_name="special_stage", state="on")
+    wait(serial, "back.png")
+    connection_retry(serial, wait_name="main_stage_btn.png", timeout=40.0)
     special_stage_loop_game(serial, planet=Planet.COLLAB)
