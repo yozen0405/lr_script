@@ -9,3 +9,5 @@ class PvP(str, Enum):
     BTN = "pvp_btn.png"
     MATCHING_TEXT = "pvp_battle_opponent_text.png"
     LVL_UP = "pvp_lvl_up.png"
+    BLIND_MATCH = "pvp_blind_match.png"
+    CHALLENGE_BLIND = "pvp_opponent_challenge2.png"

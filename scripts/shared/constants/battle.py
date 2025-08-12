@@ -18,3 +18,4 @@ class Battle(str, Enum):
     MULTIPLIER_TEXT = "pre_start_multiplier_text.png"
     MULTIPLIER_ON = "pre_start_multiplier_light_btn.png"
     MULTIPLIER_OFF = "pre_start_multiplier_dark_btn.png"
+    ENTER = "enter_btn.png"

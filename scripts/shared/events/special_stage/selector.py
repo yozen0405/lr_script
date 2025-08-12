@@ -44,18 +44,25 @@ class SpecialStageTask:
             return
         self.base.loop_mode_run()
     
-    def conquer_planet(self, planet: str):
+    def loop_battle(self, planet: str, stage: int):
         self.base.enter_menu()
         crop_region = self._stage_to_region_map(planet=planet)
         region = self.base.find_target_planet(planet=planet, crop_region=crop_region)
 
+        self._loop_battle(planet=planet, stage=stage, region=region)
+
+    def conquer_planet(self, planet: str):
         for stage in range(1, 7):
-            self._loop_battle(planet=planet, stage=stage, region=region)
+            self.loop_battle(planet=planet, stage=stage)
 
 def special_stage_single_game(serial, planet: str, stage: int):
     spc = SpecialStageTask(serial)
     spc.single_battle(planet=planet, stage=stage)
 
-def special_stage_loop_game(serial, planet: str):
+def special_stage_loop_game(serial, planet: str, stage: int):
+    spc = SpecialStageTask(serial)
+    spc.loop_battle(planet=planet, stage=stage)
+
+def special_stage_conquer_planet(serial, planet: str):
     spc = SpecialStageTask(serial)
     spc.conquer_planet(planet=planet)

@@ -33,6 +33,17 @@ class BasePvP:
             if wait(self.serial, PvP.MATCHING_TEXT, timeout=3.0):
                 break
 
+        for _ in range(5):
+            wait_click(self.serial, PvP.BATTLE)
+            if wait(self.serial, PvP.MATCHING_TEXT, timeout=3.0):
+                wait_click(self.serial, PvP.CHALLENGE)
+                break
+            if wait(self.serial, PvP.BLIND_MATCH, timeout=3.0):
+                wait_click(self.serial, PvP.CHALLENGE)
+                break
+            if exist(self.serial, Retry.TEXT1):
+                exist_click(self.serial, Retry.BTN)
+
         connection_retry(self.serial, wait_name=PvP.MATCHED, timeout=40.0)
         wait_click(self.serial, PvP.CHALLENGE)
         connection_retry(self.serial, wait_name=Battle.NEXT, timeout=40.0)

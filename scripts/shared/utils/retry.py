@@ -13,14 +13,15 @@ def connection_retry(
     retry_text=Retry.TEXT1,
     exception_msg="等待畫面失敗",
     timeout=15.0,
-    wait_time=0.0
+    wait_time=0.0,
+    threshold=0.7
 ):
     start_time = time.time()
     while time.time() - start_time < timeout:
-        if image_name and not exist(serial, image_name):
+        if image_name and not exist(serial, image_name, threshold=threshold):
             time.sleep(wait_time)
             return True
-        if wait_name and exist(serial, wait_name):
+        if wait_name and exist(serial, wait_name, threshold=threshold):
             time.sleep(wait_time)
             return True
         if wait(serial, retry_text, timeout=1.5):

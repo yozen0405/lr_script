@@ -4,6 +4,7 @@ class MainView(str, Enum):
     GACHA_SKIP = "gacha_skip.png"
     SETTINGS = "settings_btn.png"
     CLOSE_BOARD = "close_board.png"
+    CLOSE_BOARD2 = "close_board2.png"
     CLOSE_PVP = "close_to_pvp.png"
     SKIP = "skip.png"
     BOARD_DONT_SHOW = "board_dont_show.png"
