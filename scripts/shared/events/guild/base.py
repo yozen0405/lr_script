@@ -49,14 +49,18 @@ class GuildRaid:
         self._support_members()
         wait_click(self.serial, Guild.QUEST_BTN)
         while True:
-            wait_click(self.serial, Guild.CLAIM, timeout=3.0)
-            if exist(self.serial, Retry.TEXT1):
+            if exist(self.serial, Guild.QUEST_CLAIMED_TEXT, threshold=0.9):
                 exist_click(self.serial, Confirm.SMALL)
-            elif exist(self.serial, Guild.QUEST_CLAIMED_TEXT, threshold=0.9):
+            elif exist(self.serial, Retry.TEXT1):
                 exist_click(self.serial, Confirm.SMALL)
+            elif wait_click(self.serial, Guild.CLAIM, timeout=3.0):
+                continue
             else:
-                break
-        wait_click(self.serial, MainView.CLOSE_BOARD2, threshold=0.9)
+                wait_click(self.serial, MainView.CLOSE_BOARD2, threshold=0.9, timeout=3.0)
+                if not wait_vanish(self.serial, MainView.CLOSE_BOARD2, threshold=0.9, timeout=3.0):
+                    continue
+                else:
+                    break
         
 
     def enter_raid_menu(self):
@@ -72,13 +76,11 @@ class GuildRaid:
         if not wait(self.serial, Guild.RAID_ATTACK, timeout=3.0):
             wait_click(self.serial, Battle.ENTER)
             connection_retry(self.serial, image_name=Battle.ENTER, exception_msg="無法進入公會副本關卡", timeout=40.0)
-        for _ in range(3):
-            if not wait_click(self.serial, Guild.TOUCH_SCREEN, timeout=3.0):
+        for _ in range(10):
+            wait_click(self.serial, Guild.TOUCH_SCREEN, timeout=3.0)
+            wait_click(self.serial, MainView.CLOSE_BOARD, threshold=0.9, timeout=3.0)
+            if wait_click(self.serial, Guild.RAID_ATTACK):
                 break
-        for _ in range(3):
-            if not wait_click(self.serial, MainView.CLOSE_BOARD, threshold=0.9, timeout=3.0):
-                break
-        wait_click(self.serial, Guild.RAID_ATTACK)
         while True:
             if exist(self.serial, Guild.RAID_LIMITED):
                 exist_click(self.serial, Confirm.CANCEL, wait_time=1.0)
@@ -116,9 +118,9 @@ class GuildRaid:
 
 def guild_raid_battle(serial):
     grd = GuildRaid(serial)
-    # grd.enter_raid_menu()
-    # for _ in range(3):
-    #     if not grd.raid_run():
-    #         break
-    # grd.enter_menu()
+    grd.enter_raid_menu()
+    for _ in range(3):
+        if not grd.raid_run():
+            break
+    grd.enter_menu()
     grd.do_quest()

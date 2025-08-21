@@ -43,8 +43,11 @@ class BaseSpecialStage:
             if pos:
                 x, y = pos
                 drag(self.serial, (x, y), (640, y), wait_time=1.5)
-                pos = get_pos(self.serial, planet)
-                x, y = pos
+                for i in range(2):
+                    pos = get_pos(self.serial, planet)
+                    if pos is None:
+                        continue
+                    x, y = pos
                 if crop_region:
                     (offsets_x1, offsets_y1, offsets_x2, offsets_y2) = crop_region
                     region = (x - offsets_x1, y - offsets_y1, x + offsets_x2, y + offsets_y2)
@@ -100,6 +103,13 @@ class BaseSpecialStage:
         
         log_msg(self.serial, "Special Stage 任務完成")
 
+    def _quit_game(self):
+        wait_click(self.serial, Confirm.CANCEL, wait_time=1.0)
+        wait_click(self.serial, MainView.BACK)
+        connection_retry(self.serial, wait_name=SpecialStage.TEXT, exception_msg="無法回去特殊關卡準備畫面", timeout=40.0)
+        wait_click(self.serial, "back.png", timeout=20.0)
+        connection_retry(self.serial, wait_name=SpecialStage.LAB, exception_msg="回不去特殊關卡主畫面", timeout=40.0)
+
     def loop_mode_run(self):
         log_msg(self.serial, "Special Stage 迴圈進場")
 
@@ -108,7 +118,9 @@ class BaseSpecialStage:
         wait_click(self.serial, Battle.CYCLE)
         if wait(self.serial, Confirm.SMALL):
             exist_click(self.serial, Battle.MAX_OFF, threshold=0.9)
-            wait_click(self.serial, Confirm.SMALL)
+            if not wait_click(self.serial, Confirm.SMALL, threshold=0.9):
+                self._quit_game()
+                return False
 
         wait_click(self.serial, Battle.NEXT)
         wait_click(self.serial, Battle.START)
@@ -132,6 +144,7 @@ class BaseSpecialStage:
         connection_retry(self.serial, wait_name=SpecialStage.LAB, exception_msg="回不去特殊關卡主畫面", timeout=40.0)
 
         log_msg(self.serial, "Special Stage 迴圈任務完成")
+        return True
 
     def _on_start_page(self):
         if not wait_click(self.serial, SpecialStage.CIRCLE, timeout=3.0, wait_time=1.5):

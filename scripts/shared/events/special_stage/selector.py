@@ -41,19 +41,20 @@ class SpecialStageTask:
     def _loop_battle(self, planet: str, stage: int, region):
         if self.base.enter_stage(stage_num=stage, region=region) == False:
             log_msg(self.serial, f"第{stage}關已經達到上限")
-            return
-        self.base.loop_mode_run()
+            return True
+        return self.base.loop_mode_run()
     
     def loop_battle(self, planet: str, stage: int):
         self.base.enter_menu()
         crop_region = self._stage_to_region_map(planet=planet)
         region = self.base.find_target_planet(planet=planet, crop_region=crop_region)
 
-        self._loop_battle(planet=planet, stage=stage, region=region)
+        return self._loop_battle(planet=planet, stage=stage, region=region)
 
     def conquer_planet(self, planet: str):
         for stage in range(1, 7):
-            self.loop_battle(planet=planet, stage=stage)
+            if not self.loop_battle(planet=planet, stage=stage):
+                return
 
 def special_stage_single_game(serial, planet: str, stage: int):
     spc = SpecialStageTask(serial)

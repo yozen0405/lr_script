@@ -12,18 +12,38 @@ class BasePvP:
     def __init__(self, serial):
         self.serial = serial
 
+    def _close_pvp_in(self):
+        cnt = 0
+        while True:
+            if exist_click(self.serial, PvP.LVL_DOWN):
+                cnt = 0
+                continue
+            if exist(self.serial, PvP.SEASON_END_TEXT, threshold=0.9):
+                cnt = 0
+                exist_click(self.serial, Confirm.SMALL)
+                continue
+            if exist(self.serial, PvP.TEXT, threshold=0.9):
+                cnt += 1
+                if cnt >= 2:
+                    return
+            
+
     def enter_menu(self):
-        if exist(self.serial, PvP.TEXT, threshold=0.9):
+        if exist(self.serial, PvP.TEXT, threshold=0.999):
             return
         
         for _ in range(5):
             if wait_click(self.serial, PvP.BTN):
                 connection_retry(self.serial, image_name=PvP.BTN, exception_msg="不在主畫面", timeout=40.0)
+                self._close_pvp_in()
                 # 判賽季結算(或聯盟初始化) 跟 pvp介紹 跟 屬性關卡介紹 跟 降級
                 return
             elif exist(self.serial, MainStage.BTN):
                 drag(self.serial, (800, 400), (200, 400))
                 drag(self.serial, (800, 400), (200, 400))
+            elif exist(self.serial, PvP.TEXT):
+                self._close_pvp_in()
+                return
 
         raise GameError("無法進入特殊關卡")
 

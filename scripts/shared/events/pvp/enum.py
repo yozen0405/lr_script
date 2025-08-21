@@ -11,3 +11,5 @@ class PvP(str, Enum):
     LVL_UP = "pvp_lvl_up.png"
     BLIND_MATCH = "pvp_blind_match.png"
     CHALLENGE_BLIND = "pvp_opponent_challenge2.png"
+    LVL_DOWN = "pvp_lvl_downgrade.png"
+    SEASON_END_TEXT = "pvp_season_end_text.png"

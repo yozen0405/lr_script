@@ -17,3 +17,4 @@ class Guild(str, Enum):
     WAR_REWARD_POP = "guild_war_reward.png"
     RAID_LIMITED = "guild_raid_limited_text.png"
     QUEST_CLAIMED_TEXT = "guild_quest_claimed_text.png"
+    QUEST_FINISHED = "guild_quest_finished.png"
