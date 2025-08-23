@@ -18,3 +18,4 @@ class Guild(str, Enum):
     RAID_LIMITED = "guild_raid_limited_text.png"
     QUEST_CLAIMED_TEXT = "guild_quest_claimed_text.png"
     QUEST_FINISHED = "guild_quest_finished.png"
+    RAID_OCCUPIED = "guild_raid_occupied_text.png"

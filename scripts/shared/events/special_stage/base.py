@@ -64,7 +64,7 @@ class BaseSpecialStage:
         if not wait(self.serial, SpecialStage.TEXT, timeout=30.0):
             raise GameError("不在特殊")
         
-        if wait_click(self.serial, SpecialStage.STAGE(stage=stage_num), region=region, timeout=7.0, threshold=0.96):
+        if wait_click(self.serial, SpecialStage.STAGE(stage=stage_num), region=region, timeout=7.0, threshold=0.8):
             connection_retry(self.serial, wait_name=SpecialStage.TEXT, exception_msg="進不去特殊關卡的關卡", timeout=40.0)
             wait_click(self.serial, SpecialStage.ENTER, timeout=25.0)
             while True:

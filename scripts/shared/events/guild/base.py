@@ -78,7 +78,7 @@ class GuildRaid:
             connection_retry(self.serial, image_name=Battle.ENTER, exception_msg="無法進入公會副本關卡", timeout=40.0)
         for _ in range(10):
             wait_click(self.serial, Guild.TOUCH_SCREEN, timeout=3.0)
-            wait_click(self.serial, MainView.CLOSE_BOARD, threshold=0.9, timeout=3.0)
+            wait_click(self.serial, MainView.CLOSE_BOARD2, threshold=0.9, timeout=3.0)
             if wait_click(self.serial, Guild.RAID_ATTACK):
                 break
         while True:
@@ -87,6 +87,8 @@ class GuildRaid:
                 wait_click(self.serial, MainView.BACK)
                 connection_retry(self.serial, wait_name=Battle.ENTER, timeout=40.0)
                 return False
+            if exist(self.serial, Guild.RAID_OCCUPIED):
+                exist_click(self.serial, Confirm.SMALL)
             if exist(self.serial, Retry.TEXT1):
                 exist_click(self.serial, Retry.BTN)
             if exist(self.serial, Battle.PAUSE):

@@ -24,5 +24,6 @@ def normal_stage(serial):
     wait_click(serial, "back.png")
     connection_retry(serial, wait_name="main_stage_btn.png", timeout=40.0)
     special_stage_conquer_planet(serial, planet=Planet.COLLAB)
-    for stage in range(4, 7):
+    for stage in range(4, 5):
         special_stage_loop_game(serial, planet=Planet.IMMORTAL_SKULL, stage=stage)
+    special_stage_loop_game(serial, planet=Planet.IMMORTAL_SKULL, stage=2)
