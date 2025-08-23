@@ -3,7 +3,7 @@ from core.system.logger import log_msg
 from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
 from core.actions.ocr import get_main_stage_num
 from core.base.exceptions import GameError
-from scripts.shared.constants.positions import positions
+from scripts.shared.constants.positions import Positions
 from scripts.shared.utils.retry import connection_retry
 from typing import Optional
 from scripts.shared.constants import GameView, Settlement, Battle, Confirm, MainView, Leonard, Retry
@@ -12,9 +12,9 @@ from scripts.shared.events.main_stage.enum import MainStage, Stages, Treasure
 class BaseMainStage:
     def __init__(self, serial):
         self.serial = serial
-        self.MEMBER3_POS = positions["member3"]
-        self.MEMBER4_POS = positions["member4"]
-        self.FRIEND = positions["friend"]
+        self.MEMBER3_POS = Positions.MEMBER3
+        self.MEMBER4_POS = Positions.MEMBER4
+        self.FRIEND = Positions.FRIEND
 
     def enter_menu(self):
         if exist(self.serial, MainStage.TEXT):
@@ -38,7 +38,7 @@ class BaseMainStage:
                 return True
         return False
 
-    def _find_stage(self):
+    def _find_stage(self, custom_stage: str = None):
         y = 360
         x = 800
         drag_pairs = [
@@ -63,8 +63,13 @@ class BaseMainStage:
 
                 if exist(self.serial, Stages.LOCKED, threshold=0.9):
                     timeout = 5.0
-                if self._check_stage_on_screen(timeout=timeout):
-                    return 
+                if custom_stage is None:
+                    if self._check_stage_on_screen(timeout=timeout):
+                        return
+                else:
+                    if wait_click(self.serial, custom_stage, timeout=3.0):
+                        connection_retry(self.serial, image_name=MainStage.TEXT, retry_text=Retry.TEXT2, timeout=40.0)
+                        return
 
                 if wait(self.serial, Treasure.ICON, threshold=0.9, timeout=3.5):
                     pos = get_pos(self.serial, Treasure.ICON, threshold=0.9)
@@ -91,6 +96,28 @@ class BaseMainStage:
                         end_pos[0] = x_val
 
                 drag(self.serial, tuple(start_pos), tuple(end_pos))
+
+    def _find_custom_stage(self, stage: int):
+        # 魔王關會爛
+        stage_str = f"main_stage_num{stage}.png"
+        if exit(self.serial, stage_str):
+            return
+        exist_click(self.serial, 右下角)
+
+        if stage < 100:
+            exist_click(self.serial, MainStage.STAGE_NAV_1)
+        elif stage < 200:
+            exist_click(self.serial, MainStage.STAGE_NAV_100)
+        elif stage < 300:
+            exist_click(self.serial, MainStage.STAGE_NAV_200)
+        elif stage < 400:
+            exist_click(self.serial, MainStage.STAGE_NAV_300)
+        elif stage < 500:
+            exist_click(self.serial, MainStage.STAGE_NAV_400)
+
+        self._find_stage(custom_stage=stage_str)
+        if not wait(self.serial, MainStage.PRE_START_TEXT, timeout=5.5):
+            raise GameError(f"找不到指定關卡 {stage}")
 
     def get_current_stage(self) -> int:
         return get_main_stage_num(self.serial)

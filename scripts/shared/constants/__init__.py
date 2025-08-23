@@ -4,5 +4,6 @@ from .retry import Retry
 from .battle import Battle
 from .leonard import Leonard
 from .view import GameView, MainView
+from .positions import Positions
 
-__all__ = ["Confirm", "Settlement", "Retry", "Battle", "GameView", "MainView", "Leonard"]
+__all__ = ["Confirm", "Settlement", "Retry", "Battle", "GameView", "MainView", "Leonard", "Positions"]

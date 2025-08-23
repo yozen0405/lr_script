@@ -20,15 +20,15 @@ if __name__ == "__main__":
         print("啟動單機模式")
         normal_stage(devices[0])
 
-    else:
-        print("啟動多執行緒模式")
-        try:
-            with ThreadPoolExecutor(max_workers=len(devices)) as executor:
-                futures = [executor.submit(normal_stage, d) for d in devices]
-                for future in futures:
-                    future.result()
+    # else:
+    #     print("啟動多執行緒模式")
+    #     try:
+    #         with ThreadPoolExecutor(max_workers=len(devices)) as executor:
+    #             futures = [executor.submit(normal_stage, d) for d in devices]
+    #             for future in futures:
+    #                 future.result()
 
-        except KeyboardInterrupt:
-            print("\n偵測到中斷，正在關閉執行緒...")
-            executor.shutdown(wait=False, cancel_futures=True)
-            print("已停止所有任務。")
+    #     except KeyboardInterrupt:
+    #         print("\n偵測到中斷，正在關閉執行緒...")
+    #         executor.shutdown(wait=False, cancel_futures=True)
+    #         print("已停止所有任務。")

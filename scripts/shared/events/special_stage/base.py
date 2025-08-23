@@ -2,8 +2,7 @@ import time
 from core.system.logger import log_msg
 from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, get_pos, drag
 from core.base.exceptions import GameError
-from scripts.shared.constants.positions import positions
-from scripts.shared.constants import Settlement, Confirm, Battle, Retry, MainView
+from scripts.shared.constants import Settlement, Confirm, Battle, Retry, MainView, Positions
 from scripts.shared.events.main_stage.enum import MainStage
 from scripts.shared.events.special_stage.enum import SpecialStage
 from scripts.shared.utils.retry import connection_retry
@@ -12,8 +11,8 @@ from typing import Optional, Tuple
 class BaseSpecialStage:
     def __init__(self, serial):
         self.serial = serial
-        self.MEMBER3_POS = positions["member3"]
-        self.MEMBER4_POS = positions["member4"]
+        self.MEMBER3_POS = Positions.MEMBER3
+        self.MEMBER4_POS = Positions.MEMBER4
 
     def enter_menu(self):
         if exist(self.serial, SpecialStage.TEXT):

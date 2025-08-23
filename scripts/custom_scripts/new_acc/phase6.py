@@ -10,25 +10,9 @@ from core.actions.screen import (
 )
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_view import on_main_view
-from scripts.shared.events.gacha import Gacha
-from scripts.shared.events.url import LinkNavigator
+from scripts.shared.events.gacha.base import Gacha
+from scripts.shared.events.url.base import LinkNavigator
 from core.base.exceptions import GameError
-
-class FirstGacha(Gacha):
-    def _skip_tutorial(self):
-        for _ in range(5):
-            wait_click(self.serial, "gacha_text.png", wait_time=1.0)
-        wait_click(self.serial, "gacha_equip_nav.png", wait_time=1.0)
-        wait_click(self.serial, "gacha_text.png", wait_time=1.0)
-        wait_click(self.serial, "gacha_gear_gauge.png", wait_time=1.0)
-
-        for _ in range(3):
-            wait_click(self.serial, "close_board.png", wait_time=1.0, threshold=0.5)
-        wait_click(self.serial, "gacha_shop.png", wait_time=1.0)
-        for _ in range(2):
-            wait_click(self.serial, "back.png", wait_time=1.0, threshold=0.5)
-        
-        wait_click(self.serial, "gacha_text.png", wait_time=1.0)
 
 def nav_link(serial):
     link_nav = LinkNavigator(serial)

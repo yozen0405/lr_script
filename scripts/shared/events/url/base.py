@@ -1,5 +1,8 @@
-from core.actions.screen import wait, drag, exist, exist_click, log_msg, open_external_url, launch_game
+from core.actions.screen import wait, drag, exist, exist_click, log_msg
+from core.actions.system import open_external_url, launch_game
 from core.system.config import Config
+from scripts.shared.events.url.enum import Url
+from scripts.shared.constants import MainView
 
 class LinkNavigator:
     def __init__(self, serial: str):
@@ -11,7 +14,7 @@ class LinkNavigator:
         return open_external_url(self.serial, self.url, wait_time)
 
     def wait_for_webpage_load(self, timeout: float = 10.0):
-        if not wait(self.serial, "link_page_loaded.png", timeout=timeout):
+        if not wait(self.serial, Url.LINK_PAGE_LOADED, timeout=timeout):
             log_msg(self.serial, "網頁加載逾時")
             return False
         log_msg(self.serial, "網頁載入成功")
@@ -19,13 +22,13 @@ class LinkNavigator:
 
     def scroll_until_run_button(self, max_scrolls: int = 5):
         for i in range(max_scrolls):
-            if exist(self.serial, "link_page_run_game.png"):
+            if exist(self.serial, Url.LINK_PAGE_RUN_GAME):
                 return True
             drag(self.serial, (600, 500), (600, 200), wait_time=2.0)
         return False
 
     def click_run_game(self):
-        if exist_click(self.serial, "link_page_run_game.png"):
+        if exist_click(self.serial, Url.LINK_PAGE_RUN_GAME):
             log_msg(self.serial, "已點擊 Run Game 按鈕")
             return True
         else:
@@ -49,5 +52,5 @@ class LinkNavigator:
             log_msg(self.serial, "無法開啟外部網址")
             return
 
-        if not wait(self.serial, "settings_btn.png"):
+        if not wait(self.serial, MainView.SETTINGS):
             launch_game(self.serial)
