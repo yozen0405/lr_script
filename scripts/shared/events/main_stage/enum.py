@@ -7,6 +7,12 @@ class MainStage(str, Enum):
     PRE_START_TEXT = "main_stage_pre_start_text.png"
     METEOR = "meteor.png"
     JAMES_FRIEND = "james_friend_icon.png"
+    STAGE_SELECTOR = "main_stage_selector.png"
+    STAGE_NAV_1 = "main_stage_nav1.png"
+    STAGE_NAV_100 = "main_stage_nav100.png"
+    STAGE_NAV_200 = "main_stage_nav200.png"
+    STAGE_NAV_300 = "main_stage_nav300.png"
+    STAGE_NAV_400 = "main_stage_nav400.png"
     
 class Stages(str, Enum):
     LOCKED = "new_stage_locked.png"

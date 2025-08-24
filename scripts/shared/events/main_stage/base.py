@@ -12,12 +12,12 @@ from scripts.shared.events.main_stage.enum import MainStage, Stages, Treasure
 class BaseMainStage:
     def __init__(self, serial):
         self.serial = serial
-        self.MEMBER3_POS = Positions.MEMBER3
-        self.MEMBER4_POS = Positions.MEMBER4
-        self.FRIEND = Positions.FRIEND
+        self.MEMBER3_POS = Positions.MEMBER3.value
+        self.MEMBER4_POS = Positions.MEMBER4.value
+        self.FRIEND = Positions.FRIEND.value
 
     def enter_menu(self):
-        if exist(self.serial, MainStage.TEXT):
+        if exist(self.serial, MainStage.TEXT, threshold=0.6):
             return
 
         if wait(self.serial, MainStage.BTN, timeout=20.0, wait_time=1.0):
@@ -26,14 +26,14 @@ class BaseMainStage:
         else:
             raise GameError("不在主畫面")
 
-    def _check_stage_on_screen(self, timeout: float = 3.0):
+    def _check_stage_on_screen(self):
         for image, threshold in [
             (Stages.NEW_COMMON, 0.98),
             (Stages.NEW_EVENT, 0.97),
             (Stages.BOSS, 0.92),
             (Stages.NEW_SHINE, 0.85),
         ]:
-            if wait_click(self.serial, image, threshold=threshold, timeout=timeout):
+            if exist(self.serial, image, threshold=threshold):
                 connection_retry(self.serial, image_name=MainStage.TEXT, retry_text=Retry.TEXT2, timeout=40.0)
                 return True
         return False
@@ -61,17 +61,15 @@ class BaseMainStage:
                 start_pos = list(base_start)
                 end_pos = list(base_end)
 
-                if exist(self.serial, Stages.LOCKED, threshold=0.9):
-                    timeout = 5.0
                 if custom_stage is None:
-                    if self._check_stage_on_screen(timeout=timeout):
+                    if self._check_stage_on_screen():
                         return
                 else:
-                    if wait_click(self.serial, custom_stage, timeout=3.0):
-                        connection_retry(self.serial, image_name=MainStage.TEXT, retry_text=Retry.TEXT2, timeout=40.0)
+                    if exist_click(self.serial, custom_stage, threshold=0.9):
+                        connection_retry(self.serial, image_name=MainStage.TEXT, retry_text=Retry.TEXT2, threshold=0.6, timeout=40.0)
                         return
 
-                if wait(self.serial, Treasure.ICON, threshold=0.9, timeout=3.5):
+                if exist(self.serial, Treasure.ICON, threshold=0.9):
                     pos = get_pos(self.serial, Treasure.ICON, threshold=0.9)
 
                     if start_pos[1] == end_pos[1]:
@@ -83,7 +81,7 @@ class BaseMainStage:
                         start_pos[0] = x_val
                         end_pos[0] = x_val
                 
-                if wait(self.serial, Treasure.ICON2, threshold=0.95, timeout=3.5):
+                if exist(self.serial, Treasure.ICON2, threshold=0.95):
                     pos = get_pos(self.serial, Treasure.ICON2, threshold=0.95)
 
                     if start_pos[1] == end_pos[1]:
@@ -99,10 +97,10 @@ class BaseMainStage:
 
     def _find_custom_stage(self, stage: int):
         # 魔王關會爛
-        stage_str = f"main_stage_num{stage}.png"
-        if exit(self.serial, stage_str):
+        stage_str = f"main_stage_stage_{stage}.png"
+        if exist_click(self.serial, stage_str, threshold=0.9):
             return
-        exist_click(self.serial, 右下角)
+        exist_click(self.serial, MainStage.STAGE_SELECTOR, wait_time=1.0)
 
         if stage < 100:
             exist_click(self.serial, MainStage.STAGE_NAV_1)
@@ -122,14 +120,16 @@ class BaseMainStage:
     def get_current_stage(self) -> int:
         return get_main_stage_num(self.serial)
 
-    def enter_stage(self, custom_stage: Optional[str] = None) -> int:
-        if not wait(self.serial, MainStage.TEXT, timeout=30.0, wait_time=2.5):
+    def enter_stage(self, custom_stage: Optional[int] = None) -> int:
+        if not wait(self.serial, MainStage.TEXT, threshold=0.6, timeout=30.0, wait_time=2.5):
             raise GameError("不在主要關卡")
         
-        if custom_stage is None and not self._check_stage_on_screen():
-            self._find_stage()
-        if custom_stage is not None:
-            wait_click(self.serial, custom_stage)
+        if custom_stage is None:
+            if not self._check_stage_on_screen():
+                self._find_stage()
+        else:
+            self._find_custom_stage(stage=custom_stage)
+            return custom_stage
 
         for _ in range(10):
             if wait(self.serial, MainStage.PRE_START_TEXT, timeout=5.5):
@@ -146,6 +146,7 @@ class BaseMainStage:
         log_msg(self.serial, "Main Stage 戰鬥開始")
 
         self._on_pre_start_page_prev()
+        exist_click(self.serial, Battle.AUTO_BTN_OFF2, threshold=0.99)
         wait_click(self.serial, Battle.NEXT, timeout=3.0)
         self._on_pre_start_page_next()
 
@@ -221,6 +222,8 @@ class BaseMainStage:
                 else:
                     return
 
-            for terminal_img in [MainView.GACHA_SKIP, MainView.SETTINGS, MainStage.TEXT]:
+            for terminal_img in [MainView.GACHA_SKIP, MainView.SETTINGS]:
                 if exist(self.serial, terminal_img):
                     return
+            if exist(self.serial, MainStage.TEXT, threshold=0.6):
+                return
