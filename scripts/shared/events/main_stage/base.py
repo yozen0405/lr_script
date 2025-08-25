@@ -129,8 +129,7 @@ class BaseMainStage:
                 self._find_stage()
         else:
             self._find_custom_stage(stage=custom_stage)
-            return custom_stage
-
+            
         for _ in range(10):
             if wait(self.serial, MainStage.PRE_START_TEXT, timeout=5.5):
                 self._handle_loop_stage_tutorial()

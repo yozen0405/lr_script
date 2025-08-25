@@ -14,84 +14,83 @@ class GuildRaid:
         self.serial = serial
 
     def enter_menu(self):
-        if exist(self.serial, Guild.RAID_TEXT):
-            wait_click(self.serial, MainView.BACK)
-            connection_retry(self.serial, wait_name=Guild.TEXT, timeout=40.0)
+        if exist(self.serial, Guild.RAID_TEXT.value):
+            wait_click(self.serial, MainView.BACK.value)
+            connection_retry(self.serial, wait_name=Guild.TEXT.value, timeout=40.0)
             return
         
-        if exist(self.serial, MainStage.BTN):
+        if exist(self.serial, MainStage.BTN.value):
             drag(self.serial, (200, 400), (800, 400))
             drag(self.serial, (200, 400), (800, 400))
 
-        if exist_click(self.serial, Guild.BTN):
-            connection_retry(self.serial, image_name=Guild.BTN, exception_msg="不在主畫面", timeout=40.0)
-            return
-        
-        if wait(self.serial, Guild.TEXT, timeout=10.0):
-            wait_click(self.serial, Guild.WAR_REWARD_POP, wait_time=2.0)
+        if exist_click(self.serial, Guild.BTN.value):
+            connection_retry(self.serial, image_name=Guild.BTN.value, exception_msg="不在主畫面", timeout=40.0)
+            
+        if wait(self.serial, Guild.TEXT.value, timeout=10.0):
+            wait_click(self.serial, Guild.WAR_REWARD_POP.value, wait_time=2.0)
         else:
             raise GameError("無法進入公會")
         
     def _support_members(self):
-        exist_click(self.serial, Guild.MEMBER_NAV_LIGHT)
+        exist_click(self.serial, Guild.MEMBER_NAV_LIGHT.value)
         while True:
-            if exist(self.serial, Guild.SUPPORT_DARK, threshold=0.97):
+            if exist(self.serial, Guild.SUPPORT_DARK.value, threshold=0.97):
                 return
-            if exist_click(self.serial, Guild.SUPPORT_LIGHT, threshold=0.95, wait_time=1.5):
-                exist_click(self.serial, Confirm.SMALL)
+            if exist_click(self.serial, Guild.SUPPORT_LIGHT.value, threshold=0.95, wait_time=1.5):
+                exist_click(self.serial, Confirm.SMALL.value)
                 break
-            if exist(self.serial, Retry.TEXT1):
-                exist_click(self.serial, Retry.BTN)
+            if exist(self.serial, Retry.TEXT1.value):
+                exist_click(self.serial, Retry.BTN.value)
 
-        connection_retry(self.serial, wait_name=Guild.SUPPORT_DARK, timeout=40.0, threshold=0.97)
+        connection_retry(self.serial, wait_name=Guild.SUPPORT_DARK.value, timeout=40.0, threshold=0.97)
         
     def do_quest(self):
         self._support_members()
-        wait_click(self.serial, Guild.QUEST_BTN)
+        wait_click(self.serial, Guild.QUEST_BTN.value)
         while True:
-            if exist(self.serial, Guild.QUEST_CLAIMED_TEXT, threshold=0.9):
-                exist_click(self.serial, Confirm.SMALL)
-            elif exist(self.serial, Retry.TEXT1):
-                exist_click(self.serial, Confirm.SMALL)
-            elif wait_click(self.serial, Guild.CLAIM, timeout=3.0):
+            if exist(self.serial, Guild.QUEST_CLAIMED_TEXT.value, threshold=0.9):
+                exist_click(self.serial, Confirm.SMALL.value)
+            elif exist(self.serial, Retry.TEXT1.value):
+                exist_click(self.serial, Confirm.SMALL.value)
+            elif wait_click(self.serial, Guild.CLAIM.value, timeout=3.0):
                 continue
             else:
-                wait_click(self.serial, MainView.CLOSE_BOARD2, threshold=0.9, timeout=3.0)
-                if not wait_vanish(self.serial, MainView.CLOSE_BOARD2, threshold=0.9, timeout=3.0):
+                wait_click(self.serial, MainView.CLOSE_BOARD2.value, threshold=0.9, timeout=3.0)
+                if not wait_vanish(self.serial, MainView.CLOSE_BOARD2.value, threshold=0.9, timeout=3.0):
                     continue
                 else:
                     break
         
 
     def enter_raid_menu(self):
-        if exist(self.serial, Guild.RAID_TEXT):
+        if exist(self.serial, Guild.RAID_TEXT.value):
             return
         
         self.enter_menu()
 
-        wait_click(self.serial, Guild.RAID_BTN)
-        connection_retry(self.serial, wait_name=Guild.RAID_TEXT, exception_msg="無法進入公會副本", timeout=40.0)
+        wait_click(self.serial, Guild.RAID_BTN.value)
+        connection_retry(self.serial, wait_name=Guild.RAID_TEXT.value, exception_msg="無法進入公會副本", timeout=40.0)
 
     def enter_raid_stage(self):
-        if not wait(self.serial, Guild.RAID_ATTACK, timeout=3.0):
-            wait_click(self.serial, Battle.ENTER)
-            connection_retry(self.serial, image_name=Battle.ENTER, exception_msg="無法進入公會副本關卡", timeout=40.0)
+        if not wait(self.serial, Guild.RAID_ATTACK.value, timeout=3.0):
+            wait_click(self.serial, Battle.ENTER.value)
+            connection_retry(self.serial, image_name=Battle.ENTER.value, exception_msg="無法進入公會副本關卡", timeout=40.0)
         for _ in range(10):
-            wait_click(self.serial, Guild.TOUCH_SCREEN, timeout=3.0)
-            wait_click(self.serial, MainView.CLOSE_BOARD2, threshold=0.9, timeout=3.0)
-            if wait_click(self.serial, Guild.RAID_ATTACK):
+            wait_click(self.serial, Guild.TOUCH_SCREEN.value, timeout=3.0)
+            wait_click(self.serial, MainView.CLOSE_BOARD2.value, threshold=0.9, timeout=3.0)
+            if wait_click(self.serial, Guild.RAID_ATTACK.value):
                 break
         while True:
-            if exist(self.serial, Guild.RAID_LIMITED):
-                exist_click(self.serial, Confirm.CANCEL, wait_time=1.0)
-                wait_click(self.serial, MainView.BACK)
-                connection_retry(self.serial, wait_name=Battle.ENTER, timeout=40.0)
+            if exist(self.serial, Guild.RAID_LIMITED.value):
+                exist_click(self.serial, Confirm.CANCEL.value, wait_time=1.0)
+                wait_click(self.serial, MainView.BACK.value)
+                connection_retry(self.serial, wait_name=Battle.ENTER.value, timeout=40.0)
                 return False
-            if exist(self.serial, Guild.RAID_OCCUPIED):
-                exist_click(self.serial, Confirm.SMALL)
-            if exist(self.serial, Retry.TEXT1):
-                exist_click(self.serial, Retry.BTN)
-            if exist(self.serial, Battle.PAUSE):
+            if exist(self.serial, Guild.RAID_OCCUPIED.value):
+                exist_click(self.serial, Confirm.SMALL.value)
+            if exist(self.serial, Retry.TEXT1.value):
+                exist_click(self.serial, Retry.BTN.value)
+            if exist(self.serial, Battle.PAUSE.value):
                 break
         return True
 
@@ -100,7 +99,7 @@ class GuildRaid:
         if not self.enter_raid_stage():
             return False
 
-        wait_vanish(self.serial, Battle.PAUSE, threshold=0.97, timeout=60.0)
+        wait_vanish(self.serial, Battle.PAUSE.value, threshold=0.97, timeout=60.0)
 
         log_msg(self.serial, "結算中")
         self.raid_settlement()
@@ -108,15 +107,15 @@ class GuildRaid:
         return True
 
     def raid_settlement(self):
-        connection_retry(self.serial, wait_name=Guild.LVL_UP, timeout=40.0)
-        wait_click(self.serial, Guild.LVL_UP, wait_time=1.0)
-        wait_click(self.serial, Guild.COMPLETE)
-        wait_click(self.serial, Settlement.SILVER_BOX, wait_time=1.0)
-        wait_click(self.serial, Confirm.BIG2, wait_time=1.5)
-        wait_click(self.serial, Guild.COMPLETE)
-        connection_retry(self.serial, wait_name=Guild.RAID_TEXT, timeout=40.0)
-        wait_click(self.serial, MainView.BACK)
-        connection_retry(self.serial, image_name=Guild.RAID_ATTACK, timeout=40.0)
+        connection_retry(self.serial, wait_name=Guild.LVL_UP.value, timeout=40.0)
+        wait_click(self.serial, Guild.LVL_UP.value, wait_time=1.0)
+        wait_click(self.serial, Guild.COMPLETE.value)
+        wait_click(self.serial, Settlement.SILVER_BOX.value, wait_time=1.0)
+        wait_click(self.serial, Confirm.BIG2.value, wait_time=1.5)
+        wait_click(self.serial, Guild.COMPLETE.value)
+        connection_retry(self.serial, wait_name=Guild.RAID_TEXT.value, timeout=40.0)
+        wait_click(self.serial, MainView.BACK.value)
+        connection_retry(self.serial, image_name=Guild.RAID_ATTACK.value, timeout=40.0)
 
 def guild_raid_battle(serial):
     grd = GuildRaid(serial)

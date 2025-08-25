@@ -9,10 +9,22 @@ from scripts.shared.events.pvp.enum import PvP
 from scripts.shared.events.guild.enum import Guild
 from scripts.shared.events.guild.base import guild_raid_battle
 from scripts.shared.events.main_stage.selector import main_stage_finish_custom
+from scripts.shared.events.advent_stage.base import advent_stage_battle
 
 def normal_stage(serial):
-    apply_mode(serial, mode_name="main_stage", state="on")
-    main_stage_finish_custom(serial, custom_stage=323)
+    # apply_mode(serial, mode_name="advent", state="on")
+    # advent_stage_battle(serial)
+    # apply_mode(serial, mode_name="advent", state="off")
+    # wait_click(serial, "back.png")
+    # connection_retry(serial, wait_name="main_stage_btn.png", timeout=40.0)
+
+    # apply_mode(serial, mode_name="main_stage", state="on")
+    # for _ in range(2):
+    #     main_stage_finish_custom(serial, custom_stage=323)
+    # apply_mode(serial, mode_name="main_stage", state="off")
+    # wait_click(serial, "back.png")
+    # connection_retry(serial, wait_name="main_stage_btn.png", timeout=40.0)
+
     # apply_mode(serial, mode_name="guild_raid", state="on")
     # guild_raid_battle(serial)
     # apply_mode(serial, mode_name="guild_raid", state="off")
@@ -30,3 +42,6 @@ def normal_stage(serial):
     # for stage in range(4, 5):
     #     special_stage_loop_game(serial, planet=Planet.IMMORTAL_SKULL, stage=stage)
     # special_stage_loop_game(serial, planet=Planet.IMMORTAL_SKULL, stage=2)
+    special_stage_loop_game(serial, planet=Planet.IMMORTAL_SKULL, stage=3)
+    special_stage_loop_game(serial, planet=Planet.IMMORTAL_SKULL, stage=5)
+    special_stage_loop_game(serial, planet=Planet.IMMORTAL_SKULL, stage=6)

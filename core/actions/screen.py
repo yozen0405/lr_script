@@ -29,6 +29,7 @@ def exist_click(serial, image_name, threshold=SIMILARITY, wait_time=0.0):
         adb_cmd(serial, ["shell", "input", "tap", str(pos[0]), str(pos[1])])
         time.sleep(wait_time)
         return True
+    log_msg(serial, f"未找到 {image_name}")
     return False
 
 def exist(serial, image_name, threshold=SIMILARITY, wait_time=0.0):
