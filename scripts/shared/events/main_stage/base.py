@@ -97,6 +97,8 @@ class BaseMainStage:
 
     def _find_custom_stage(self, stage: int):
         # 魔王關會爛
+        # 要去魔王關，先找附近的普通關卡，看他們是否存在
+        # 假設存在，點進去魔王關，看是不是我們要的，如果不是就退回來，然後繼續滑動找
         stage_str = f"main_stage_stage_{stage}.png"
         if exist_click(self.serial, stage_str, threshold=0.9):
             return

@@ -12,3 +12,5 @@ class Gacha(Enum):
     ACC_UID_COPY = "settings_uid_copy.png"
     SKIP = "gacha_skip.png"
     CONFIRM = "gacha_confirm.png"
+    JESSICA = "gacha_jessica.png"
+    

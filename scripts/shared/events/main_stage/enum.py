@@ -24,3 +24,4 @@ class Stages(str, Enum):
 class Treasure(str, Enum):
     ICON = "treasure_icon.png"
     ICON2 = "treasure_icon2.png"
+    TEXT = "treasure_text.png"
