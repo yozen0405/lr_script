@@ -3,52 +3,47 @@ import os
 from core.system.logger import log_msg
 from core.actions.screen import (
     wait_click, exist_click, exist, wait,
-    wait_vanish, back, drag,
-     get_clipboard_text,
-     pull_account_file, clear_game_storage,
-     force_close, force_close_all_apps
+    wait_vanish, back, drag
+)
+from core.actions.system import (
+    force_close_all_apps,
+    clear_game_storage
 )
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_view import on_main_view
-from scripts.shared.events.gacha.base import Gacha
+from scripts.shared.events.gacha.base import BaseGacha
 from scripts.shared.events.url.base import LinkNavigator
 from core.base.exceptions import GameError
+from scripts.shared.constants import GameView, Settlement, Battle, Confirm, MainView, Leonard, Retry, Positions
+from scripts.custom_scripts.new_acc.enum import Phase6UI
+from scripts.custom_scripts.new_acc.base import BasePhase
 
-def nav_link(serial):
-    link_nav = LinkNavigator(serial)
-    link_nav.run()
+class Phase6(BasePhase):
+    def _nav_link(self):
+        link_nav = LinkNavigator(self.serial)
+        link_nav.run()
 
-def claim_tickets(serial):
-    wait_click(serial, "gift_btn.png", timeout=7.0, wait_time=2.0)
-    
-    if not wait_click(serial, "accept_all.png", timeout=15.0):
-        wait_click(serial, "close_board.png")
-        
-    wait_click(serial, "confirm_small.png", timeout=15.0, wait_time=3.0)
-    wait_click(serial, "confirm_small.png", wait_time=1.5)
-    wait_click(serial, "close_board.png", wait_time=1.5)
+    def _claim_tickets(self):
+        wait_click(self.serial, Phase6UI.GIFT.value, timeout=7.0, wait_time=2.0)
+        if not wait_click(self.serial, Phase6UI.ACCEPT_ALL.value, timeout=15.0):
+            wait_click(self.serial, MainView.CLOSE_BOARD.value)
+        wait_click(self.serial, Confirm.SMALL.value, timeout=15.0, wait_time=3.0)
+        wait_click(self.serial, Confirm.SMALL.value, wait_time=1.5)
+        wait_click(self.serial, MainView.CLOSE_BOARD.value, wait_time=1.5)
 
-def gacha_pull(serial):
-    gacha = FirstGacha(serial)
-    gacha.enter_gacha()
-    gacha.pull()
-    force_close_all_apps(serial)
-    clear_game_storage(serial)
+    def _gacha_pull(self):
+        gacha = BaseGacha(self.serial)
+        gacha.enter_gacha()
+        gacha.pull()
+        force_close_all_apps(self.serial)
+        clear_game_storage(self.serial)
 
-def phase6(serial):
-    log_msg(serial, "第六階段")
-    
-    try:
-        nav_link(serial)
-    except GameError as e:
-        raise
+    def _detect_event(self):
+        return 0
 
-    try:
-        claim_tickets(serial)
-    except GameError as e:
-        raise
-
-    try:
-        gacha_pull(serial)
-    except GameError as e:
-        raise
+    def steps(self):
+        return [
+            self._nav_link,
+            self._claim_tickets,
+            self._gacha_pull,
+        ]

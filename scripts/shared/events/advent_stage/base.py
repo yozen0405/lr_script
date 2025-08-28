@@ -19,7 +19,7 @@ class BaseAdventStage:
         
         for _ in range(5):
             if wait_click(self.serial, Advent.BTN.value):
-                connection_retry(self.serial, image_name=Advent.BTN.value, exception_msg="不在主畫面", timeout=40.0)
+                connection_retry(self.serial, vanish=Advent.BTN.value, timeout=40.0)
                 self._on_pre_anime()
                 return
             elif exist(self.serial, MainStage.BTN.value):
@@ -76,7 +76,7 @@ class BaseAdventStage:
 
         if wait_click(self.serial, Battle.ENTER.value, region=region, timeout=7.0, threshold=0.8):
             wait_click(self.serial, Advent.VERY_HARD.value)
-            connection_retry(self.serial, image_name=Advent.VERY_HARD.value, exception_msg="進不去降臨關卡", timeout=40.0)
+            connection_retry(self.serial, vanish=Advent.VERY_HARD.value, timeout=40.0)
             return True
         else:
             return False
@@ -87,7 +87,7 @@ class BaseAdventStage:
 
         wait_click(self.serial, Battle.NEXT.value)
         wait_click(self.serial, Battle.START.value)
-        connection_retry(self.serial, wait_name=Battle.PAUSE.value, timeout=60.0)
+        connection_retry(self.serial, appear=Battle.PAUSE.value, timeout=60.0)
 
         wait_vanish(self.serial, Battle.PAUSE.value, threshold=0.97, timeout=60.0)
 
@@ -101,7 +101,7 @@ class BaseAdventStage:
                 raise GameError("沒有進入失敗葉面")
             raise GameError("輸了")
 
-        connection_retry(self.serial, wait_name=Settlement.TEXT.value, retry_text=Retry.TEXT2.value, timeout=40.0)
+        connection_retry(self.serial, appear=Settlement.TEXT.value, timeout=40.0)
         for _ in range(3):
             wait_click(self.serial, self.MEMBER4_POS)
 

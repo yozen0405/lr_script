@@ -39,9 +39,7 @@ def connect_all_mumu_instances(goal=1, max_attempts=10, base_port=16384):
     print(f"目標連線數: {goal}，最多嘗試組數: {max_attempts}")
 
     cached_ports = load_cache()
-    print(f"快取中有 {len(cached_ports)} 台裝置: {cached_ports}")
     current_devices = get_adb_devices()
-    print(f"目前 ADB 已連線裝置: {current_devices}")
     final_connected = []
 
     for addr in cached_ports:

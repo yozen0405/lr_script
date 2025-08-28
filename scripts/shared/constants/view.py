@@ -15,6 +15,7 @@ class GameView(str, Enum):
     GAME_OPENED = "open_game.png"
     ICON = "gameicon.png"
     LINE_STUDIO_TEXT = "open_game_line_studio_text.png"
+    LINE_WEBSITE = "login_line_website.png"
     LOADING = "loading_page.png"
     WAITING = "game_waiting_page.png"
     PLAY_BTN = "game_waiting_play_btn.png"

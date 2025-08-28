@@ -17,7 +17,7 @@ class BingoBase:
         
         for _ in range(5):
             if wait_click(self.serial, Bingo.BTN.value):
-                connection_retry(self.serial, image_name=Bingo.BTN.value, exception_msg="不在主畫面", timeout=40.0)
+                connection_retry(self.serial, vanish=Bingo.BTN.value, timeout=40.0)
                 self._on_pre_anime()
                 return
             elif exist(self.serial, MainStage.BTN.value):
@@ -30,7 +30,7 @@ class BingoBase:
 
     def _claim_mission(self):
         wait_click(self.serial, Bingo.MISSION_BTN.value)
-        connection_retry(self.serial, wait_name=Bingo.MISSION_TEXT.value, exception_msg="無法進入賓果任務頁面", timeout=40.0)
+        connection_retry(self.serial, appear=Bingo.MISSION_TEXT.value, timeout=40.0)
         while True:
             if exist(self.serial, Bingo.MISSION_CLAIMED_TEXT.value, threshold=0.9):
                 exist_click(self.serial, Confirm.SMALL.value)
@@ -55,11 +55,11 @@ class BingoBase:
                     continue
                 log_msg(self.serial,"抽到重複的，而且沒廣告看了")
                 exist_click(self.serial, Confirm.SMALL.value)
-                connection_retry(self.serial, image_name=Bingo.DUPLICATE_TEXT.value, exception_msg="無法進入賓果抽獎頁面", timeout=40.0)
+                connection_retry(self.serial, vanish=Bingo.DUPLICATE_TEXT.value, timeout=40.0)
                 return 2
             elif wait(self.serial, Bingo.GOT_NEW_TEXT.value, timeout=3.0, threshold=0.99):
                 wait_click(self.serial, Confirm.SMALL.value)
-                connection_retry(self.serial, image_name=Bingo.GOT_NEW_TEXT.value, exception_msg="無法進入賓果抽獎頁面", timeout=40.0)
+                connection_retry(self.serial, vanish=Bingo.GOT_NEW_TEXT.value, timeout=40.0)
                 log_msg(self.serial, "抽到新的")
                 return 0
             elif exist(self.serial, Retry.TEXT1.value):

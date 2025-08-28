@@ -4,7 +4,7 @@ from core.system.logger import log_msg
 from core.actions.screen import (
     wait_click, exist_click, exist,
     wait, wait_vanish,
-    back, drag, force_close,
+    back, drag,
     get_pos
 )
 from core.base.exceptions import GameError
@@ -12,158 +12,153 @@ from scripts.shared.utils.game_view import close_board
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_view import on_main_view
 from scripts.shared.events.main_stage.selector import main_stage_finish_new, main_stage_finish_custom
+from scripts.shared.constants import GameView, Settlement, Battle, Confirm, MainView, Leonard, Retry, Positions
+from scripts.shared.utils.retry import connection_retry
+from scripts.shared.utils.game_view import on_main_view
+from scripts.shared.events.login import guest_login
+from scripts.shared.events.teams.enum import Teams
+from scripts.shared.events.gacha.enum import Gacha
 
-def james_friend(serial):
-    on_main_view(serial)
-    if wait_click(serial, "skip.png", timeout=5.0):
-        wait_click(serial, "confirm_small.png", wait_time=3.0)
-    main_stage_finish_new(serial)
+from scripts.custom_scripts.new_acc.enum import Phase5UI, Gear, Diamond, SeasonPass, SevenDays
+from scripts.custom_scripts.new_acc.base import BasePhase
 
-def stage30(serial):
-    main_stage_finish_custom(serial, custom_stage="stage30_btn.png")
+class Phase5(BasePhase):
+    def _finish_main_stage(self, times: int = 1):
+        def _step():
+            for _ in range(times):
+                main_stage_finish_new(self.serial)
+        return _step
 
-def do_team_upgrade(serial):
-    if not wait_click(serial, "back.png"):
-        raise GameError("未知狀態")
-    on_main_view(serial)
-    
-    wait_click(serial, "team_icon.png")
-    connection_retry(serial, wait_name="team_text.png", exception_msg="進不去隊伍", timeout=40.0)
-    wait_click(serial, "leonard_teacher_switch_team.png")
-    wait_click(serial, "leonard_teacher_switch_team2.png", wait_time=2.0)
-    wait_click(serial, "jessica_upgrade_ranger.png", wait_time=1.5)
-    wait_click(serial, "upgrade_btn.png")
-    connection_retry(serial, wait_name="back.png", exception_msg="無法進入升級頁面", timeout=40.0, wait_time=3.0)
-    for _ in range(2):
-        drag(serial, (449, 605), (449, 357), timeout=10.0)
-    wait_click(serial, "upgrade_lvl_btn.png")
-    if not wait_click(serial, "confirm_small.png", wait_time=3.0):
-        raise GameError("升級失敗")
-    
-    connection_retry(serial, wait_name="upgrade_success.png", exception_msg="無法升級", timeout=40.0)
-    for _ in range(3):
-        if not wait_click(serial, "upgrade_success.png", timeout=5.0, wait_time=1.0):
-            break
-    wait_click(serial, "back.png")
-    wait(serial, "team_text.png", timeout=20.0)
-    wait_click(serial, "back.png", timeout=20.0)
-    connection_retry(serial, image_name="back.png", timeout=40.0)
+    def _james_friend(self):
+        on_main_view(self.serial)
+        if wait_click(self.serial, MainView.SKIP.value, timeout=5.0):
+            wait_click(self.serial, Confirm.SMALL.value, wait_time=3.0)
+        main_stage_finish_new(self.serial)
 
-def do_diamond_upgrade(serial):
-    on_main_view(serial)
-    wait_click(serial, "diamond_upgrade_icon.png")
-    connection_retry(serial, wait_name="diamond_upgrade_text.png", exception_msg="無法進入科技升級", timeout=40.0)
-    pos = get_pos(serial, "diamond_upgrade_text.png")
-    if pos:
+    def _stage30(self):
+        main_stage_finish_custom(self.serial, custom_stage=30)
+
+    def _do_team_upgrade(self):
+        if not wait_click(self.serial, MainView.BACK.value):
+            raise GameError("未知狀態")
+        on_main_view(self.serial)
+        wait_click(self.serial, Teams.ICON_LIGHT.value)
+        connection_retry(self.serial, appear=Teams.TEXT.value, exception_msg="進不去隊伍", timeout=40.0)
+        wait_click(self.serial, Leonard.TP_POINT.value)
+        wait_click(self.serial, Leonard.TP_HAPPY.value, wait_time=2.0)
+        wait_click(self.serial, Phase5UI.JESSICA.value, wait_time=1.5)
+        wait_click(self.serial, Teams.UPGRADE_BTN.value)
+        connection_retry(self.serial, appear=MainView.BACK.value, retry=Teams.UPGRADE_BTN.value, timeout=40.0)
+        time.sleep(3.0)
+        for _ in range(2):
+            drag(self.serial, (449, 605), (449, 357), timeout=10.0)
+        wait_click(self.serial, Teams.UPGRADE_LVL_BTN.value)
+        if not wait_click(self.serial, Confirm.SMALL.value, wait_time=3.0):
+            raise GameError("升級失敗")
+
+        connection_retry(self.serial, appear=Teams.UPGRADE_SUCCESS.value, retry=[(Teams.UPGRADE_LVL_BTN.value), (Confirm.SMALL.value)], timeout=40.0)
+
+        for _ in range(3):
+            if not wait_click(self.serial, Teams.UPGRADE_SUCCESS.value, timeout=5.0, wait_time=1.0):
+                break
+        wait_click(self.serial, MainView.BACK.value)
+        wait(self.serial, Teams.TEXT.value, timeout=20.0)
+        wait_click(self.serial, MainView.BACK.value, timeout=20.0)
+        connection_retry(self.serial, vanish=MainView.BACK.value, retry=MainView.BACK.value, timeout=40.0)
+
+    def _do_diamond_upgrade(self):
+        on_main_view(self.serial)
+        wait_click(self.serial, Diamond.ICON.value)
+        connection_retry(self.serial, appear=Diamond.UPGRADE_TEXT.value, retry=Diamond.ICON.value, exception_msg="無法進入科技升級", timeout=40.0)
+        pos = get_pos(self.serial, Diamond.UPGRADE_TEXT.value)
+        if not pos:
+            raise GameError("找不到升級文字")
         x, y = pos
-    else:
-        raise GameError("找不到升級文字")
+        wait_click(self.serial, (x, y + 350))
+        if not wait_click(self.serial, Diamond.MAX.value):
+            raise GameError("無法升級")
+        for _ in range(7):
+            wait_click(self.serial, Diamond.MINUS.value)
+        wait_click(self.serial, Confirm.SMALL.value, wait_time=1.0)
+        for _ in range(3):
+            wait_click(self.serial, Diamond.SUCCESS.value, timeout=5.0, wait_time=1.0)
+            if wait_click(self.serial, MainView.BACK.value):
+                break
+        connection_retry(self.serial, vanish=MainView.BACK.value, timeout=40.0)
 
-    wait_click(serial, (x, y + 350))
-    if not wait_click(serial, "diamond_upgrade_max.png"):
-        raise GameError("無法升級")
-
-    for _ in range(7):
-        wait_click(serial, "diamond_upgrade_minus.png")
-    wait_click(serial, "confirm_small.png", wait_time=1.0)
-
-    for _ in range(3):
-        wait_click(serial, "diamond_upgrade_success.png", timeout=5.0, wait_time=1.0)
-        if wait_click(serial, "back.png"):
-            break
-    connection_retry(serial, image_name="back.png", timeout=40.0)
-
-def claim_seven_day(serial):
-    on_main_view(serial)
-
-    wait_click(serial, "7days.png")
-    connection_retry(serial, wait_name="7day_quest_reward.png", exception_msg="無法進入7天登入", timeout=40.0)
-    pos = get_pos(serial, "7day_quest_reward.png")
-    if pos:
+    def _claim_seven_day(self):
+        on_main_view(self.serial)
+        wait_click(self.serial, SevenDays.ICON.value)
+        connection_retry(self.serial, appear=SevenDays.QUEST_REWARD.value, exception_msg="無法進入7天登入", timeout=40.0)
+        pos = get_pos(self.serial, SevenDays.QUEST_REWARD.value)
+        if not pos:
+            raise GameError("找不到升級文字")
         x, y = pos
-    else:
-        raise GameError("找不到升級文字")
+        wait_click(self.serial, (x + 500, y), wait_time=1.0)
+        wait_click(self.serial, Confirm.SMALL.value, timeout=10.0)
+        wait_click(self.serial, SevenDays.DAILY_REWARD.value, timeout=10.0, wait_time=1.0)
+        wait_click(self.serial, Confirm.SMALL.value, timeout=10.0)
+        if not wait(self.serial, SevenDays.CLAIM.value):
+            raise GameError("沒領到扭蛋卷")
+        wait_click(self.serial, MainView.CLOSE_BOARD.value)
 
-    wait_click(serial, (x + 500, y), wait_time=1.0)
-    wait_click(serial, "confirm_small.png", timeout=10.0)
-    wait_click(serial, "7day_daily_reward.png", timeout=10.0, wait_time=1.0)
-    wait_click(serial, "confirm_small.png", timeout=10.0)
-    if not wait(serial, "7day_daily_claimed.png"):
-        raise GameError("沒領到扭蛋卷")
-    wait_click(serial, "close_board.png")
+    def _claim_single_reward(self):
+        wait_click(self.serial, SeasonPass.CLAIM.value, wait_time=2.0)
 
-def claim_season_pass(serial):
-    on_main_view(serial)
-    wait_click(serial, "season_pass_icon.png", timeout=7.0)
-    connection_retry(serial, wait_name="confirm_small.png", exception_msg="無法進入季票", timeout=40.0)
-    wait_click(serial, "confirm_small.png", timeout=10.0)
+        while True:
+            if exist(self.serial, Retry.TEXT2.value):
+                exist_click(self.serial, Confirm.SMALL.value, wait_time=1.0)
+                wait_click(self.serial, SeasonPass.CLAIM.value)
+            if exist(self.serial, Retry.TEXT1.value):
+                exist_click(self.serial, Retry.BTN.value)
+            if exist(self.serial, SeasonPass.CLAIMED_TEXT.value):
+                exist_click(self.serial, Confirm.SMALL.value, wait_time=2.0)
+                return
 
-    if not wait_click(serial, "leonard_teacher_circle.png"):
-        raise GameError("並非首次進入季票")
-    wait_click(serial, "leonard_teacher_circle.png")
-    for _ in range(10):
-        wait_click(serial, "season_pass_text.png", wait_time=1.5)
+    def _claim_season_pass(self):
+        on_main_view(self.serial)
+        wait_click(self.serial, SeasonPass.ICON.value, timeout=7.0)
+        connection_retry(self.serial, appear=Confirm.SMALL.value, retry=SeasonPass.ICON.value, exception_msg="無法進入季票", timeout=40.0)
+        wait_click(self.serial, Confirm.SMALL.value, timeout=10.0)
+        if not wait_click(self.serial, Phase5UI.CIRCLE.value):
+            raise GameError("並非首次進入季票")
+        wait_click(self.serial, Phase5UI.CIRCLE.value)
+        for _ in range(10):
+            wait_click(self.serial, SeasonPass.TEXT.value, wait_time=1.5)
+        wait(self.serial, SeasonPass.TEXT.value, timeout=10.0, threshold=0.99)
+        
+        for _ in range(2):
+            wait_click(self.serial, SeasonPass.DAILY_NAV.value, timeout=10.0, wait_time=1.0)
+        for _ in range(3):
+            self._claim_single_reward()
 
-    wait(serial, "season_pass_text.png", timeout=10.0, threshold=0.99)
-    wait_click(serial, "daily_quest_nav.png", timeout=10.0)
-    for _ in range(3):
-        if wait_click(serial, "daily_quest_claim.png", wait_time=2.0):
-            wait_click(serial, "confirm_small.png", wait_time=2.0)
-    wait_click(serial, "weekly_quest_nav.png", timeout=10.0, wait_time=1.0)
-    if wait_click(serial, "daily_quest_claim.png", wait_time=2.0):
-        wait_click(serial, "confirm_small.png", wait_time=2.0)
-
-    if wait(serial, "season_pass_text.png", timeout=10.0, threshold=0.99):
-        wait_click(serial, "season_pass_nav.png", timeout=10.0, wait_time=1.0)
-        wait_click(serial, "season_pass_tickets.png", timeout=10.0, wait_time=2.0)
-        wait_click(serial, "confirm_big.png", wait_time=2.0, threshold=0.65)
-        if wait(serial, "season_pass_level1_text.png", timeout=60.0):
-            wait_click(serial, "close_board.png", timeout=10.0)
+        wait_click(self.serial, SeasonPass.WEELKY_NAV.value, timeout=10.0, wait_time=1.0)
+        self._claim_single_reward()
+        
+        if wait(self.serial, SeasonPass.TEXT.value, timeout=10.0, threshold=0.99):
+            wait_click(self.serial, SeasonPass.PASS_NAV.value, timeout=10.0, wait_time=1.0)
+            wait_click(self.serial, Phase5UI.SEASON_PASS_TICKETS.value, timeout=10.0, wait_time=2.0)
+            wait_click(self.serial, Confirm.BIG1.value, wait_time=2.0, threshold=0.65)
+            if wait(self.serial, Phase5UI.SEASON_PASS_LVL1.value, timeout=60.0):
+                wait_click(self.serial, MainView.CLOSE_BOARD.value, timeout=10.0)
+            else:
+                raise GameError("季票領取獎勵錯誤")
         else:
             raise GameError("季票領取獎勵錯誤")
-    else:
-        raise GameError("季票領取獎勵錯誤")
-    wait_click(serial, "back.png")
-    connection_retry(serial, image_name="back.png", timeout=40.0)
-    on_main_view(serial)
+        wait_click(self.serial, MainView.BACK.value)
+        connection_retry(self.serial, vanish=MainView.BACK.value, timeout=40.0)
+        on_main_view(self.serial)
 
+    def _detect_event(self):
+        return 0
 
-def phase5(serial):
-    log_msg(serial, "第五階段")
-
-    for _ in range(4):
-        try:
-            main_stage_finish_new(serial)
-        except GameError as e:
-            raise
-
-    try:
-        james_friend(serial)
-    except GameError as e:
-        raise
-
-    try:
-        stage30(serial)
-    except GameError as e:
-        raise
-
-    try:
-        do_team_upgrade(serial)
-    except GameError as e:
-        raise
-
-    try:
-        do_diamond_upgrade(serial)
-    except GameError as e:
-        raise
-
-    try:
-        claim_seven_day(serial)
-    except GameError as e:
-        raise
-
-    try:
-        claim_season_pass(serial)
-    except GameError as e:
-        raise
-    
+    def steps(self):
+        return [
+            self._finish_main_stage(4),
+            self._james_friend,
+            self._stage30,
+            self._do_team_upgrade,
+            self._do_diamond_upgrade,
+            self._claim_seven_day,
+            self._claim_season_pass,
+        ]

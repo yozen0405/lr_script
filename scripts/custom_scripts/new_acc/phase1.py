@@ -9,8 +9,9 @@ from scripts.shared.constants import GameView, Settlement, Battle, Confirm, Main
 from scripts.custom_scripts.new_acc.enum import PreStage, Phase1UI, Quests
 from scripts.shared.events.teams.enum import Teams
 from scripts.shared.events.gacha.enum import Gacha
+from scripts.custom_scripts.new_acc.base import BasePhase
 
-class Phase1:
+class Phase1(BasePhase):
     def __init__(self, serial):
         self.serial = serial
         self.MEMBER1 = Positions.MEMBER1.value
@@ -21,7 +22,7 @@ class Phase1:
         self.DIAMOND = Positions.DIAMOND.value
         self.MISSILE = Positions.MISSILE.value
 
-    def _first_time_login(self):
+    def _login(self):
         log_msg(self.serial, "首次登入流程啟動")
         first_guest_login(self.serial)
 
@@ -34,14 +35,12 @@ class Phase1:
         wait_click(self.serial, self.DIAMOND, wait_time=0.0)
         wait_click(self.serial, self.MISSILE, wait_time=1.0)
 
-    def _pre_stage(self):
-        log_msg(self.serial, "進去前置關卡")
-
+    def _handle_nickname(self):
         if wait(self.serial, PreStage.NICKNAME.value):
             wait_click(self.serial, Confirm.SMALL.value)
             wait_click(self.serial, Confirm.SMALL.value)
             wait_click(self.serial, Confirm.SMALL.value)
-        elif wait(self.serial, PreStage.TEXT, timeout=2.0):
+        elif wait(self.serial, PreStage.TEXT.value, timeout=2.0):
             pass
         else:
             return
@@ -49,46 +48,31 @@ class Phase1:
         wait_click(self.serial, MainView.SKIP.value)
         wait_click(self.serial, Confirm.SMALL.value, wait_time=0.5)
 
-        if wait(self.serial, Battle.PAUSE.value, threshold=0.5, timeout=15.0):
-            for _ in range(60):
-                if exist_click(self.serial, MainView.SKIP.value, threshold=0.8):
-                    break
+    def _pre_stage(self):
+        log_msg(self.serial, "進去前置關卡")
+        
+        while True:
+            if exist(self.serial, Battle.PAUSE.value, threshold=0.8):
                 self._spam_click_members()
-        else:
-            raise GameError("無法確認戰鬥狀態，跳出")
-        
-        wait_click(self.serial, Confirm.SMALL.value, wait_time=3)
-
-        for _ in range(30):
-            if not exist(self.serial, Battle.PAUSE.value, threshold=0.8):
+            if exist(self.serial, Retry.TEXT1.value, threshold=0.8):
+                exist_click(self.serial, Retry.BTN.value)
+            if exist(self.serial, MainView.SETTINGS.value):
                 break
-            self._spam_click_members()
-        
-        if wait_click(self.serial, MainView.SKIP.value, timeout=5.0):
-            wait_click(self.serial, Confirm.SMALL.value, wait_time=2)
-
-        if wait_click(self.serial, MainView.SKIP.value, timeout=5.0):
-            wait_click(self.serial, Confirm.SMALL.value, wait_time=2)
-        connection_retry(self.serial, wait_name=MainView.SETTINGS.value, timeout=120.0)
+            if exist_click(self.serial, MainView.SKIP.value):
+                wait_click(self.serial, Confirm.SMALL.value)
 
     def _first_stage(self):
         log_msg(self.serial, "遊戲開場介紹")
-        if not exist(self.serial, Phase1UI.LVL1_TEXT.value, threshold=0.9):
-            return
 
         if wait_click(self.serial, MainView.SKIP.value, timeout=5.0):
             wait_click(self.serial, Confirm.SMALL.value, wait_time=2)
         
-        wait_click(self.serial, MainView.SKIP.value, timeout=5.0)
+        wait_click(self.serial, MainView.SKIP.value, timeout=3.0)
 
         apply_mode(self.serial, mode_name="main_stage", state="on")
         main_stage_finish_new(self.serial)
 
     def _first_ranger(self):
-        if not exist(self.serial, Phase1UI.NEW_FRIEND_TEXT.value):
-            if not exist(self.serial, Phase1UI.LVL2_TEXT.value, threshold=0.9999) or not exist(self.serial, Teams.ICON_DARK.value, threshold=0.9999):
-                return
-
         wait_click(self.serial, MainView.SKIP.value)
         wait_click(self.serial, Confirm.SMALL.value)
         wait_click(self.serial, Gacha.ICON.value, timeout=7.0)
@@ -101,14 +85,14 @@ class Phase1:
         wait_click(self.serial, Gacha.CONFIRM.value)
         wait_click(self.serial, MainView.SKIP.value, timeout=40.0)
         wait_click(self.serial, Confirm.SMALL.value)
-        connection_retry(self.serial, wait_name=MainView.SETTINGS.value, timeout=35.0)
-
+        connection_retry(self.serial, appear=MainView.SETTINGS.value, timeout=35.0)
 
     def _first_arrange_team(self):
         if wait_click(self.serial, MainView.SKIP.value, timeout=3):
             wait_click(self.serial, Confirm.SMALL.value)
+
         wait_click(self.serial, Teams.ICON_LIGHT.value)
-        connection_retry(self.serial, wait_name=Leonard.BG_HAPPY.value, exception_msg="找不到隊伍教學", timeout=35.0)
+        connection_retry(self.serial, appear=Leonard.BG_HAPPY.value, timeout=35.0)
         wait_click(self.serial, Leonard.BG_HAPPY.value)
         wait_click(self.serial, Leonard.BG_HAPPY.value)
 
@@ -119,7 +103,7 @@ class Phase1:
         wait_click(self.serial, MainView.SKIP.value)
         wait_click(self.serial, Confirm.SMALL.value)
         wait_click(self.serial, Teams.SAVE.value, wait_time=3.0)
-        connection_retry(self.serial, wait_name=MainView.SETTINGS.value, exception_msg="未進入主畫面，隊伍教學失敗", timeout=35.0)
+        connection_retry(self.serial, appear=MainView.SETTINGS.value, timeout=35.0)
         for _ in range(3):
             if wait_click(self.serial, MainView.SKIP.value, timeout=5, wait_time=1.0):
                 if not exist(self.serial, Confirm.SMALL.value):
@@ -128,19 +112,26 @@ class Phase1:
                 break
         wait_click(self.serial, Confirm.SMALL.value, wait_time=0.5)
 
-    def run(self):
-        self._first_time_login()
-        self._pre_stage()
+    def _detect_event(self):
+        return 0
+        # if exist(self.serial, GameView.ICON.value):
+        #     return 1
+        # if exist(self.serial, PreStage.MOON.value):
+        #     return 2
+        # if exist(self.serial, Phase1UI.LVL1_TEXT.value, threshold=0.9):
+        #     return 3
+        # elif exist(self.serial, Phase1UI.LVL2_TEXT.value, threshold=0.9999):
+        #     if exist(self.serial, Teams.ICON_DARK.value, threshold=0.9999):
+        #         return 4
+        #     else:  
+        #         return 5
 
-        if exist(self.serial, Quests.LONG.value, threshold=0.65):
-            return
-        if exist(self.serial, MainView.CLOSE_BOARD.value):
-            return
-
-        self._first_stage()
-        self._first_ranger()
-        self._first_arrange_team()
-
-def phase1(serial):
-    runner = Phase1(serial)
-    runner.run()
+    def steps(self):
+        return [
+            self._login,
+            self._handle_nickname,
+            self._pre_stage,
+            self._first_stage,
+            self._first_ranger,
+            self._first_arrange_team,
+        ]

@@ -18,20 +18,20 @@ def normal_stage(serial):
     # advent_stage_battle(serial)
     # apply_mode(serial, mode_name="advent", state="off")
     # wait_click(serial, "back.png")
-    # connection_retry(serial, wait_name="main_stage_btn.png", timeout=40.0)
+    # connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
 
     # apply_mode(serial, mode_name="main_stage", state="on")
     # for _ in range(2):
     #     main_stage_finish_custom(serial, custom_stage=323)
     # apply_mode(serial, mode_name="main_stage", state="off")
     # wait_click(serial, "back.png")
-    # connection_retry(serial, wait_name="main_stage_btn.png", timeout=40.0)
+    # connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
 
     # apply_mode(serial, mode_name="guild_raid", state="on")
     # guild_raid_battle(serial)
     # apply_mode(serial, mode_name="guild_raid", state="off")
     # wait_click(serial, "back.png")
-    # connection_retry(serial, wait_name="main_stage_btn.png", timeout=40.0)
+    # connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
     # apply_mode(serial, mode_name="pvp", state="on")
     # for _ in range(5):
     #     if not pvp_loop_battle(serial):
@@ -39,7 +39,7 @@ def normal_stage(serial):
     # apply_mode(serial, mode_name="pvp", state="off")
     # apply_mode(serial, mode_name="special_stage", state="on")
     # wait_click(serial, "back.png")
-    # connection_retry(serial, wait_name="main_stage_btn.png", timeout=40.0)
+    # connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
     # special_stage_conquer_planet(serial, planet=Planet.COLLAB)
     # for stage in range(4, 5):
     #     special_stage_loop_game(serial, planet=Planet.IMMORTAL_SKULL, stage=stage)

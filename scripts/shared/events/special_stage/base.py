@@ -20,7 +20,7 @@ class BaseSpecialStage:
         
         for _ in range(5):
             if wait_click(self.serial, SpecialStage.BTN.value):
-                connection_retry(self.serial, image_name=SpecialStage.BTN.value, exception_msg="不在主畫面", timeout=40.0)
+                connection_retry(self.serial, vanish=[(SpecialStage.BTN.value)], retry=[(SpecialStage.BTN.value)])
                 self._on_pre_anime()
                 return
             elif exist(self.serial, MainStage.BTN.value):
@@ -64,7 +64,7 @@ class BaseSpecialStage:
             raise GameError("不在特殊")
         
         if wait_click(self.serial, SpecialStage.STAGE(stage=stage_num), region=region, timeout=7.0, threshold=0.8):
-            connection_retry(self.serial, wait_name=SpecialStage.TEXT.value, exception_msg="進不去特殊關卡的關卡", timeout=40.0)
+            connection_retry(self.serial, appear=[(SpecialStage.ENTER.value)], timeout=40.0)
             wait_click(self.serial, SpecialStage.ENTER.value, timeout=25.0)
             while True:
                 if exist(self.serial, Retry.TEXT1.value):
@@ -74,7 +74,7 @@ class BaseSpecialStage:
                 elif exist(self.serial, SpecialStage.LIMITED.value):
                     exist_click(self.serial, Confirm.SMALL.value, wait_time=2.0)
                     wait_click(self.serial, MainView.BACK.value)
-                    connection_retry(self.serial, wait_name=SpecialStage.LAB.value, exception_msg="回不去特殊關卡主畫面", timeout=40.0)
+                    connection_retry(self.serial, appear=[(SpecialStage.LAB.value)], timeout=40.0)
                     return False
         else:
             return False
@@ -84,7 +84,7 @@ class BaseSpecialStage:
 
         wait_click(self.serial, Battle.NEXT.value)
         wait_click(self.serial, Battle.START.value)
-        connection_retry(self.serial, image_name=Battle.START.value, timeout=60.0)
+        connection_retry(self.serial, appear=[(Battle.START.value)], timeout=60.0)
 
         if wait(self.serial, Battle.PAUSE.value, timeout=15.0, threshold=0.9):
             self._on_start_page()
@@ -98,16 +98,16 @@ class BaseSpecialStage:
         self.settlement()
 
         wait_click(self.serial, MainView.BACK.value, timeout=20.0)
-        connection_retry(self.serial, wait_name=SpecialStage.LAB.value, exception_msg="回不去特殊關卡主畫面", timeout=40.0)
+        connection_retry(self.serial, appear=[(SpecialStage.LAB.value)], timeout=40.0)
         
         log_msg(self.serial, "Special Stage 任務完成")
 
     def _quit_game(self):
         wait_click(self.serial, Confirm.CANCEL.value, wait_time=1.0)
         wait_click(self.serial, MainView.BACK.value)
-        connection_retry(self.serial, wait_name=SpecialStage.TEXT.value, exception_msg="無法回去特殊關卡準備畫面", timeout=40.0)
-        wait_click(self.serial, "back.png", timeout=20.0)
-        connection_retry(self.serial, wait_name=SpecialStage.LAB.value, exception_msg="回不去特殊關卡主畫面", timeout=40.0)
+        connection_retry(self.serial, appear=[(SpecialStage.TEXT.value)], timeout=40.0)
+        wait_click(self.serial, MainView.BACK.value, timeout=20.0)
+        connection_retry(self.serial, appear=[(SpecialStage.LAB.value)], timeout=40.0)
 
     def loop_mode_run(self):
         log_msg(self.serial, "Special Stage 迴圈進場")
@@ -123,7 +123,7 @@ class BaseSpecialStage:
 
         wait_click(self.serial, Battle.NEXT.value)
         wait_click(self.serial, Battle.START.value)
-        connection_retry(self.serial, image_name=Battle.START.value, timeout=60.0)
+        connection_retry(self.serial, vanish=[(Battle.START.value)], timeout=60.0)
 
         if wait(self.serial, Battle.PAUSE.value, timeout=15.0, threshold=0.9):
             self._on_start_page()
@@ -139,9 +139,9 @@ class BaseSpecialStage:
         log_msg(self.serial, "結算中")
         wait_click(self.serial, Confirm.BIG2.value)
 
-        connection_retry(self.serial, wait_name=SpecialStage.TEXT.value, exception_msg="無法回去特殊關卡準備畫面", timeout=40.0)
-        wait_click(self.serial, "back.png", timeout=20.0)
-        connection_retry(self.serial, wait_name=SpecialStage.LAB.value, exception_msg="回不去特殊關卡主畫面", timeout=40.0)
+        connection_retry(self.serial, appear=[(SpecialStage.TEXT.value)], timeout=40.0)
+        wait_click(self.serial, MainView.BACK.value, timeout=20.0)
+        connection_retry(self.serial, appear=[(SpecialStage.LAB.value)], timeout=40.0)
 
         log_msg(self.serial, "Special Stage 迴圈任務完成")
         return True
@@ -169,7 +169,7 @@ class BaseSpecialStage:
                 raise GameError("沒有進入失敗葉面")
             raise GameError("輸了")
 
-        connection_retry(self.serial, wait_name=Settlement.TEXT.value, retry_text=Retry.TEXT2.value, timeout=40.0)
+        connection_retry(self.serial, appear=[(Settlement.TEXT.value)], timeout=40.0)
         for _ in range(3):
             wait_click(self.serial, self.MEMBER4_POS)
 

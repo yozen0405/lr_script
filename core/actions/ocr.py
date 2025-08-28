@@ -82,7 +82,7 @@ class ImageProcceser:
         """
         從指定區域 OCR 並比對與目標文字的相似度是否達標。
         """
-        result_text = self._extract_text(self.serial, region=region)
+        result_text = self._extract_text(region=region)
 
         result_cleaned = " ".join(result_text.strip().split())
         target_cleaned = " ".join(target_text.strip().split())

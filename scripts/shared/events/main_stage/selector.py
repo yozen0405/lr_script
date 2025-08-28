@@ -52,7 +52,7 @@ def main_stage_enter_menu(serial):
     main_stage_task = MainStageTask(serial)
     main_stage_task.enter_menu()
 
-def main_stage_finish_custom(serial, custom_stage: str):
+def main_stage_finish_custom(serial, custom_stage: int):
     main_stage_task = MainStageTask(serial)
     main_stage_task.battle(custom_stage=custom_stage)
 

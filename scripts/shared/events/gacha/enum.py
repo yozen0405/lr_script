@@ -5,6 +5,7 @@ class Gacha(Enum):
     ICON = "gacha_icon.png"
     TEXT = "gacha_text.png"
     EQUIP_NAV = "gacha_equip_nav.png"
+    EQUIP_SHIRT_PULL =  "gacha_equip_shirt_pull.png"
     GEAR_GAUGE = "gacha_gear_gauge.png"
     SHOP = "gacha_shop.png"
     TICKET_PULL = "gacha_pull_tickets.png"

@@ -43,7 +43,7 @@ class BasePvP:
         
         for _ in range(5):
             if wait_click(self.serial, PvP.BTN.value):
-                connection_retry(self.serial, image_name=PvP.BTN.value, exception_msg="不在主畫面", timeout=40.0)
+                connection_retry(self.serial, vanish=[(PvP.BTN.value)], timeout=40.0)
                 self._close_pvp_in()
                 # 判賽季結算(或聯盟初始化) 跟 pvp介紹 跟 屬性關卡介紹 跟 降級
                 return
@@ -73,15 +73,15 @@ class BasePvP:
             if exist(self.serial, Retry.TEXT1.value):
                 exist_click(self.serial, Retry.BTN.value)
 
-        connection_retry(self.serial, wait_name=PvP.MATCHED.value, timeout=40.0)
+        connection_retry(self.serial, appear=PvP.MATCHED.value, timeout=40.0)
         wait_click(self.serial, PvP.CHALLENGE.value)
-        connection_retry(self.serial, wait_name=Battle.NEXT.value, timeout=40.0)
+        connection_retry(self.serial, appear=Battle.NEXT.value, timeout=40.0)
 
     def _cancel_match_up(self):
         wait_click(self.serial, Confirm.CANCEL.value)
         wait_click(self.serial, MainView.BACK.value)
         wait_click(self.serial, MainView.BACK.value)
-        connection_retry(self.serial, wait_name=PvP.TEXT.value, timeout=40.0)
+        connection_retry(self.serial, appear=PvP.TEXT.value, timeout=40.0)
 
     def run(self):
         log_msg(self.serial, "PVP 任務開始")
@@ -90,7 +90,7 @@ class BasePvP:
         wait_click(self.serial, Battle.START.value)
         if exist_click(self.serial, Leonard.TP_JUMP.value, wait_time=1.0):
             wait_click(self.serial, Battle.START.value)
-        connection_retry(self.serial, wait_name=Battle.PAUSE.value, timeout=60.0)
+        connection_retry(self.serial, appear=Battle.PAUSE.value, timeout=60.0)
 
         while True:
             if exist(self.serial, Battle.NO_FEATHER.value):
@@ -109,7 +109,7 @@ class BasePvP:
         return True
 
     def settlement(self):
-        connection_retry(self.serial, wait_name=PvP.SETTLEMENT_TEXT.value, timeout=40.0)
+        connection_retry(self.serial, appear=PvP.SETTLEMENT_TEXT.value, timeout=40.0)
         exist_click(self.serial, PvP.SETTLEMENT_TEXT.value)
 
         while True:

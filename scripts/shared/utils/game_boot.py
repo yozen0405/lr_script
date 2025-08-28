@@ -12,31 +12,31 @@ def open_game(serial, mode: str = "main_stage"):
     succ = False
     on_open = 0
     while True:
-        if exist_click(serial, GameView.ICON, threshold=0.5):
+        if exist_click(serial, GameView.ICON.value, threshold=0.5):
             on_open = 0
-            if not wait(serial, GameView.GAME_OPENED, threshold=0.5, timeout=10.0):
+            if not wait(serial, GameView.GAME_OPENED.value, threshold=0.5, timeout=10.0):
                 log_msg(serial, "遊戲卡在開啟畫面，嘗試重新啟動...")
                 force_close(serial)
                 continue
 
-        if exist(serial, GameView.GAME_OPENED):
+        if exist(serial, GameView.GAME_OPENED.value):
             on_open = 0
-            if not wait_vanish(serial, GameView.GAME_OPENED, threshold=0.5, timeout=15.0):
+            if not wait_vanish(serial, GameView.GAME_OPENED.value, threshold=0.5, timeout=15.0):
                 log_msg(serial, "遊戲卡在開啟畫面，嘗試重新啟動...")
                 force_close(serial)
                 continue
 
-        if exist_click(serial, GameView.PERM):
+        if exist_click(serial, GameView.PERM.value):
             on_open = 0
 
-        if exist_click(serial, GameView.LINE_STUDIO_TEXT):
+        if exist_click(serial, GameView.LINE_STUDIO_TEXT.value):
             on_open = 0
         
-        if exist(serial, GameView.LOADING):
+        if exist(serial, GameView.LOADING.value):
             succ = True
             break
         
-        if exist(serial, GameView.WAITING):
+        if exist(serial, GameView.WAITING.value):
             succ = True
             break
         
