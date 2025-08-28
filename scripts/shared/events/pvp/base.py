@@ -1,5 +1,5 @@
 from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
-from scripts.shared.constants import Settlement, Confirm, Battle, Retry, MainView
+from scripts.shared.constants import Settlement, Confirm, Battle, Retry, MainView, Leonard
 from scripts.shared.events.main_stage.enum import MainStage
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.events.pvp.enum import PvP
@@ -16,6 +16,15 @@ class BasePvP:
         cnt = 0
         while True:
             if exist_click(self.serial, PvP.LVL_DOWN.value):
+                cnt = 0
+                continue
+            if exist_click(self.serial, Leonard.TP_POINT.value):
+                cnt = 0
+                continue
+            if exist_click(self.serial, Leonard.TP_JUMP.value):
+                cnt = 0
+                continue
+            if exist_click(self.serial, PvP.CLOSE_TIPS.value):
                 cnt = 0
                 continue
             if exist(self.serial, PvP.SEASON_END_TEXT.value, threshold=0.9):
@@ -79,6 +88,9 @@ class BasePvP:
         exist_click(self.serial, Battle.AUTO_BTN_OFF2.value, threshold=0.99)
         wait_click(self.serial, Battle.NEXT.value)
         wait_click(self.serial, Battle.START.value)
+        if exist_click(self.serial, Leonard.TP_JUMP.value, wait_time=1.0):
+            wait_click(self.serial, Battle.START.value)
+        connection_retry(self.serial, wait_name=Battle.PAUSE.value, timeout=60.0)
 
         while True:
             if exist(self.serial, Battle.NO_FEATHER.value):

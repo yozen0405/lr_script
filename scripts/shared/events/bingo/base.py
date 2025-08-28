@@ -87,13 +87,10 @@ class BingoBase:
                 break
             
         while True:
-            if exist_click(self.serial, Bingo.CLOSE_AD1.value, threshold=0.99):
-                continue
-            if exist_click(self.serial, Bingo.CLOSE_AD2.value, threshold=0.99):
-                continue
-            elif exist_click(self.serial, Bingo.CLOSE_PLAY_STORE.value, threshold=0.99):
-                continue
-            elif exist(self.serial, Bingo.TEXT.value):
+            for i in range(1, 7):
+                if exist_click(self.serial, Bingo.CLOSE_AD(num=i), threshold=0.99):
+                    continue
+            if exist(self.serial, Bingo.TEXT.value):
                 break
         
         res = self._wait_bingo_text()

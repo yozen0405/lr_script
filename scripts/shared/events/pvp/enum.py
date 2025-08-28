@@ -13,3 +13,4 @@ class PvP(str, Enum):
     CHALLENGE_BLIND = "pvp_opponent_challenge2.png"
     LVL_DOWN = "pvp_lvl_downgrade.png"
     SEASON_END_TEXT = "pvp_season_end_text.png"
+    CLOSE_TIPS = "close_lose_tips.png"

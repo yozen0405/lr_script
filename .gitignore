@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 .env
+venv/
 bin/acc
 bin/tmp
 bin/cache.json

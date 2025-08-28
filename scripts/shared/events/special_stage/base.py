@@ -126,6 +126,7 @@ class BaseSpecialStage:
         connection_retry(self.serial, image_name=Battle.START.value, timeout=60.0)
 
         if wait(self.serial, Battle.PAUSE.value, timeout=15.0, threshold=0.9):
+            self._on_start_page()
             while True:
                 if exist(self.serial, Battle.LOOP_END_TEXT.value, threshold=0.9):
                     break

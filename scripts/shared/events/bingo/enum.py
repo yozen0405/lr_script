@@ -1,15 +1,14 @@
 from enum import Enum
+from scripts.shared.constants.base import Base
 
-class Bingo(Enum):
+class Bingo(Base):
     BTN = "bingo_btn.png"
     TEXT = "bingo_text.png"
     RANDOM = "bingo_random.png"
     MISSION_BTN = "bingo_mission_btn.png"
     MISSION_TEXT = "bingo_mission_text.png"
     GET = "daily_quest_claim.png"
-    CLOSE_AD1 = "bingo_close_ad_1.png"
-    CLOSE_AD2 = "bingo_close_ad_2.png"
-    CLOSE_PLAY_STORE = "bingo_close_play_store.png"
+    CLOSE_AD = "bingo_close_ad_{num}.png"
     MISSION_CLAIMED_TEXT = "guild_quest_claimed_text.png"
     REDRAW = "bingo_redraw.png"
     GOT_NEW_TEXT = "bingo_get_new_text.png"

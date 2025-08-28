@@ -7,4 +7,4 @@ class Leonard(str, Enum):
     TP_POINT = "leonard_teacher_pvp1.png"
     TP_CLAP = "leonard_teacher_pvp2.png"
     TP_HAPPY = "leonard_teacher_switch_team2.png"
-    
+    TP_JUMP = "leonard_teacher_jump.png"
