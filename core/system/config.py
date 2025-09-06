@@ -1,17 +1,10 @@
 # core/system/config.py
+
 from configparser import ConfigParser
 import os
 
-class Config:
-    _instance = None
-
-    def __new__(cls, config_path="./bin/config.ini"):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance._init_config(config_path)
-        return cls._instance
-
-    def _init_config(self, config_path):
+class BaseConfig:
+    def __init__(self, config_path="./bin/config.ini"):
         self.config_path = config_path
         if not os.path.isfile(self.config_path):
             raise FileNotFoundError(f"找不到設定檔: {self.config_path}")
@@ -38,15 +31,6 @@ class Config:
 
         return value
 
-    def is_single_mode(self):
-        return self.get("single_mode", fallback=True)
-
-    def get_cycle_num(self):
-        return self.get("cycle_num", fallback=1)
-
-    def get_link(self):
-        return self.get("link", fallback="")
-
     def _parse_gacha_settings(self):
         target_count = self.get("herowant", fallback=1)
         expected_names = []
@@ -64,3 +48,24 @@ class Config:
                     continue
 
         return target_count, expected_names, name_map
+
+class Config(BaseConfig):
+    _instance = None
+
+    def __new__(cls, config_path="./bin/config.ini"):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            BaseConfig.__init__(cls._instance, config_path)
+        return cls._instance
+
+    def is_single_mode(self):
+        return self.get("single_mode", fallback=True)
+
+    def get_cycle_num(self):
+        return self.get("cycle_num", fallback=1)
+
+    def get_link(self):
+        return self.get("link", fallback="")
+    
+    def get_team_num(self):
+        return self.get("team_num", fallback=1)

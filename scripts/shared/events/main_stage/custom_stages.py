@@ -1,4 +1,4 @@
-from scripts.shared.events.main_stage.base import BaseMainStage
+from scripts.shared.events.main_stage.hooks import MainStageHooks
 from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
 from scripts.shared.utils.retry import connection_retry
 import time
@@ -6,21 +6,22 @@ from core.base.exceptions import GameError
 from core.system.logger import log_msg
 from scripts.shared.constants import GameView, MainView, Battle, Confirm, Settlement
 from scripts.shared.events.main_stage.enum import MainStage
+from scripts.shared.events.main_stage.base import BaseMainStage
 
-class FirstStage(BaseMainStage):
-    def _on_pre_start_page_prev(self):
+class FirstStage(MainStageHooks):
+    def on_pre_start_page_prev(self, ctx):
         wait_click(self.serial, MainStage.METEOR.value, threshold=0.5)
 
-    def _settlement_items(self):
+    def settlement_items(self, ctx):
         return [Settlement.ONE_REWARD.value, Confirm.BIG1.value,Confirm.BIG2.value]
 
-class SecondStage(BaseMainStage):
-    def _on_settlement_page(self):
+class SecondStage(MainStageHooks):
+    def on_settlement_page(self):
         if exist_click(self.serial, MainView.SKIP.value):
             wait_click(self.serial, Confirm.SMALL.value, wait_time=0.5)
 
-class ThirdStage(BaseMainStage):
-    def _on_start_page(self):
+class ThirdStage(MainStageHooks):
+    def on_start_page(self, ctx):
         time.sleep(1.0)
         if not wait_click(self.serial, Battle.SPEED_BTN_OFF.value, wait_time=3.0):
             raise GameError("無法點擊x2")
@@ -29,8 +30,8 @@ class ThirdStage(BaseMainStage):
         if not wait_click(self.serial, Battle.SPEED_BTN_ON.value):
             raise GameError("無法點擊x2")
 
-class AutoStage(BaseMainStage):
-    def _on_start_page(self):
+class AutoStage(MainStageHooks):
+    def on_start_page(self, ctx):
         time.sleep(1.0)
         if not wait_click(self.serial, Battle.AUTO_BTN_ON.value, wait_time=3.0):
             raise GameError("無法點擊 auto")
@@ -39,16 +40,16 @@ class AutoStage(BaseMainStage):
         if not wait_click(self.serial,  Battle.AUTO_BTN_OFF.value):
             raise GameError("無法點擊 auto")
 
-class FriendStage(BaseMainStage):
-    def _on_start_page(self):
+class FriendStage(MainStageHooks):
+    def on_start_page(self, ctx):
         for _ in range(3):
-            wait_click(self.serial, self.FRIEND, wait_time=1.5)
+            wait_click(self.serial, ctx.FRIEND, wait_time=1.5)
         if wait_click(self.serial, MainView.SKIP.value, timeout=25.0):
             wait_click(self.serial, Confirm.SMALL.value, wait_time=1.0)
         
         wait_click(self.serial, MainView.SKIP.value)
 
-    def _on_pre_start_page_next(self):
+    def on_pre_start_page_next(self, ctx):
         if wait_click(self.serial, MainView.SKIP.value, timeout=5.0):
             wait_click(self.serial, Confirm.SMALL.value, wait_time=1.0)
         wait_click(self.serial, MainView.SKIP.value, timeout=5.0, wait_time=1.0)

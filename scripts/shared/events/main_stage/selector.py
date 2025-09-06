@@ -8,41 +8,42 @@ from scripts.shared.events.main_stage.custom_stages import (
 from core.base.exceptions import GameError
 from typing import Optional
 from core.system.logger import log_msg
+from scripts.shared.events.main_stage.hooks import MainStageHooks
+from core.system.config import Config
 
 class MainStageTask:
     def __init__(self, serial):
         self.serial = serial
         self.base_stage = BaseMainStage(serial)
+        config = Config()
+        self.team_num = config.get_team_num()
 
     def battle(self, custom_stage: Optional[int] = None, multiplier: int = 1):
         self.base_stage.enter_menu()
-        stage = self._proccess_stage(custom_stage=custom_stage)
-        stage.enter_battle(multiplier=multiplier)
+        hooks = self._proccess_stage(custom_stage=custom_stage)
+        current_stage = BaseMainStage(self.serial, hooks=hooks, is_low=self.is_low, team_num=self.team_num)
+        current_stage.enter_battle(multiplier=multiplier)
 
     def enter_menu(self):
         self.base_stage.enter_menu()
 
-    def _map_stage_to_class(self, stage_num: int) -> BaseMainStage:
-        stage_class = None
+    def _get_hook_class(self, stage_num: int) -> MainStageHooks:
+        self.is_low = stage_num < 100
 
-        if stage_num == 1:
-            stage_class = FirstStage(self.serial)
-        elif stage_num == 2:
-            stage_class = SecondStage(self.serial)
-        elif stage_num == 3:
-            stage_class = ThirdStage(self.serial)
-        elif stage_num == 13:
-            stage_class = AutoStage(self.serial)
-        elif stage_num == 30:
-            stage_class = FriendStage(self.serial)
-        else:
-            stage_class = self.base_stage
-        return stage_class
+        stage_map = {
+            1: FirstStage,
+            2: SecondStage,
+            3: ThirdStage,
+            13: AutoStage,
+            30: FriendStage,
+        }
+        cls = stage_map.get(stage_num, MainStageHooks)
+        return cls(self.serial)
 
-    def _proccess_stage(self, custom_stage: Optional[int] = None) -> BaseMainStage:
+    def _proccess_stage(self, custom_stage: Optional[int] = None) -> MainStageHooks:
         stage_num = self.base_stage.enter_stage(custom_stage=custom_stage)
-        stage_class = self._map_stage_to_class(stage_num)
-        return stage_class
+        hooks = self._get_hook_class(stage_num)
+        return hooks
 
 def main_stage_finish_new(serial):
     main_stage_task = MainStageTask(serial)

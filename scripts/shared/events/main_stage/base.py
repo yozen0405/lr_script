@@ -8,14 +8,19 @@ from scripts.shared.utils.retry import connection_retry
 from typing import Optional
 from scripts.shared.constants import GameView, Settlement, Battle, Confirm, MainView, Leonard, Retry
 from scripts.shared.events.main_stage.enum import MainStage, Stages, Treasure
+from scripts.shared.events.main_stage.finder import MainStageFinder
+from scripts.shared.events.main_stage.hooks import MainStageHooks
 
 class BaseMainStage:
-    def __init__(self, serial):
+    def __init__(self, serial, hooks=None, is_low=True, team_num=1):
         self.serial = serial
         self.MEMBER3_POS = Positions.MEMBER3.value
         self.MEMBER4_POS = Positions.MEMBER4.value
         self.FRIEND = Positions.FRIEND.value
-        self.is_low = True
+        self.finder = MainStageFinder(serial)
+        self.is_low = is_low
+        self.team_num = team_num
+        self.hooks = hooks or MainStageHooks(serial)
 
     def enter_menu(self):
         if exist(self.serial, MainStage.TEXT.value, threshold=0.9):
@@ -26,122 +31,22 @@ class BaseMainStage:
             connection_retry(self.serial, appear=[(MainStage.TEXT.value, 0.9)], timeout=60.0)
         else:
             raise GameError("不在主畫面")
-
-    def _check_stage_on_screen(self):
-        for image, threshold in [
-            (Stages.NEW_COMMON.value, 0.98),
-            (Stages.NEW_EVENT.value, 0.97),
-            (Stages.BOSS.value, 0.92),
-            (Stages.NEW_SHINE.value, 0.85),
-        ]:
-            if exist_click(self.serial, image, threshold=threshold):
-                connection_retry(self.serial, vanish=MainStage.TEXT.value, retry=[(image, threshold)], timeout=40.0)
-                return True
-        return False
-
-    def _find_stage(self, custom_stage: str = None):
-        y = 360
-        x = 800
-        drag_pairs = [
-            ((800, 360), (500, 360)), # 右
-            ((800, 360), (500, 360)), # 右
-            ((800, 360), (500, 360)), # 右
-            ((800, 360), (500, 360)), # 右
-            ((800, 360), (500, 360)), # 右
-            ((800, 200), (800, 360)), # 上
-            ((500, 360), (800, 360)), # 左
-            ((500, 360), (800, 360)), # 左
-            ((500, 360), (800, 360)), # 左
-            ((500, 360), (800, 360)), # 左
-            ((500, 360), (800, 360)), # 左
-            ((800, 200), (800, 360)), # 上
-        ]
-        timeout = 1.0
-        for _ in range(10):
-            for base_start, base_end in drag_pairs:
-                start_pos = list(base_start)
-                end_pos = list(base_end)
-
-                if custom_stage is None:
-                    if self._check_stage_on_screen():
-                        return
-                else:
-                    if exist_click(self.serial, custom_stage, threshold=0.9):
-                        connection_retry(self.serial, vanish=[(MainStage.TEXT.value, 0.9)], timeout=40.0)
-                        return
-
-                if exist(self.serial, Treasure.ICON.value, threshold=0.9):
-                    pos = get_pos(self.serial, Treasure.ICON.value, threshold=0.9)
-
-                    if start_pos[1] == end_pos[1]:
-                        y_val = pos[1] - 100 if pos[1] >= 360 else pos[1] + 100
-                        start_pos[1] = y_val
-                        end_pos[1] = y_val
-                    else:
-                        x_val = pos[0] - 100 if pos[0] >= 640 else pos[0] + 100
-                        start_pos[0] = x_val
-                        end_pos[0] = x_val
-                
-                if exist(self.serial, Treasure.ICON2.value, threshold=0.95):
-                    pos = get_pos(self.serial, Treasure.ICON2.value, threshold=0.95)
-
-                    if start_pos[1] == end_pos[1]:
-                        y_val = pos[1] - 100 if pos[1] >= 360 else pos[1] + 100
-                        start_pos[1] = y_val
-                        end_pos[1] = y_val
-                    else:
-                        x_val = pos[0] - 100 if pos[0] >= 640 else pos[0] + 100
-                        start_pos[0] = x_val
-                        end_pos[0] = x_val
-
-                drag(self.serial, tuple(start_pos), tuple(end_pos))
-        raise GameError("找不到關卡")
-
-    def _find_custom_stage(self, stage: int):
-        # 魔王關會爛
-        # 要去魔王關，先找附近的普通關卡，看他們是否存在
-        # 假設存在，點進去魔王關，看是不是我們要的，如果不是就退回來，然後繼續滑動找
-        stage_str = f"main_stage_stage_{stage}.png"
-        if exist_click(self.serial, stage_str, threshold=0.9):
-            return
-        exist_click(self.serial, MainStage.STAGE_SELECTOR.value, wait_time=1.0)
-
-        if stage < 100:
-            exist_click(self.serial, MainStage.STAGE_NAV_1.value)
-        elif stage < 200:
-            exist_click(self.serial, MainStage.STAGE_NAV_100.value)
-        elif stage < 300:
-            exist_click(self.serial, MainStage.STAGE_NAV_200.value)
-        elif stage < 400:
-            exist_click(self.serial, MainStage.STAGE_NAV_300.value)
-        elif stage < 500:
-            exist_click(self.serial, MainStage.STAGE_NAV_400.value)
-
-        self._find_stage(custom_stage=stage_str)
-        if not wait(self.serial, MainStage.PRE_START_TEXT.value, timeout=5.5):
-            raise GameError(f"找不到指定關卡 {stage}")
-
-    def get_current_stage(self) -> int:
-        stage = get_main_stage_num(self.serial)
-        if stage < 100:
-            self.is_low = True
-        else:
-            self.is_low = False
-
+        
     def enter_stage(self, custom_stage: Optional[int] = None) -> int:
         if not wait(self.serial, MainStage.TEXT.value, threshold=0.9, timeout=30.0, wait_time=2.5):
             raise GameError("不在主要關卡")
         
         if custom_stage is None:
-            if not self._check_stage_on_screen():
-                self._find_stage()
+            if not self.finder._check_stage_on_screen():
+                self.finder._find_stage()
         else:
-            self._find_custom_stage(stage=custom_stage)
-            
+            self.finder._find_custom_stage(stage=custom_stage)
+
         for _ in range(10):
             if wait(self.serial, MainStage.PRE_START_TEXT.value, timeout=5.5):
-                self._handle_loop_stage_tutorial()
-                return self.get_current_stage()
+                self.hooks.handle_loop_stage_tutorial(self)
+                result = self.finder.get_current_stage()
+                return result
             elif exist(self.serial, Retry.TEXT1.value):
                 exist_click(self.serial, Retry.BTN.value)
             else:
@@ -152,12 +57,14 @@ class BaseMainStage:
     def enter_battle(self, multiplier: int):
         log_msg(self.serial, "Main Stage 戰鬥開始")
 
-        self._on_pre_start_page_prev()
-        exist_click(self.serial, Battle.AUTO_BTN_OFF2.value, threshold=0.99)
-        self._handle_multiplier(times=multiplier)
-        wait_click(self.serial, Battle.NEXT.value, timeout=3.0)
-        self._on_pre_start_page_next()
+        self.hooks.on_pre_start_page_prev(self)
+        self.hooks.handle_auto_btn(ctx=self)
+        self.hooks.handle_multiplier(times=multiplier, ctx=self)
+        
+        self.hooks.handle_team_num(ctx=self)
 
+        wait_click(self.serial, Battle.NEXT.value, timeout=3.0)
+        self.hooks.on_pre_start_page_next(ctx=self)
         wait_click(self.serial, Battle.START.value)
 
         try:
@@ -166,7 +73,7 @@ class BaseMainStage:
             wait_click(self.serial, Battle.START.value)
 
         if wait(self.serial, Battle.PAUSE.value, timeout=15.0, threshold=0.9):
-            self._on_start_page()
+            self.hooks.on_start_page(self)
             while exist(self.serial, Battle.PAUSE.value, threshold=0.97):
                 wait_click(self.serial, self.MEMBER3_POS)
                 wait_click(self.serial, self.MEMBER4_POS)
@@ -177,75 +84,26 @@ class BaseMainStage:
         self.settlement()
         log_msg(self.serial, "Main Stage 任務完成")
 
-    def _handle_multiplier(self, times):
-        if not exist(self.serial, Battle.MULTIPLIER_OFF.value):
-            return
-        for _ in range(5):
-            if self.is_low:
-                did_found = exist(self.serial, MainStage.MULTIPLIER_LOW_BTN(times=times), threshold=0.9)
-            else:
-                did_found = exist(self.serial, MainStage.MULTIPLIER_HIGH_BTN(times=times), threshold=0.9)
-
-            if did_found:
-                return
-            exist_click(self.serial, Battle.MULTIPLIER_OFF.value, wait_time=0.5)
-        
-    def _handle_loop_stage_tutorial(self):
-        if not wait(self.serial, Battle.MULTIPLIER_TEXT.value, timeout=2.0):
-            return
-        wait_click(self.serial, Battle.CYCLE.value, wait_time=2.5)
-        wait_click(self.serial, Leonard.BG_POINT.value, wait_time=2.5)
-        wait_click(self.serial, Battle.MULTIPLIER_OFF.value, wait_time=1.0)
-        wait_click(self.serial, Battle.MULTIPLIER_ON.value, wait_time=1.0)
-        wait_click(self.serial, Leonard.BG_HAPPY.value, wait_time=1.0)
-
-
-    def _on_pre_start_page_prev(self):
-        pass
-    
-    def _on_pre_start_page_next(self):
-        pass
-
-    def _on_start_page(self):
-        pass
-
-    def _on_settlement_page(self):
-        pass
-
-    def _on_settlement_next_feature(self):
-        if not wait(self.serial, MainStage.NEXT_FEATURE.value, timeout=3.0):
-            return
-        wait_click(self.serial, Settlement.AGAIN.value, wait_time=1.2)
-        wait_click(self.serial, Settlement.NEXT.value)
-
-    def _settlement_items(self):
-        return [
-            Settlement.ACQUIRED.value, Confirm.BIG1.value,Confirm.BIG2.value, 
-            Settlement.ONE_REWARD.value, Confirm.SMALL.value, Settlement.STOP.value
-        ]
-
     def settlement(self):
-        if wait_click(self.serial, Settlement.CANCEL_LOSE.value, wait_time=10.0):
-            wait_click(self.serial, Settlement.CLOSE_LOSE_TIPS.value, wait_time=7.0)
-            if not wait_click(self.serial, Confirm.SMALL.value, wait_time=7.0):
-                raise GameError("沒有進入失敗葉面")
-            raise GameError("輸了")
-
         connection_retry(self.serial, appear=Settlement.TEXT.value, timeout=40.0)
 
         for _ in range(3):
             wait_click(self.serial, self.MEMBER4_POS)
 
         while True:
-            for img in self._settlement_items():
-                exist_click(self.serial, img, wait_time=1.5)
+            for item in self.hooks.settlement_items(ctx=self):
+                if isinstance(item, tuple):
+                    img, threshold = item
+                    exist_click(self.serial, img, threshold=threshold, wait_time=1.5)
+                else:
+                    exist_click(self.serial, item, wait_time=1.5)
 
             if exist(self.serial, Retry.TEXT1.value):
                 exist_click(self.serial, Retry.BTN.value)
 
-            self._on_settlement_page()
-            self._on_settlement_next_feature()
-            
+            self.hooks.on_settlement_page(ctx=self)
+            self.hooks.on_settlement_next_feature(ctx=self)
+
             if exist(self.serial, MainView.CLOSE_BOARD.value):
                 if exist(self.serial, Retry.TEXT1.value):
                     exist_click(self.serial, Retry.BTN.value)

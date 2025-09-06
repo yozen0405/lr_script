@@ -16,6 +16,14 @@ class MainStage(Base):
     STAGE_NAV_400 = "main_stage_nav400.png"
     MULTIPLIER_LOW_BTN = "main_stage_multiplier_low_{times}.png"
     MULTIPLIER_HIGH_BTN = "main_stage_multiplier_high_{times}.png"
+    TEAM_BTN_LOW = "main_stage_team_btn_low.png"
+    TEAM_BTN_HIGH = "main_stage_team_btn_high.png"
+    TEAM_NUM_LOW_OFF = "main_stage_team_num_low_off_{num}.png"
+    TEAM_NUM_LOW_ON = "main_stage_team_num_low_on_{num}.png"
+    TEAM_NUM_HIGH_OFF = "main_stage_team_num_high_off_{num}.png"
+    TEAM_NUM_HIGH_ON = "main_stage_team_num_high_on_{num}.png"
+    AUTO_BTN_LOW_OFF = "main_stage_auto_btn_low_off.png"
+    AUTO_BTN_HIGH_OFF = "main_stage_auto_btn_high_off.png"
     
 class Stages(str, Enum):
     LOCKED = "new_stage_locked.png"

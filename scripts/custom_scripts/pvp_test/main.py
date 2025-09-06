@@ -17,7 +17,7 @@ from scripts.shared.utils.game_view import on_main_view
 import time
 
 def normal_stage(serial):
-    bingo_attempt(serial)
+    # bingo_attempt(serial)
     # apply_mode(serial, mode_name="advent", state="on")
     # advent_stage_battle(serial)
     # apply_mode(serial, mode_name="advent", state="off")
@@ -25,8 +25,8 @@ def normal_stage(serial):
     # connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
 
     # apply_mode(serial, mode_name="main_stage", state="on")
-    # for _ in range(2):
-    #     main_stage_finish_custom(serial, custom_stage=26, multiplier=2)
+    for _ in range(2):
+        main_stage_finish_custom(serial, custom_stage=27, multiplier=1)
     # apply_mode(serial, mode_name="main_stage", state="off")
     # wait_click(serial, "back.png")
     # connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
