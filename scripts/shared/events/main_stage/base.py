@@ -15,6 +15,7 @@ class BaseMainStage:
         self.MEMBER3_POS = Positions.MEMBER3.value
         self.MEMBER4_POS = Positions.MEMBER4.value
         self.FRIEND = Positions.FRIEND.value
+        self.is_low = True
 
     def enter_menu(self):
         if exist(self.serial, MainStage.TEXT.value, threshold=0.9):
@@ -121,7 +122,11 @@ class BaseMainStage:
             raise GameError(f"找不到指定關卡 {stage}")
 
     def get_current_stage(self) -> int:
-        return get_main_stage_num(self.serial)
+        stage = get_main_stage_num(self.serial)
+        if stage < 100:
+            self.is_low = True
+        else:
+            self.is_low = False
 
     def enter_stage(self, custom_stage: Optional[int] = None) -> int:
         if not wait(self.serial, MainStage.TEXT.value, threshold=0.9, timeout=30.0, wait_time=2.5):
@@ -144,11 +149,12 @@ class BaseMainStage:
                 continue
         raise GameError("未知的主要關卡")
 
-    def enter_battle(self):
+    def enter_battle(self, multiplier: int):
         log_msg(self.serial, "Main Stage 戰鬥開始")
 
         self._on_pre_start_page_prev()
         exist_click(self.serial, Battle.AUTO_BTN_OFF2.value, threshold=0.99)
+        self._handle_multiplier(times=multiplier)
         wait_click(self.serial, Battle.NEXT.value, timeout=3.0)
         self._on_pre_start_page_next()
 
@@ -171,6 +177,19 @@ class BaseMainStage:
         self.settlement()
         log_msg(self.serial, "Main Stage 任務完成")
 
+    def _handle_multiplier(self, times):
+        if not exist(self.serial, Battle.MULTIPLIER_OFF.value):
+            return
+        for _ in range(5):
+            if self.is_low:
+                did_found = exist(self.serial, MainStage.MULTIPLIER_LOW_BTN(times=times), threshold=0.9)
+            else:
+                did_found = exist(self.serial, MainStage.MULTIPLIER_HIGH_BTN(times=times), threshold=0.9)
+
+            if did_found:
+                return
+            exist_click(self.serial, Battle.MULTIPLIER_OFF.value, wait_time=0.5)
+        
     def _handle_loop_stage_tutorial(self):
         if not wait(self.serial, Battle.MULTIPLIER_TEXT.value, timeout=2.0):
             return

@@ -1,6 +1,6 @@
 from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
 from scripts.shared.constants import Settlement, Confirm, Battle, Retry, MainView
-from scripts.shared.events.guild.enum import Guild
+from scripts.shared.events.guild.enum import Guild, GuildRaidSide
 from scripts.shared.events.main_stage.enum import MainStage
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.events.pvp.enum import PvP
@@ -9,7 +9,7 @@ from core.system.logger import log_msg
 from scripts.shared.utils.hacks import apply_mode
 import time
 
-class GuildRaid:
+class BaseGuild:
     def __init__(self, serial):
         self.serial = serial
 
@@ -25,12 +25,22 @@ class GuildRaid:
 
         if exist_click(self.serial, Guild.BTN.value):
             connection_retry(self.serial, vanish=Guild.BTN.value, timeout=40.0)
-            
-        if wait(self.serial, Guild.TEXT.value, timeout=10.0):
-            wait_click(self.serial, Guild.WAR_REWARD_POP.value, wait_time=2.0)
-        else:
-            raise GameError("無法進入公會")
         
+        self._handle_enter()
+        
+    def _handle_enter(self):
+        while True:
+            if exist(self.serial, Guild.TEXT.value, threshold=0.999):
+                break
+            exist_click(self.serial, Battle.ANIME.value, threshold=0.6)
+            exist_click(self.serial, Guild.WAR_REWARD_POP.value)
+            if exist(self.serial, Guild.PURCHASE_POP.value):
+                exist_click(self.serial, Confirm.SMALL.value)
+            if exist(self.serial, Guild.ACCEPT_SUPPORT_POP.value):
+                exist_click(self.serial, Confirm.SMALL.value)
+            if exist(self.serial, Retry.TEXT1.value):
+                exist_click(self.serial, Retry.BTN.value)
+
     def _support_members(self):
         exist_click(self.serial, Guild.MEMBER_NAV_LIGHT.value)
         while True:
@@ -60,26 +70,41 @@ class GuildRaid:
                     continue
                 else:
                     break
-        
+
+class GuildRaid:
+    def __init__(self, serial):
+        self.serial = serial
+        self.base_guild = BaseGuild(serial)
+
+    def enter_guild_menu(self):
+        self.base_guild.enter_menu()
 
     def enter_raid_menu(self):
         if exist(self.serial, Guild.RAID_TEXT.value):
             return
         
-        self.enter_menu()
+        self.enter_guild_menu()
 
         wait_click(self.serial, Guild.RAID_BTN.value)
         connection_retry(self.serial, appear=Guild.RAID_TEXT.value, timeout=40.0)
 
-    def enter_raid_stage(self):
+    def enter_raid_stage(self, side):
         if not wait(self.serial, Guild.RAID_ATTACK.value, timeout=3.0):
-            wait_click(self.serial, Battle.ENTER.value)
+            if side == 1:
+                wait_click(self.serial, Battle.ENTER.value, region=GuildRaidSide.LEFT.value)
+            else:
+                wait_click(self.serial, Battle.ENTER.value, region=GuildRaidSide.RIGHT.value)
+
             connection_retry(self.serial, vanish=Battle.ENTER.value, timeout=40.0)
         for _ in range(10):
+            if wait(self.serial, Guild.RAID_ATTACK.value, threshold=0.999):
+                break
             wait_click(self.serial, Guild.TOUCH_SCREEN.value, timeout=3.0)
             wait_click(self.serial, MainView.CLOSE_BOARD2.value, threshold=0.9, timeout=3.0)
-            if wait_click(self.serial, Guild.RAID_ATTACK.value):
-                break
+        
+        exist_click(self.serial, Guild.AUTO_BTN_OFF.value, threshold=0.999)
+        wait_click(self.serial, Guild.RAID_ATTACK.value)
+
         while True:
             if exist(self.serial, Guild.RAID_LIMITED.value):
                 exist_click(self.serial, Confirm.CANCEL.value, wait_time=1.0)
@@ -90,13 +115,16 @@ class GuildRaid:
                 exist_click(self.serial, Confirm.SMALL.value)
             if exist(self.serial, Retry.TEXT1.value):
                 exist_click(self.serial, Retry.BTN.value)
+            if exist(self.serial, Guild.RAID_TRY_AGAIN.value):
+                exist_click(self.serial, Confirm.SMALL.value, wait_time=1.0)
+                wait(self.serial, Guild.RAID_ATTACK.value)
             if exist(self.serial, Battle.PAUSE.value):
                 break
         return True
 
-    def raid_run(self):
+    def raid_run(self, side: int = 1):
         log_msg(self.serial, "公會副本任務開始")
-        if not self.enter_raid_stage():
+        if not self.enter_raid_stage(side=side):
             return False
 
         wait_vanish(self.serial, Battle.PAUSE.value, threshold=0.97, timeout=60.0)
@@ -107,7 +135,7 @@ class GuildRaid:
         return True
 
     def raid_settlement(self):
-        connection_retry(self.serial, appear=Guild.LVL_UP.value, timeout=40.0)
+        connection_retry(self.serial, appear=[(Guild.LVL_UP.value), (Guild.COMPLETE.value)], timeout=40.0)
         wait_click(self.serial, Guild.LVL_UP.value, wait_time=1.0)
         wait_click(self.serial, Guild.COMPLETE.value)
         wait_click(self.serial, Settlement.SILVER_BOX.value, wait_time=1.0)
@@ -120,8 +148,15 @@ class GuildRaid:
 def guild_raid_battle(serial):
     grd = GuildRaid(serial)
     grd.enter_raid_menu()
-    for _ in range(3):
-        if not grd.raid_run():
+    
+    side = 1
+    for i in range(3):
+        if i == 2:
+            side = 2
+        result = grd.raid_run(side=side)
+        if not result:
             break
-    grd.enter_menu()
-    grd.do_quest()
+
+    gbase = BaseGuild(serial)
+    gbase.enter_menu()
+    gbase.do_quest()

@@ -52,13 +52,14 @@ def connection_retry(
                 return
 
         if exist(serial, Retry.TEXT1.value):
-            if not exist_click(serial, Retry.TEXT1.value):
+            if not exist_click(serial, Retry.BTN.value):
                 exist_click(serial, Confirm.SMALL.value)
 
         if exist(serial, Retry.TEXT2.value):
-            wait_click(serial, Confirm.SMALL.value, wait_time=1.0)
-            for img, th, tm in retry:
-                wait_click(serial, img, threshold=th, timeout=tm)
+            if not exist_click(serial, Retry.BTN.value):
+                wait_click(serial, Confirm.SMALL.value, wait_time=1.0)
+                for img, th, tm in retry:
+                    wait_click(serial, img, threshold=th, timeout=tm)
 
         time.sleep(0.2)
 

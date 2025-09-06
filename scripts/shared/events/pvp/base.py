@@ -86,10 +86,9 @@ class BasePvP:
     def run(self):
         log_msg(self.serial, "PVP 任務開始")
         exist_click(self.serial, Battle.AUTO_BTN_OFF2.value, threshold=0.99)
-        wait_click(self.serial, Battle.NEXT.value)
+        wait_click(self.serial, Battle.NEXT.value, wait_time=1.5)
+        exist_click(self.serial, Leonard.TP_JUMP.value, wait_time=1.0)
         wait_click(self.serial, Battle.START.value)
-        if exist_click(self.serial, Leonard.TP_JUMP.value, wait_time=1.0):
-            wait_click(self.serial, Battle.START.value)
         connection_retry(self.serial, appear=Battle.PAUSE.value, timeout=60.0)
 
         while True:
@@ -97,6 +96,8 @@ class BasePvP:
                 self._cancel_match_up()
                 return False
             if exist(self.serial, Battle.PAUSE.value, threshold=0.9):
+                break
+            if exist(self.serial, PvP.SETTLEMENT_TEXT.value):
                 break
             if exist(self.serial, Retry.TEXT1.value):
                 exist_click(self.serial, Retry.BTN.value)

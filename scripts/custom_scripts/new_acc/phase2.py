@@ -109,7 +109,7 @@ class Phase2(BasePhase):
         if not wait(self.serial, MainStage.TEXT.value, timeout=15.0):
             raise GameError("不在主畫面")
         wait_click(self.serial, MainView.BACK.value)
-        on_main_view(self.serial, sign=MainView.BACK.value, vanish=True)
+        on_main_view(self.serial)
         force_close(self.serial)
 
     def _detect_event(self):

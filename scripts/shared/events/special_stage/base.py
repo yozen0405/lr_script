@@ -131,7 +131,7 @@ class BaseSpecialStage:
                 if exist(self.serial, Battle.LOOP_END_TEXT.value, threshold=0.9):
                     break
 
-                if exist(self.serial, Retry.TEXT1.value):
+                if exist(self.serial, Retry.TEXT1.value) or exist(self.serial, Retry.TEXT2.value):
                     exist_click(self.serial, Retry.BTN.value, wait_time=2.5)
         else:
             raise GameError("無法確認戰鬥狀態，跳出")
@@ -139,9 +139,9 @@ class BaseSpecialStage:
         log_msg(self.serial, "結算中")
         wait_click(self.serial, Confirm.BIG2.value)
 
-        connection_retry(self.serial, appear=[(SpecialStage.TEXT.value)], timeout=40.0)
+        connection_retry(self.serial, appear=[(SpecialStage.TEXT.value)], timeout=80.0)
         wait_click(self.serial, MainView.BACK.value, timeout=20.0)
-        connection_retry(self.serial, appear=[(SpecialStage.LAB.value)], timeout=40.0)
+        connection_retry(self.serial, appear=[(SpecialStage.LAB.value)], timeout=80.0)
 
         log_msg(self.serial, "Special Stage 迴圈任務完成")
         return True

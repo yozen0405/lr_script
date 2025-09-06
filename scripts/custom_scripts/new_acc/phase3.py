@@ -57,8 +57,10 @@ class Phase3(BasePhase):
         wait_click(self.serial, Gacha.SKIP.value)
         if not wait_click(self.serial, Gacha.CONFIRM.value):
             raise GameError("無法進行扭蛋")
+        connection_retry(self.serial, appear=Gacha.TEXT.value, timeout=40.0)
         if not wait_click(self.serial, MainView.BACK.value, timeout=20.0):
             raise GameError("找不到返回鍵")
+        connection_retry(self.serial, vanish=MainView.BACK.value, timeout=40.0)
     
     def _pre_skip_rene(self):
         if wait_click(self.serial, MainView.SKIP.value, timeout=30.0):
@@ -71,7 +73,7 @@ class Phase3(BasePhase):
         wait_click(self.serial, MainView.SKIP.value, timeout=10.0, wait_time=2.0)
         wait_click(self.serial, Gear.ARROW.value, timeout=10.0)
 
-        connection_retry(self.serial, appear=Gear.TEXT.value, timeout=40.0)
+        connection_retry(self.serial, appear=Gear.TEXT.value, retry=Gear.ARROW.value, timeout=40.0)
         if wait_click(self.serial, MainView.SKIP.value, timeout=5.0):
             wait_click(self.serial, Confirm.SMALL.value, wait_time=3.0)
         wait_click(self.serial, Leonard.BG_POINT.value, wait_time=3)

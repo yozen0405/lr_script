@@ -46,11 +46,13 @@ class NewAccFarm:
     #         self.phases[i].run()
     def run(self, start_phase_idx, start_step_idx):
         start = start_phase_idx - 1
-        for i in range(start, len(self.phases)):
-            log_msg(self.serial, f"第 {i + 1} 階段開始, 從第 {start_step_idx} 個 step")
-            self.phases[i].run(start_idx=start_step_idx)
-            start_step_idx = 0
+        for attemps in range(5):
+            for i in range(start, len(self.phases)):
+                log_msg(self.serial, f"第 {i + 1} 階段開始, 從第 {start_step_idx} 個 step")
+                self.phases[i].run(start_idx=start_step_idx)
+                start_step_idx = 0
+            start = 0
 
 def normal_stage(serial):
     farm = NewAccFarm(serial)
-    farm.run(start_phase_idx=2, start_step_idx=2)
+    farm.run(start_phase_idx=1, start_step_idx=0)

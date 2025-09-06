@@ -5,7 +5,7 @@ class Bingo(Base):
     BTN = "bingo_btn.png"
     TEXT = "bingo_text.png"
     RANDOM = "bingo_random.png"
-    MISSION_BTN = "bingo_mission_btn.png"
+    MISSION_ON = "bingo_mission_on.png"
     MISSION_TEXT = "bingo_mission_text.png"
     GET = "daily_quest_claim.png"
     CLOSE_AD = "bingo_close_ad_{num}.png"

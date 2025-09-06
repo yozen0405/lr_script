@@ -12,7 +12,7 @@ class FirstStage(BaseMainStage):
         wait_click(self.serial, MainStage.METEOR.value, threshold=0.5)
 
     def _settlement_items(self):
-        return [Settlement.ONE_REWARD.value]
+        return [Settlement.ONE_REWARD.value, Confirm.BIG1.value,Confirm.BIG2.value]
 
 class SecondStage(BaseMainStage):
     def _on_settlement_page(self):

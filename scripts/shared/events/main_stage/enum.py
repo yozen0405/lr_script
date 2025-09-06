@@ -1,6 +1,7 @@
 from enum import Enum
+from scripts.shared.constants.base import Base
 
-class MainStage(str, Enum):
+class MainStage(Base):
     TEXT = "main_stage_text.png"
     BTN = "main_stage_btn.png"
     NEXT_FEATURE = "main_stage_settlement_next_feature_text.png"
@@ -13,6 +14,8 @@ class MainStage(str, Enum):
     STAGE_NAV_200 = "main_stage_nav200.png"
     STAGE_NAV_300 = "main_stage_nav300.png"
     STAGE_NAV_400 = "main_stage_nav400.png"
+    MULTIPLIER_LOW_BTN = "main_stage_multiplier_low_{times}.png"
+    MULTIPLIER_HIGH_BTN = "main_stage_multiplier_high_{times}.png"
     
 class Stages(str, Enum):
     LOCKED = "new_stage_locked.png"

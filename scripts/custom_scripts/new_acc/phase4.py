@@ -47,6 +47,7 @@ class Phase4(BasePhase):
         if wait_click(self.serial, MainView.SKIP.value, timeout=5.0):
             wait_click(self.serial, Confirm.SMALL.value, wait_time=3.0)
         wait_click(self.serial, MainView.BACK.value)
+        on_main_view(self.serial, timeout=40.0)
 
     def _introduce_scene(self):
         wait_click(self.serial, MainView.BACK.value)

@@ -22,7 +22,7 @@ def on_main_view(serial, sign=MainView.BACK.value, vanish=True, skip_included = 
 
         if exist(serial, Retry.TEXT1.value):
             exist_click(serial, Retry.BTN.value)
-        if exist(serial, Confirm.SMALL.value):
+        if exist(serial, Confirm.SMALL.value, threshold=0.9):
             if not exist(serial, Retry.TEXT2.value):
                 found = True
                 exist_click(serial, Confirm.SMALL.value, wait_time=1.0)

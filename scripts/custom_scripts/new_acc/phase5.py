@@ -43,7 +43,7 @@ class Phase5(BasePhase):
             raise GameError("未知狀態")
         on_main_view(self.serial)
         wait_click(self.serial, Teams.ICON_LIGHT.value)
-        connection_retry(self.serial, appear=Teams.TEXT.value, exception_msg="進不去隊伍", timeout=40.0)
+        connection_retry(self.serial, appear=Teams.TEXT.value, retry=Teams.ICON_LIGHT.value, timeout=40.0)
         wait_click(self.serial, Leonard.TP_POINT.value)
         wait_click(self.serial, Leonard.TP_HAPPY.value, wait_time=2.0)
         wait_click(self.serial, Phase5UI.JESSICA.value, wait_time=1.5)
@@ -64,12 +64,11 @@ class Phase5(BasePhase):
         wait_click(self.serial, MainView.BACK.value)
         wait(self.serial, Teams.TEXT.value, timeout=20.0)
         wait_click(self.serial, MainView.BACK.value, timeout=20.0)
-        connection_retry(self.serial, vanish=MainView.BACK.value, retry=MainView.BACK.value, timeout=40.0)
+        on_main_view(self.serial, timeout=40.0)
 
     def _do_diamond_upgrade(self):
-        on_main_view(self.serial)
         wait_click(self.serial, Diamond.ICON.value)
-        connection_retry(self.serial, appear=Diamond.UPGRADE_TEXT.value, retry=Diamond.ICON.value, exception_msg="無法進入科技升級", timeout=40.0)
+        connection_retry(self.serial, appear=Diamond.UPGRADE_TEXT.value, retry=Diamond.ICON.value, timeout=40.0)
         pos = get_pos(self.serial, Diamond.UPGRADE_TEXT.value)
         if not pos:
             raise GameError("找不到升級文字")
@@ -80,16 +79,16 @@ class Phase5(BasePhase):
         for _ in range(7):
             wait_click(self.serial, Diamond.MINUS.value)
         wait_click(self.serial, Confirm.SMALL.value, wait_time=1.0)
+        connection_retry(self.serial, appear=Diamond.SUCCESS.value, timeout=40.0)
         for _ in range(3):
             wait_click(self.serial, Diamond.SUCCESS.value, timeout=5.0, wait_time=1.0)
             if wait_click(self.serial, MainView.BACK.value):
                 break
-        connection_retry(self.serial, vanish=MainView.BACK.value, timeout=40.0)
+        connection_retry(self.serial, vanish=MainView.BACK.value, retry=MainView.BACK.value, timeout=40.0)
 
     def _claim_seven_day(self):
-        on_main_view(self.serial)
         wait_click(self.serial, SevenDays.ICON.value)
-        connection_retry(self.serial, appear=SevenDays.QUEST_REWARD.value, exception_msg="無法進入7天登入", timeout=40.0)
+        connection_retry(self.serial, appear=SevenDays.QUEST_REWARD.value, retry=SevenDays.ICON.value, timeout=40.0)
         pos = get_pos(self.serial, SevenDays.QUEST_REWARD.value)
         if not pos:
             raise GameError("找不到升級文字")
@@ -111,19 +110,15 @@ class Phase5(BasePhase):
                 wait_click(self.serial, SeasonPass.CLAIM.value)
             if exist(self.serial, Retry.TEXT1.value):
                 exist_click(self.serial, Retry.BTN.value)
-            if exist(self.serial, SeasonPass.CLAIMED_TEXT.value):
+            if exist(self.serial, SeasonPass.CLAIMED_TEXT.value, threshold=0.9):
                 exist_click(self.serial, Confirm.SMALL.value, wait_time=2.0)
                 return
 
     def _claim_season_pass(self):
-        on_main_view(self.serial)
         wait_click(self.serial, SeasonPass.ICON.value, timeout=7.0)
-        connection_retry(self.serial, appear=Confirm.SMALL.value, retry=SeasonPass.ICON.value, exception_msg="無法進入季票", timeout=40.0)
+        connection_retry(self.serial, appear=Confirm.SMALL.value, retry=SeasonPass.ICON.value, timeout=40.0)
         wait_click(self.serial, Confirm.SMALL.value, timeout=10.0)
-        if not wait_click(self.serial, Phase5UI.CIRCLE.value):
-            raise GameError("並非首次進入季票")
-        wait_click(self.serial, Phase5UI.CIRCLE.value)
-        for _ in range(10):
+        for _ in range(13):
             wait_click(self.serial, SeasonPass.TEXT.value, wait_time=1.5)
         wait(self.serial, SeasonPass.TEXT.value, timeout=10.0, threshold=0.99)
         
@@ -138,13 +133,16 @@ class Phase5(BasePhase):
         if wait(self.serial, SeasonPass.TEXT.value, timeout=10.0, threshold=0.99):
             wait_click(self.serial, SeasonPass.PASS_NAV.value, timeout=10.0, wait_time=1.0)
             wait_click(self.serial, Phase5UI.SEASON_PASS_TICKETS.value, timeout=10.0, wait_time=2.0)
+            connection_retry(self.serial, appear=SeasonPass.CONGRATS.value, retry=Phase5UI.SEASON_PASS_TICKETS.value, timeout=40.0)
             wait_click(self.serial, Confirm.BIG1.value, wait_time=2.0, threshold=0.65)
+            connection_retry(self.serial, appear=SeasonPass.HISTORY_TEXT.value, retry=Confirm.BIG1.value, timeout=40.0)
             if wait(self.serial, Phase5UI.SEASON_PASS_LVL1.value, timeout=60.0):
                 wait_click(self.serial, MainView.CLOSE_BOARD.value, timeout=10.0)
             else:
                 raise GameError("季票領取獎勵錯誤")
         else:
             raise GameError("季票領取獎勵錯誤")
+        
         wait_click(self.serial, MainView.BACK.value)
         connection_retry(self.serial, vanish=MainView.BACK.value, timeout=40.0)
         on_main_view(self.serial)

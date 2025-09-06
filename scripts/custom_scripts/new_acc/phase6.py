@@ -25,8 +25,10 @@ class Phase6(BasePhase):
 
     def _claim_tickets(self):
         wait_click(self.serial, Phase6UI.GIFT.value, timeout=7.0, wait_time=2.0)
+        connection_retry(self.serial, appear=Phase6UI.GIFT_TEXT.value, retry=Phase6UI.GIFT.value, timeout=40.0)
         if not wait_click(self.serial, Phase6UI.ACCEPT_ALL.value, timeout=15.0):
             wait_click(self.serial, MainView.CLOSE_BOARD.value)
+            return
         wait_click(self.serial, Confirm.SMALL.value, timeout=15.0, wait_time=3.0)
         wait_click(self.serial, Confirm.SMALL.value, wait_time=1.5)
         wait_click(self.serial, MainView.CLOSE_BOARD.value, wait_time=1.5)

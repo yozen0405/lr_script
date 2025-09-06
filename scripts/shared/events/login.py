@@ -43,7 +43,7 @@ class BaseLoginFlow:
             self._agree_terms()
 
             force_close_line(self.serial, timeout=3.0)
-            if exist(self.serial, GameView.LINE_WEBSITE.value):
+            if wait(self.serial, GameView.LINE_WEBSITE.value, timeout=15.0):
                 for _ in range(3):
                     back(self.serial)
 

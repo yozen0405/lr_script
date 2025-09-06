@@ -2,12 +2,12 @@ from core.system.adb import adb_cmd
 from core.system.logger import log_msg
 
 MODES = {
-    "main_stage": ["m1", "m2", "m8", "m10"],
-    "guild_raid": ["m1", "m2", "m8", "m10"],
-    "advent": ["m1", "m2", "m10"],
-    "special_stage": ["m1", "m2", "m8", "m10"],
-    "pvp": ["m3", "m4", "m7", "m9", "m11"],
-    "pre_stage": ["m10"]
+    "main_stage": ["m1", "m2", "m12", "m15"],
+    "guild_raid": ["m1", "m2", "m12", "m15"],
+    "advent": ["m1", "m2", "m15"],
+    "special_stage": ["m1", "m2", "m12", "m15"],
+    "pvp": ["m3", "m6", "m11", "m13", "m17"],
+    "pre_stage": ["m15"]
 }
 
 

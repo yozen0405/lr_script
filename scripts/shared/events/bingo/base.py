@@ -1,4 +1,5 @@
 from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
+from core.actions.screen import back
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.constants import Settlement, Confirm, Battle, MainView, Retry, Positions
 from core.base.exceptions import GameError
@@ -10,6 +11,7 @@ from scripts.shared.events.bingo.enum import Bingo
 class BingoBase:
     def __init__(self, serial):
         self.serial = serial
+        self.BINGO_CLOSE_AD_LEN = 13
 
     def enter_menu(self):
         if exist(self.serial, Bingo.TEXT.value):
@@ -29,7 +31,9 @@ class BingoBase:
         pass
 
     def _claim_mission(self):
-        wait_click(self.serial, Bingo.MISSION_BTN.value)
+        if not exist_click(self.serial, Bingo.MISSION_ON.value, threshold=0.999):
+            return
+        
         connection_retry(self.serial, appear=Bingo.MISSION_TEXT.value, timeout=40.0)
         while True:
             if exist(self.serial, Bingo.MISSION_CLAIMED_TEXT.value, threshold=0.9):
@@ -87,19 +91,20 @@ class BingoBase:
                 break
             
         while True:
-            for i in range(1, 7):
-                if exist_click(self.serial, Bingo.CLOSE_AD(num=i), threshold=0.99):
+            for i in range(1, self.BINGO_CLOSE_AD_LEN + 1):
+                if exist_click(self.serial, Bingo.CLOSE_AD(num=i), threshold=0.7):
                     continue
             if exist(self.serial, Bingo.TEXT.value):
                 break
+            back(self.serial)
         
         res = self._wait_bingo_text()
-        return False if res == 2 else True
+        return True
         
     def run(self):
         log_msg(self.serial,"賓果活動開始")
         self.enter_menu()
-        # self._claim_mission()
+        self._claim_mission()
         while self._do_random():
             pass
         log_msg(self.serial, "賓果活動結束")
