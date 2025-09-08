@@ -6,7 +6,7 @@ from core.base.exceptions import GameError
 from core.system.logger import log_msg
 from typing import Optional, Tuple
 from scripts.shared.events.main_stage.enum import MainStage
-from scripts.shared.events.bingo.enum import Bingo
+from scripts.shared.events.bingo.enum import Bingo, BingoAdPositions
 
 class BingoBase:
     def __init__(self, serial):
@@ -92,7 +92,10 @@ class BingoBase:
             
         while True:
             for i in range(1, self.BINGO_CLOSE_AD_LEN + 1):
-                if exist_click(self.serial, Bingo.CLOSE_AD(num=i), threshold=0.7):
+                if wait_click(self.serial, Bingo.CLOSE_AD(num=i), threshold=0.4, region=BingoAdPositions.TOP_LEFT.value, timeout=1.0):
+                    continue
+            for i in range(1, self.BINGO_CLOSE_AD_LEN + 1):
+                if wait_click(self.serial, Bingo.CLOSE_AD(num=i), threshold=0.4, region=BingoAdPositions.TOP_RIGHT.value, timeout=1.0):
                     continue
             if exist(self.serial, Bingo.TEXT.value):
                 break

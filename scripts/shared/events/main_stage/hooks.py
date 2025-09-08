@@ -57,13 +57,13 @@ class MainStageHooks:
         if ctx.is_low:
             if not exist_click(self.serial, MainStage.TEAM_BTN_LOW.value):
                 return
-            if exist(self.serial, MainStage.TEAM_NUM_LOW_ON(num=ctx.team_num), threshold=0.999):
+            if exist_click(self.serial, MainStage.TEAM_NUM_LOW_ON(num=ctx.team_num), threshold=0.999):
                 return
             exist_click(self.serial, MainStage.TEAM_NUM_LOW_OFF(num=ctx.team_num), threshold=0.9)
         else:
             if not exist_click(self.serial, MainStage.TEAM_BTN_HIGH.value):
                 return
-            if exist(self.serial, MainStage.TEAM_NUM_HIGH_ON(num=ctx.team_num), threshold=0.999):
+            if exist_click(self.serial, MainStage.TEAM_NUM_HIGH_ON(num=ctx.team_num), threshold=0.999):
                 return
             exist_click(self.serial, MainStage.TEAM_NUM_HIGH_OFF(num=ctx.team_num), threshold=0.9)
 

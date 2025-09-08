@@ -6,6 +6,7 @@ from scripts.shared.utils.hacks import apply_mode
 from scripts.shared.events.special_stage.selector import special_stage_single_game, special_stage_loop_game, special_stage_conquer_planet
 from scripts.shared.events.special_stage.enum import Planet
 from scripts.shared.events.main_stage.enum import MainStage
+from scripts.shared.events.special_stage.enum import SpecialStage
 from scripts.shared.events.pvp.enum import PvP
 from scripts.shared.events.guild.enum import Guild
 from scripts.shared.events.guild.base import guild_raid_battle
@@ -17,7 +18,7 @@ from scripts.shared.utils.game_view import on_main_view
 import time
 
 def normal_stage(serial):
-    # bingo_attempt(serial)
+    bingo_attempt(serial)
     # apply_mode(serial, mode_name="advent", state="on")
     # advent_stage_battle(serial)
     # apply_mode(serial, mode_name="advent", state="off")
@@ -25,8 +26,8 @@ def normal_stage(serial):
     # connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
 
     # apply_mode(serial, mode_name="main_stage", state="on")
-    for _ in range(2):
-        main_stage_finish_custom(serial, custom_stage=27, multiplier=1)
+    # for _ in range(2):
+    #     main_stage_finish_custom(serial, custom_stage=27, multiplier=2)
     # apply_mode(serial, mode_name="main_stage", state="off")
     # wait_click(serial, "back.png")
     # connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)

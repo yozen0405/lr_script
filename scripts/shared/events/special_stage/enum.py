@@ -17,4 +17,6 @@ class SpecialStage(Base):
     STAGE = "special_stage_num{stage}.png"
     LIMITED = "special_stage_limited_text.png"
     LAB = "special_stage_lab_icon.png"
-    
+    TEAM_BTN = "main_stage_team_btn_high.png"
+    TEAM_NUM_OFF = "main_stage_team_num_high_off_{num}.png"
+    TEAM_NUM_ON = "main_stage_team_num_high_on_{num}.png"

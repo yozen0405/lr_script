@@ -25,5 +25,5 @@ class Guild(str, Enum):
     RAID_TRY_AGAIN = "guild_raid_error_try_again.png"
 
 class GuildRaidSide(Enum):
-    LEFT = (286, 532, 520, 473)
-    RIGHT = (757, 532, 1000, 473)
+    LEFT = (275, 469, 531, 539)
+    RIGHT = (746, 469, 1013, 539)

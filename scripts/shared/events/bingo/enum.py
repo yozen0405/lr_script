@@ -14,3 +14,12 @@ class Bingo(Base):
     GOT_NEW_TEXT = "bingo_get_new_text.png"
     NO_TICKETS_TEXT = "bingo_no_tickets_text.png"
     DUPLICATE_TEXT = "bingo_duplicate_text.png"
+
+class BingoAdPositions(Enum):
+    """
+    the screen is 1280x720
+    so i need the positon to be (x1, y1, x2, y2)
+    each of them is a square(96 * 96) from four corners
+    """
+    TOP_LEFT = (0, 0, 96, 96)
+    TOP_RIGHT = (1184, 0, 1280, 96)

@@ -5,11 +5,14 @@ from core.base.exceptions import GameError
 from typing import Optional
 from core.system.logger import log_msg
 from scripts.shared.events.special_stage.enum import Planet
+from core.system.config import Config
 
 class SpecialStageTask:
     def __init__(self, serial):
         self.serial = serial
-        self.base = BaseSpecialStage(serial)
+        config = Config()
+        self.team_num = config.get_team_num()
+        self.base = BaseSpecialStage(serial, self.team_num)
 
     def _stage_to_region_map(self, planet: str) -> tuple[int, int, int, int]:
         stage_region_map = {
@@ -38,7 +41,7 @@ class SpecialStageTask:
             log_msg(self.serial, f"進入第{stage}關")
         self.base.single_mode_run()
 
-    def _loop_battle(self, planet: str, stage: int, region):
+    def _loop_battle(self, stage: int, region):
         if self.base.enter_stage(stage_num=stage, region=region) == False:
             log_msg(self.serial, f"第{stage}關已經達到上限")
             return True
@@ -49,7 +52,7 @@ class SpecialStageTask:
         crop_region = self._stage_to_region_map(planet=planet)
         region = self.base.find_target_planet(planet=planet, crop_region=crop_region)
 
-        return self._loop_battle(planet=planet, stage=stage, region=region)
+        return self._loop_battle(stage=stage, region=region)
 
     def conquer_planet(self, planet: str):
         for stage in range(1, 7):

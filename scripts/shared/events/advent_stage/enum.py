@@ -12,4 +12,5 @@ class Stage(Enum):
     DRAGON = "advent_dragon_stage.png"
     SIMON = "advent_simon_stage.png"
     JACOB = "advent_jacob_stage.png"
-    
+    HAM = "advent_ham_stage.png"
+    MANAGER = "advent_manager_stage.png"
