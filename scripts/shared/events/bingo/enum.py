@@ -14,6 +14,7 @@ class Bingo(Base):
     GOT_NEW_TEXT = "bingo_get_new_text.png"
     NO_TICKETS_TEXT = "bingo_no_tickets_text.png"
     DUPLICATE_TEXT = "bingo_duplicate_text.png"
+    NO_AD_TEXT = "bingo_no_ad_text.png"
 
 class BingoAdPositions(Enum):
     """

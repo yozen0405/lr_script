@@ -15,41 +15,51 @@ from scripts.shared.events.advent_stage.base import advent_stage_battle
 from scripts.shared.events.bingo.base import bingo_attempt
 from scripts.shared.events.login import guest_login
 from scripts.shared.utils.game_view import on_main_view
+from scripts.shared.events.lab.base import complete_lab_quest
+from scripts.shared.events.season_pass.base import claim_season_pass
 import time
 
 def normal_stage(serial):
-    bingo_attempt(serial)
-    # apply_mode(serial, mode_name="advent", state="on")
-    # advent_stage_battle(serial)
-    # apply_mode(serial, mode_name="advent", state="off")
+    # bingo_attempt(serial)
+
+    # complete_lab_quest(serial)
     # wait_click(serial, "back.png")
     # connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
 
-    # apply_mode(serial, mode_name="main_stage", state="on")
-    # for _ in range(2):
-    #     main_stage_finish_custom(serial, custom_stage=27, multiplier=2)
-    # apply_mode(serial, mode_name="main_stage", state="off")
-    # wait_click(serial, "back.png")
-    # connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
+    apply_mode(serial, mode_name="advent", state="on")
+    advent_stage_battle(serial)
+    apply_mode(serial, mode_name="advent", state="off")
+    wait_click(serial, "back.png")
+    connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
 
-    # apply_mode(serial, mode_name="guild_raid", state="on")
-    # guild_raid_battle(serial)
-    # apply_mode(serial, mode_name="guild_raid", state="off")
-    # wait_click(serial, "back.png")
-    # connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
-    # apply_mode(serial, mode_name="pvp", state="on")
-    # for _ in range(3):
-    #     if not pvp_loop_battle(serial):
-    #         break
-    # apply_mode(serial, mode_name="pvp", state="off")
-    # apply_mode(serial, mode_name="special_stage", state="on")
-    # wait_click(serial, "back.png")
-    # connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
-    # special_stage_single_game(serial, planet=Planet.COLLAB.value, stage=1)
-    # special_stage_loop_game(serial, planet=Planet.COLLAB.value, stage=2)
-    # special_stage_loop_game(serial, planet=Planet.COLLAB.value, stage=4)
-    # special_stage_loop_game(serial, planet=Planet.COLLAB.value, stage=6)
-    # for stage in range(2, 7):
-    #     special_stage_loop_game(serial, planet=Planet.IMMORTAL_SKULL.value, stage=stage)
-    # wait_click(serial, "back.png")
-    # connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
+    apply_mode(serial, mode_name="main_stage", state="on")
+    for _ in range(2):
+        main_stage_finish_custom(serial, custom_stage=27, multiplier=2)
+    apply_mode(serial, mode_name="main_stage", state="off")
+    wait_click(serial, "back.png")
+    connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
+
+    apply_mode(serial, mode_name="guild_raid", state="on")
+    guild_raid_battle(serial)
+    apply_mode(serial, mode_name="guild_raid", state="off")
+    wait_click(serial, "back.png")
+    connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
+    apply_mode(serial, mode_name="pvp", state="on")
+    for _ in range(3):
+        if not pvp_loop_battle(serial):
+            break
+    apply_mode(serial, mode_name="pvp", state="off")
+    apply_mode(serial, mode_name="special_stage", state="on")
+    wait_click(serial, "back.png")
+    connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
+    special_stage_single_game(serial, planet=Planet.COLLAB.value, stage=1)
+    special_stage_loop_game(serial, planet=Planet.COLLAB.value, stage=2)
+    special_stage_loop_game(serial, planet=Planet.COLLAB.value, stage=4)
+    special_stage_loop_game(serial, planet=Planet.COLLAB.value, stage=6)
+    for stage in range(2, 7):
+        special_stage_loop_game(serial, planet=Planet.IMMORTAL_SKULL.value, stage=stage)
+    wait_click(serial, "back.png")
+    connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
+    claim_season_pass(serial)
+    wait_click(serial, "back.png")
+    connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)

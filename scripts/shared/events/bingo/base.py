@@ -66,6 +66,10 @@ class BingoBase:
                 connection_retry(self.serial, vanish=Bingo.GOT_NEW_TEXT.value, timeout=40.0)
                 log_msg(self.serial, "抽到新的")
                 return 0
+            elif wait(self.serial, Bingo.NO_AD_TEXT.value, timeout=3.0, threshold=0.99):
+                exist_click(self.serial, Confirm.SMALL.value)
+                wait_click(self.serial, Bingo.RANDOM.value)
+                return
             elif exist(self.serial, Retry.TEXT1.value):
                 exist_click(self.serial, Confirm.SMALL.value)
         raise GameError("無法確認抽獎結果")
