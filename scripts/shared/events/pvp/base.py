@@ -89,8 +89,7 @@ class BasePvP:
         wait_click(self.serial, Battle.NEXT.value, wait_time=1.5)
         exist_click(self.serial, Leonard.TP_JUMP.value, wait_time=1.0)
         wait_click(self.serial, Battle.START.value)
-        connection_retry(self.serial, appear=Battle.PAUSE.value, timeout=60.0)
-
+        
         while True:
             if exist(self.serial, Battle.NO_FEATHER.value):
                 self._cancel_match_up()

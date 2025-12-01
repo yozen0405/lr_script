@@ -20,7 +20,7 @@ class SpecialStageTask:
             Planet.WIZARD_CUBE: (235, 220, 230, 130),
             Planet.IMMORTAL_SKULL: (235, 220, 230, 130),
             Planet.LIBRARY: (235, 250, 250, 135),
-            Planet.COLLAB: (240, 240, 260, 140),
+            Planet.COLLAB: (500, 250, 20, 100),
             Planet.LEONARD: (250, 240, 240, 140),
         }
 

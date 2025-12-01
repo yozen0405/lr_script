@@ -14,7 +14,7 @@ class SeasonPassClaimer:
 
         if wait(self.serial, SeasonPass.ICON.value, timeout=20.0, wait_time=1.0):
             wait_click(self.serial, SeasonPass.ICON.value, timeout=7.0)
-            connection_retry(self.serial, vanish=SeasonPass.ICON.value, retry=SeasonPass.ICON.value, timeout=40.0)
+            connection_retry(self.serial, vanish=[(SeasonPass.ICON.value, 0.99)], retry=SeasonPass.ICON.value, timeout=40.0)
             time.sleep(1.0)
         else:
             raise Exception("不在主畫面")

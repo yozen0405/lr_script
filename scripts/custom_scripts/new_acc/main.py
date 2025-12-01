@@ -47,9 +47,22 @@ class NewAccFarm:
     def run(self, start_phase_idx, start_step_idx):
         start = start_phase_idx - 1
         for attemps in range(5):
+            is_broken = False
+            tmp = 0
             for i in range(start, len(self.phases)):
+                if is_broken:
+                    i = tmp
+                    is_broken = False
+                    
                 log_msg(self.serial, f"第 {i + 1} 階段開始, 從第 {start_step_idx} 個 step")
-                self.phases[i].run(start_idx=start_step_idx)
+                try:
+                    self.phases[i].run(start_idx=start_step_idx)
+                except GameError as e:
+                    log_msg(self.serial, f"第 {i + 1} 階段發生錯誤: {e}")
+                    is_broken = True
+                    tmp = i
+                    continue
+                
                 start_step_idx = 0
             start = 0
 

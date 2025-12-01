@@ -10,6 +10,8 @@ class Guild(str, Enum):
     SUPPORT_LIGHT = "guild_support_all_light.png"
     RAID_BTN = "guild_raid_btn.png"
     QUEST_BTN = "guild_quest_btn.png"
+    QUEST_TEXT = "guild_quest_text.png"
+    WEEKLY_QUEST_NAV = "guild_weekly_quest_nav.png"
     RAID_ATTACK = "guild_raid_attack.png"
     COMPLETE = "guild_raid_settlement_complete.png"
     LVL_UP = "guild_raid_settlement_lvl_up.png"
@@ -23,6 +25,7 @@ class Guild(str, Enum):
     QUEST_FINISHED = "guild_quest_finished.png"
     RAID_OCCUPIED = "guild_raid_occupied_text.png"
     RAID_TRY_AGAIN = "guild_raid_error_try_again.png"
+    ANIME = "guild_anime.png"
 
 class GuildRaidSide(Enum):
     LEFT = (275, 469, 531, 539)

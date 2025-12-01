@@ -2,12 +2,14 @@ from core.system.adb import adb_cmd
 from core.system.logger import log_msg
 
 MODES = {
-    "main_stage": ["m1", "m2", "m12", "m15"],
-    "guild_raid": ["m1", "m2", "m12", "m15"],
-    "advent": ["m1", "m2", "m15"],
-    "special_stage": ["m1", "m2", "m12", "m15"],
-    "pvp": ["m3", "m6", "m11", "m13", "m17"],
-    "pre_stage": ["m15"]
+    "main_stage": ["a1"],
+    "guild_raid": ["a3"],
+    "advent": ["a3"],
+    "special_stage": ["a2"],
+    "pvp": ["tower", "rocket", "report", "killEnemie", "speedX4"],
+    "pre_stage": ["speedX4"],
+    "train": ["speedX6"],
+    "nc": ["noCooldown"],
 }
 
 
@@ -23,7 +25,7 @@ class BaseToggleCommand:
 
 class ModManager(BaseToggleCommand):
     def __init__(self, serial: str):
-        super().__init__(serial, "toggle_kong")
+        super().__init__(serial, "lrg")
 
     def toggle_member(self, member_id: str, state: str):
         assert state in ["on", "off"], f"狀態必須為 'on' 或 'off'"

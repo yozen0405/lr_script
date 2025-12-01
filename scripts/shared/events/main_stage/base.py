@@ -36,6 +36,8 @@ class BaseMainStage:
         if not wait(self.serial, MainStage.TEXT.value, threshold=0.9, timeout=30.0, wait_time=2.5):
             raise GameError("不在主要關卡")
         
+        exist_click(self.serial, MainStage.NORMAL_NAV.value, threshold=0.9)
+        
         if custom_stage is None:
             if not self.finder._check_stage_on_screen():
                 self.finder._find_stage()

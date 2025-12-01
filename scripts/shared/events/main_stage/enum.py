@@ -24,6 +24,8 @@ class MainStage(Base):
     TEAM_NUM_HIGH_ON = "main_stage_team_num_high_on_{num}.png"
     AUTO_BTN_LOW_OFF = "main_stage_auto_btn_low_off.png"
     AUTO_BTN_HIGH_OFF = "main_stage_auto_btn_high_off.png"
+    NORMAL_NAV = "main_stage_normal_nav.png"
+    HARD_NAV = "main_stage_hard_nav.png"
     
 class Stages(str, Enum):
     LOCKED = "new_stage_locked.png"
