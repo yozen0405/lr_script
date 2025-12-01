@@ -44,9 +44,9 @@ def normal_stage(serial):
     # wait_click(serial, "back.png")
     # connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
 
-    # apply_mode(serial, mode_name="guild_raid", state="on")
-    # guild_raid_battle(serial)
-    # apply_mode(serial, mode_name="guild_raid", state="off")
+    apply_mode(serial, mode_name="guild_raid", state="on")
+    guild_raid_battle(serial)
+    apply_mode(serial, mode_name="guild_raid", state="off")
     # wait_click(serial, "back.png")
     # connection_retry(serial, appear="main_stage_btn.png", timeout=40.0)
     # apply_mode(serial, mode_name="pvp", state="on")

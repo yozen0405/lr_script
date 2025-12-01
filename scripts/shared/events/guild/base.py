@@ -42,8 +42,28 @@ class BaseGuild:
             return
         
         connection_retry(self.serial, appear=Guild.TEXT.value, timeout=40.0)
-        for _ in range(7):
-            wait_click(self.serial, Guild.TEXT.value, timeout=3.0, wait_time=1.0)
+
+        cnt = 0
+        while True:
+            if exist(self.serial, Leonard.TP_POINT2.value, threshold=0.85):
+                cnt = 0
+                continue
+            if exist(self.serial, Leonard.TP_POINT_REV.value, threshold=0.9):
+                cnt = 0
+                continue
+            if exist(self.serial, Leonard.TP_CLAP2.value, threshold=0.9):
+                cnt = 0
+                continue
+            if exist(self.serial, Leonard.TP_HAPPY2.value, threshold=0.9):
+                cnt = 0
+                continue
+            if exist(self.serial, Leonard.TP_THUMBS_UP.value, threshold=0.9):
+                cnt = 0
+                continue
+            cnt += 1
+            if cnt >= 2:
+                break
+
 
     def _handle_enter(self):
         while True:
@@ -125,6 +145,8 @@ class GuildRaid:
         connection_retry(self.serial, appear=Guild.RAID_TEXT.value, timeout=40.0)
 
     def enter_raid_stage(self, side):
+        self.handle_anime()
+
         if not wait(self.serial, Guild.RAID_ATTACK.value, timeout=3.0):
             if side == 1:
                 wait_click(self.serial, Battle.ENTER.value, region=GuildRaidSide.LEFT.value)
