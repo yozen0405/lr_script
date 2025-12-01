@@ -26,7 +26,14 @@ class LabeMake:
             raise GameError("不在主畫面")
         
     def _handle_pre_tutorial(self):
-        pass
+        if not exist_click(self.serial, Leonard.TP_POINT2.value, threshold=0.85, wait_time=0.3):
+            return
+        exist_click(self.serial, Leonard.TP_STICK.value, wait_time=0.3)
+        exist_click(self.serial, Leonard.TP_POINT2.value, threshold=0.85, wait_time=0.3)
+        exist_click(self.serial, MakeMenu.CRAFT.value, wait_time=0.3)
+        exist_click(self.serial, Leonard.TP_STICK.value, wait_time=0.3)
+        exist_click(self.serial, Leonard.TP_POINT2.value, threshold=0.85)
+
 
     def claim_materials(self) -> bool:
         if not exist_click(self.serial, MakeMenu.BTN_LIGHT.value, threshold=0.9):

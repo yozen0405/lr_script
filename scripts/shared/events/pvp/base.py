@@ -112,10 +112,19 @@ class BasePvP:
         connection_retry(self.serial, appear=PvP.SETTLEMENT_TEXT.value, timeout=40.0)
         exist_click(self.serial, PvP.SETTLEMENT_TEXT.value)
 
+        cnt = 0
         while True:
             if not exist(self.serial, PvP.SETTLEMENT_TEXT.value):
                 time.sleep(2.0)
-                wait(self.serial, PvP.TEXT.value, timeout=40.0, wait_time=3.0, threshold=0.9)
+                if exist(self.serial, Settlement.PUZZLE_FOUND_TEXT.value):
+                    exist_click(self.serial, Confirm.BIG2.value, wait_time=2.0)
+
+                if not wait(self.serial, PvP.TEXT.value, timeout=40.0, wait_time=3.0, threshold=0.9):
+                    cnt += 1
+                    continue
+                if cnt >= 3:
+                    raise GameError("結算後未回到 PVP 主畫面")
+                
                 exist_click(self.serial, PvP.LVL_UP.value, wait_time=2.0)
                 return
             if exist(self.serial, Retry.TEXT1.value):

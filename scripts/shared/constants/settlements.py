@@ -12,3 +12,4 @@ class Settlement(str, Enum):
     AGAIN = "main_stage_settlement_again.png"
     NEXT = "main_stage_settlement_next.png"
     NEXT_FEATURE_TEXT = "main_stage_settlement_next_feature_text.png"
+    PUZZLE_FOUND_TEXT = "puzzle_found_text.png"
