@@ -2,6 +2,7 @@ import os
 import cv2
 from core.system.adb import adb_cmd
 import time
+import shutil
 
 IMG_DIR = os.path.join("bin", "img")
 TMP_DIR = os.path.join("bin", "tmp")
@@ -77,3 +78,47 @@ def find_template_position(screen_path, template_path, threshold=0.8, region=Non
         return (max_loc[0] + w // 2 + offset_x, max_loc[1] + h // 2 + offset_y)
     else:
         return None
+
+def check_freeze(serial, threshold=0.98, reset_time=600.0, minimum_interval=15.0):
+    current_path = store_screen(serial)
+    
+    old_path = current_path.replace(".png", "_old.png")
+    
+    need_reset = False
+    if not os.path.exists(old_path):
+        need_reset = True
+    else:
+        file_age = time.time() - os.path.getmtime(old_path)
+        if file_age > reset_time:
+            need_reset = True
+        elif file_age < minimum_interval:
+            return False
+
+    if need_reset:
+        shutil.copy2(current_path, old_path)
+        return False
+    
+    img_cur = safe_imread(current_path, serial)
+    img_old = safe_imread(old_path, serial)
+
+    if img_cur is None or img_old is None:
+        print("讀取圖片失敗，無法比對 Freeze")
+        return False
+
+    try:
+        img_cur_gray = cv2.cvtColor(img_cur, cv2.COLOR_BGR2GRAY)
+        img_old_gray = cv2.cvtColor(img_old, cv2.COLOR_BGR2GRAY)
+
+        res = cv2.matchTemplate(img_cur_gray, img_old_gray, cv2.TM_CCOEFF_NORMED)
+        similarity = res[0][0]
+
+        if similarity >= threshold:
+            return True
+        else:
+            shutil.copy2(current_path, old_path)
+            return False
+            
+    except Exception as e:
+        print(f"比對過程發生錯誤: {e}")
+        shutil.copy2(current_path, old_path)
+        return False

@@ -13,6 +13,7 @@ class MakeMenu(Enum):
     REGULAR_MATERIAL_NAV = "lab_make_regular_material_nav.png"
     INT_POTION = "lab_make_int_potion.png"
     CRAFT = "lab_make_craft_btn.png"
+    FINGER = "team_selector_finger.png"
 
 class ExtractMenu(Enum):
     ICON = "lab_extract_icon.png"

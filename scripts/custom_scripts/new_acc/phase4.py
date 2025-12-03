@@ -7,10 +7,10 @@ from scripts.shared.utils.game_view import close_board
 from scripts.shared.events.special_stage.selector import special_stage_single_game
 from scripts.shared.utils.game_view import on_main_view
 from scripts.shared.events.main_stage.selector import main_stage_finish_new, main_stage_enter_menu
-from scripts.shared.constants import GameView, Settlement, Battle, Confirm, MainView, Leonard, Retry, Positions
+from scripts.shared.constants import Settlement, Battle, Confirm, MainView, Leonard, Retry, Positions
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_view import on_main_view
-from scripts.shared.events.login import guest_login
+from scripts.shared.events.login.base import guest_login
 from scripts.shared.events.teams.enum import Teams
 from scripts.shared.events.gacha.enum import Gacha
 

@@ -53,6 +53,8 @@ class BaseTrainStage:
     def battle(self):
         log_msg(self.serial, "Space train 任務開始")
 
+        self._handle_introduction()
+
         wait_click(self.serial, Battle.START.value)
         connection_retry(self.serial, appear=Battle.PAUSE.value, timeout=60.0)
 

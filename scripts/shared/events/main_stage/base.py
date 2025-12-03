@@ -6,7 +6,7 @@ from core.base.exceptions import GameError
 from scripts.shared.constants.positions import Positions
 from scripts.shared.utils.retry import connection_retry
 from typing import Optional
-from scripts.shared.constants import GameView, Settlement, Battle, Confirm, MainView, Leonard, Retry
+from scripts.shared.constants import Settlement, Battle, Confirm, MainView, Leonard, Retry
 from scripts.shared.events.main_stage.enum import MainStage, Stages, Treasure
 from scripts.shared.events.main_stage.finder import MainStageFinder
 from scripts.shared.events.main_stage.hooks import MainStageHooks
@@ -55,6 +55,41 @@ class BaseMainStage:
                 wait_click(self.serial, Battle.ANIME.value, threshold=0.6, wait_time=2.0)
                 continue
         raise GameError("未知的主要關卡")
+    
+    def _battle_loop(self, timeout=300) -> bool:
+        start_time = time.time()
+        battle_started_trigger = False
+        retry_count = 0
+
+        while True:
+            if time.time() - start_time > timeout:
+                log_msg(self.serial, "戰鬥等待超時")
+                return False
+
+            if exist(self.serial, Settlement.TEXT.value, threshold=0.9):
+                return True
+
+            if exist(self.serial, Retry.TEXT1.value) or exist(self.serial, Retry.TEXT2.value):
+                log_msg(self.serial, "偵測到重試訊號")
+                exist_click(self.serial, Retry.BTN.value)
+                retry_count += 1
+                if retry_count >= 3:
+                    log_msg(self.serial, "重試次數過多，結束嘗試")
+                    return False
+                continue
+
+            if exist(self.serial, Battle.START.value):
+                wait_click(self.serial, Battle.START.value)
+                continue
+
+            is_fighting = exist(self.serial, Battle.PAUSE.value, threshold=0.9)
+            
+            if is_fighting:
+                if not battle_started_trigger:
+                    log_msg(self.serial, "確認進入戰鬥")
+                    self.hooks.on_start_page(self)
+                    battle_started_trigger = True
+                
 
     def enter_battle(self, multiplier: int):
         log_msg(self.serial, "Main Stage 戰鬥開始")
@@ -67,20 +102,11 @@ class BaseMainStage:
 
         wait_click(self.serial, Battle.NEXT.value, timeout=3.0)
         self.hooks.on_pre_start_page_next(ctx=self)
-        wait_click(self.serial, Battle.START.value)
 
-        try:
-            connection_retry(self.serial, vanish=Battle.START.value, timeout=60.0)
-        except GameError:
-            wait_click(self.serial, Battle.START.value)
+        is_victory = self._battle_loop()
 
-        if wait(self.serial, Battle.PAUSE.value, timeout=15.0, threshold=0.9):
-            self.hooks.on_start_page(self)
-            while exist(self.serial, Battle.PAUSE.value, threshold=0.97):
-                wait_click(self.serial, self.MEMBER3_POS)
-                wait_click(self.serial, self.MEMBER4_POS)
-        else:
-            raise GameError("無法確認戰鬥狀態，跳出")
+        if not is_victory:
+             raise GameError("戰鬥異常結束或超時")
 
         log_msg(self.serial, "結算中")
         self.settlement()
@@ -92,6 +118,7 @@ class BaseMainStage:
         for _ in range(3):
             wait_click(self.serial, self.MEMBER4_POS)
 
+        cnt = 0
         while True:
             for item in self.hooks.settlement_items(ctx=self):
                 if isinstance(item, tuple):
@@ -107,8 +134,9 @@ class BaseMainStage:
             self.hooks.on_settlement_next_feature(ctx=self)
 
             if exist(self.serial, MainView.CLOSE_BOARD.value):
-                if exist(self.serial, Retry.TEXT1.value):
+                if exist(self.serial, Retry.TEXT1.value) or exist(self.serial, Retry.TEXT2.value):
                     exist_click(self.serial, Retry.BTN.value)
+                    cnt += 1
                 else:
                     return
 
@@ -117,3 +145,6 @@ class BaseMainStage:
                     return
             if exist(self.serial, MainStage.TEXT.value, threshold=0.9):
                 return
+            
+            if cnt >= 5:
+                raise GameError("無法完成結算")

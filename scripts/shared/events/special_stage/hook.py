@@ -18,11 +18,14 @@ class SpecialStageHooks:
         wait_click(self.serial, SpecialStage.CIRCLE.value, wait_time=1.5)
 
     def on_pre_anime(self):
-        for _ in range(7):
+        start_time = time.time()    
+        while time.time() - start_time < 80:
             if exist(self.serial, SpecialStage.TEXT.value):
                 break
-            if not wait_click(self.serial, Battle.ANIME.value, wait_time=2.0, threshold=0.6):
-                break
+            if exist(self.serial, Retry.TEXT1.value):
+                exist_click(self.serial, Retry.BTN.value)
+                continue
+            exist_click(self.serial, Battle.ANIME.value, threshold=0.6)
 
     def handle_team_num(self, ctx):
         if not exist_click(self.serial, SpecialStage.TEAM_BTN.value):

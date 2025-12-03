@@ -9,7 +9,7 @@ from scripts.custom_scripts.new_acc.phase4 import Phase4
 from scripts.custom_scripts.new_acc.phase3 import Phase3
 from scripts.custom_scripts.new_acc.phase2 import Phase2
 from scripts.custom_scripts.new_acc.phase1 import Phase1
-from scripts.shared.constants import GameView, Settlement, Battle, Confirm, MainView, Leonard, Retry, Positions
+from scripts.shared.constants import Settlement, Battle, Confirm, MainView, Leonard, Retry, Positions
 from scripts.custom_scripts.new_acc.enum import PreStage, Phase1UI, Quests
 from scripts.shared.events.main_stage.enum import MainStage
 from scripts.shared.events.gacha.enum import Gacha

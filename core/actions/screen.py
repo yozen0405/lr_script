@@ -2,7 +2,8 @@ import time
 from core.system.adb import adb_cmd
 from core.actions.image_utils import (
     find_template_position, IMG_DIR,
-    get_image_path, get_temp_screen_path, store_screen
+    get_image_path, get_temp_screen_path, store_screen,
+    check_freeze
 )
 from core.system.logger import log_msg
 import pytesseract
@@ -162,3 +163,4 @@ def drag(serial, *args, threshold=0.7, duration=300, wait_time=0.5, timeout=5.0,
     adb_cmd(serial, ["shell", "input", "swipe", str(x1), str(y1), str(x2), str(y2), str(duration)])
     time.sleep(wait_time)
     return True
+

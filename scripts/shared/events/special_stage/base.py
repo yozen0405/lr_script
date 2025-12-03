@@ -16,7 +16,7 @@ class BaseSpecialStage:
         self.MEMBER3_POS = Positions.MEMBER3.value
         self.MEMBER4_POS = Positions.MEMBER4.value
         self.hooks = SpecialStageHooks(serial)
-        self.utils = SpecialStageUtils(serial)
+        self.utils = SpecialStageUtils(serial, hooks=self.hooks)
         self.team_num = team_num
 
     def find_target_planet(self, planet: Optional[str] = None, crop_region: Optional[Tuple[int, int, int, int]] = None) -> None:
@@ -65,16 +65,14 @@ class BaseSpecialStage:
 
         self.hooks.handle_team_num(self)
         wait_click(self.serial, Battle.NEXT.value)
-        wait_click(self.serial, Battle.START.value)
-        connection_retry(self.serial, appear=[(Battle.START.value)], timeout=60.0)
+        
+        is_victory = self.utils._battle_loop(
+            end_targets=[Settlement.TEXT.value], 
+            auto_mode=False
+        )
 
-        if wait(self.serial, Battle.PAUSE.value, timeout=15.0, threshold=0.9):
-            self.hooks.on_start_page()
-            while exist(self.serial, Battle.PAUSE.value, threshold=0.97):
-                wait_click(self.serial, self.MEMBER3_POS)
-                wait_click(self.serial, self.MEMBER4_POS)
-        else:
-            raise GameError("無法確認戰鬥狀態，跳出")
+        if not is_victory:
+            raise GameError("Special Stage 戰鬥異常或超時")
 
         log_msg(self.serial, "結算中")
         self.settlement()
@@ -98,20 +96,15 @@ class BaseSpecialStage:
                 return False
 
         wait_click(self.serial, Battle.NEXT.value)
-        wait_click(self.serial, Battle.START.value)
-        connection_retry(self.serial, vanish=[(Battle.START.value)], timeout=60.0)
+        is_finished = self.utils._battle_loop(
+            end_targets=[Battle.LOOP_END_TEXT.value], 
+            auto_mode=True,
+            timeout=600
+        )
 
-        if wait(self.serial, Battle.PAUSE.value, timeout=15.0, threshold=0.9):
-            self.hooks.on_start_page()
-            while True:
-                if exist(self.serial, Battle.LOOP_END_TEXT.value, threshold=0.9):
-                    break
-
-                if exist(self.serial, Retry.TEXT1.value) or exist(self.serial, Retry.TEXT2.value):
-                    exist_click(self.serial, Retry.BTN.value, wait_time=2.5)
-        else:
-            raise GameError("無法確認戰鬥狀態，跳出")
-
+        if not is_finished:
+             raise GameError("Special Stage 迴圈執行異常")
+        
         log_msg(self.serial, "結算中")
         wait_click(self.serial, Confirm.BIG2.value)
 
@@ -127,6 +120,7 @@ class BaseSpecialStage:
         for _ in range(3):
             wait_click(self.serial, self.MEMBER4_POS)
 
+        cnt = 0
         while True:
             for img in [
                 Confirm.BIG1.value, Confirm.BIG2.value, Settlement.ONE_REWARD.value, 
@@ -134,7 +128,10 @@ class BaseSpecialStage:
                 Settlement.BRONZE_BOX.value
             ]:
                 exist_click(self.serial, img, wait_time=1.5)
-            if exist(self.serial, Retry.TEXT1.value):
+            if exist(self.serial, Retry.TEXT1.value) or exist(self.serial, Retry.TEXT2.value):
                 exist_click(self.serial, Retry.BTN.value)
+                cnt += 1
             if exist(self.serial, SpecialStage.TEXT.value):
                 break
+            if cnt >= 5:
+                raise GameError("結算異常，跳出")

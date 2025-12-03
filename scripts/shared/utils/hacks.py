@@ -2,14 +2,17 @@ from core.system.adb import adb_cmd
 from core.system.logger import log_msg
 
 MODES = {
-    "main_stage": ["a1"],
-    "guild_raid": ["a3"],
-    "advent": ["a3"],
-    "special_stage": ["a2"],
+    "main_stage": ["strongAtk", "noCooldown", "killEnemie", "speedX4"],
+    "guild_raid": ["strongAtk", "noCooldown", "speedX4"],
+    "advent": ["strongAtk", "noCooldown", "speedX4"],
+    "special_stage": ["strongAtk", "noCooldown", "killEnemie", "speedX4"],
     "pvp": ["tower", "rocket", "report", "killEnemie", "speedX4"],
     "pre_stage": ["speedX4"],
     "train": ["speedX6"],
     "nc": ["noCooldown"],
+    "ka": ["killEnemie"],
+    "tw": ["tower"],
+    "a1": ["a1"],
 }
 
 
@@ -39,9 +42,12 @@ def toggle(serial: str, member_id: str, state: str):
     return _instance_cache[serial].toggle_member(member_id, state)
 
 def apply_mode(serial: str, mode_name: str, state: str):
+    if mode_name is None:
+        return
+
     members = MODES.get(mode_name)
     if members is None:
-        raise ValueError(f"模式「{mode_name}」不存在")
+        return
 
     log_msg(serial, f"套用模式：{mode_name}({state})")
     for member_id in members:

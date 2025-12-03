@@ -10,8 +10,51 @@ from scripts.shared.utils.retry import connection_retry
 from typing import Optional, Tuple
 
 class SpecialStageUtils:
-    def __init__(self, serial):
+    def __init__(self, serial, hooks):
         self.serial = serial
+        self.MEMBER3_POS = Positions.MEMBER3.value
+        self.MEMBER4_POS = Positions.MEMBER4.value
+        self.hooks = hooks
+
+    def _battle_loop(self, end_targets: list, auto_mode: bool = True, timeout=300) -> bool:
+        start_time = time.time()
+        battle_started_trigger = False
+        retry_count = 0
+
+        while True:
+            if time.time() - start_time > timeout:
+                log_msg(self.serial, "戰鬥等待超時")
+                return False
+
+            for target in end_targets:
+                if exist(self.serial, target, threshold=0.9):
+                    return True
+
+            if exist(self.serial, Retry.TEXT1.value) or exist(self.serial, Retry.TEXT2.value):
+                log_msg(self.serial, "偵測到重試訊號，嘗試繼續")
+                exist_click(self.serial, Retry.BTN.value, wait_time=2.0)
+                retry_count += 1
+                if retry_count >= 3:
+                    log_msg(self.serial, "重試次數過多")
+                    return False
+                continue
+
+            if exist(self.serial, Battle.START.value):
+                wait_click(self.serial, Battle.START.value)
+                continue
+
+            if exist(self.serial, Battle.PAUSE.value, threshold=0.9):
+                if not battle_started_trigger:
+                    log_msg(self.serial, "確認進入戰鬥/迴圈")
+                    self.hooks.on_start_page()
+                    battle_started_trigger = True
+                
+                if not auto_mode:
+                    self._combat_routine()
+
+    def _combat_routine(self):
+        wait_click(self.serial, self.MEMBER3_POS, threshold=0.8, wait_time=0.1)
+        wait_click(self.serial, self.MEMBER4_POS, threshold=0.8, wait_time=0.1)
 
     def find_target_planet(self, planet: Optional[str] = None, crop_region: Optional[Tuple[int, int, int, int]] = None) -> None:
         if planet is None or planet == "":

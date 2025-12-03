@@ -14,6 +14,9 @@ class SpecialStageTask:
         self.team_num = config.get_team_num()
         self.base = BaseSpecialStage(serial, self.team_num)
 
+    def enter_menu(self):
+        self.base.enter_menu()
+
     def _stage_to_region_map(self, planet: str) -> tuple[int, int, int, int]:
         stage_region_map = {
             Planet.EVO_MINE: (235, 250, 250, 135),
@@ -30,7 +33,7 @@ class SpecialStageTask:
         return stage_region_map[planet]
     
     def single_battle(self, planet: str, stage: int):
-        self.base.enter_menu()
+        self.enter_menu()
         crop_region = self._stage_to_region_map(planet=planet)
         region = self.base.find_target_planet(planet=planet, crop_region=crop_region)
 
@@ -48,7 +51,7 @@ class SpecialStageTask:
         return self.base.loop_mode_run()
     
     def loop_battle(self, planet: str, stage: int):
-        self.base.enter_menu()
+        self.enter_menu()
         crop_region = self._stage_to_region_map(planet=planet)
         region = self.base.find_target_planet(planet=planet, crop_region=crop_region)
 
@@ -70,3 +73,7 @@ def special_stage_loop_game(serial, planet: str, stage: int):
 def special_stage_conquer_planet(serial, planet: str):
     spc = SpecialStageTask(serial)
     spc.conquer_planet(planet=planet)
+
+def special_stage_enter_menu(serial):
+    spc = SpecialStageTask(serial)
+    spc.enter_menu()

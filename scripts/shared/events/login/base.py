@@ -61,14 +61,15 @@ class BaseLoginFlow:
 
         while time.time() - start < timeout:
             if wait(self.serial, GameView.LOADING.value, timeout=3.0):
-                if exist(self.serial, Confirm.SMALL.value):
+                if exist(self.serial, Confirm.SMALL.value): # 這裡不該單單用confirm來判
                     if not exist(self.serial, GameView.DOWNLOAD_TEXT.value):
                         wait_click(self.serial, Confirm.SMALL.value)
                         wait_click(self.serial, GameView.PLAY_BTN.value, timeout=25.0, wait_time=3.0)
                         start = time.time()
                         continue 
-                    else:
-                        wait_click(self.serial, Confirm.SMALL.value)
+                    elif not wait_click(self.serial, Confirm.SMALL.value, threshold=0.9):
+                        return True 
+                        
                 elif exist(self.serial, Retry.TEXT1.value):
                     wait_click(self.serial, Retry.BTN.value, wait_time=1.0)
                     start = time.time()

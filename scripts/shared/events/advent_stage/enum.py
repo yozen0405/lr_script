@@ -15,13 +15,13 @@ class Advent(Base):
     SCHEDULE = "advent_schedule.png"
 
 class AdventStageName(Enum):
+    CLARA = "advent_clara_stage.png"
+    LIA = "advent_lia_stage.png"
     CHERINA = "advent_cherina_stage.png"
     MONKEY = "advent_monkey_stage.png"
     HAM = "advent_ham_stage.png"
     DRAGON = "advent_dragon_stage.png"
     JACOB = "advent_jacob_stage.png"
-    LIA = "advent_lia_stage.png"
-    CLARA = "advent_clara_stage.png"
     SISI = "advent_sisi_stage.png"
     FRANKIE = "advent_frankie_stage.png"
     MANAGER = "advent_manager_stage.png"

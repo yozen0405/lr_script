@@ -6,7 +6,7 @@ from core.base.exceptions import GameError
 from scripts.shared.constants.positions import Positions
 from scripts.shared.utils.retry import connection_retry
 from typing import Optional
-from scripts.shared.constants import GameView, Settlement, Battle, Confirm, MainView, Leonard, Retry
+from scripts.shared.constants import Settlement, Battle, Confirm, MainView, Leonard, Retry
 from scripts.shared.events.main_stage.enum import MainStage
 from scripts.shared.events.lab.enum import LabMenu, MakeMenu, ExtractMenu
 
@@ -26,13 +26,24 @@ class LabeMake:
             raise GameError("不在主畫面")
         
     def _handle_pre_tutorial(self):
-        if not exist_click(self.serial, Leonard.TP_POINT2.value, threshold=0.85, wait_time=0.3):
+        if not wait(self.serial, Leonard.TP_POINT2.value, threshold=0.85, wait_time=0.3):
             return
-        exist_click(self.serial, Leonard.TP_STICK.value, wait_time=0.3)
-        exist_click(self.serial, Leonard.TP_POINT2.value, threshold=0.85, wait_time=0.3)
-        exist_click(self.serial, MakeMenu.CRAFT.value, wait_time=0.3)
-        exist_click(self.serial, Leonard.TP_STICK.value, wait_time=0.3)
-        exist_click(self.serial, Leonard.TP_POINT2.value, threshold=0.85)
+        cnt = 0
+        for _ in range(10):
+            if exist_click(self.serial, Leonard.TP_STICK.value):
+                cnt = 0
+                continue
+            if exist_click(self.serial, Leonard.TP_POINT2.value, threshold=0.85):
+                cnt = 0
+                continue
+            if exist_click(self.serial, MakeMenu.CRAFT.value, threshold=0.9, wait_time=0.3):
+                wait_vanish(self.serial, MakeMenu.CRAFT.value, threshold=0.9, timeout=3.0, wait_time=1.0)
+                cnt = 0
+                continue
+            cnt += 1
+            if cnt >= 3:
+                break
+        raise GameError("進入lab製作頁面失敗")
 
 
     def claim_materials(self) -> bool:
@@ -141,10 +152,10 @@ class LabBase:
                 break
 
     def _handle_pre_tutorial(self):
-        if not exist_click(self.serial, Leonard.TP_POINT.value, wait_time=1.0):
+        if not wait(self.serial, Leonard.TP_POINT.value):
             return
         for _ in range(10):
-            wait_click(self.serial, LabMenu.TEXT.value, wait_time=1.0)
+            wait_click(self.serial, LabMenu.TEXT.value)
 
     def complete_make_quest(self):
         self.maker.run()

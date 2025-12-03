@@ -6,7 +6,7 @@ from core.base.exceptions import GameError
 from scripts.shared.constants.positions import Positions
 from scripts.shared.utils.retry import connection_retry
 from typing import Optional
-from scripts.shared.constants import GameView, Settlement, Battle, Confirm, MainView, Leonard, Retry
+from scripts.shared.constants import Settlement, Battle, Confirm, MainView, Leonard, Retry
 from scripts.shared.events.main_stage.enum import MainStage, Stages, Treasure
 
 class MainStageFinder:

@@ -4,8 +4,8 @@ from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.hacks import apply_mode
 from core.base.exceptions import GameError
 from scripts.shared.events.main_stage.selector import main_stage_finish_new
-from scripts.shared.events.login import first_guest_login
-from scripts.shared.constants import GameView, Settlement, Battle, Confirm, MainView, Leonard, Retry, Positions
+from scripts.shared.events.login.base import first_guest_login
+from scripts.shared.constants import Settlement, Battle, Confirm, MainView, Leonard, Retry, Positions
 from scripts.custom_scripts.new_acc.enum import PreStage, Phase1UI, Quests
 from scripts.shared.events.teams.enum import Teams
 from scripts.shared.events.gacha.enum import Gacha

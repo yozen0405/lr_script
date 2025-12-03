@@ -16,8 +16,8 @@ class DiceBase:
         if exist(self.serial, DiceImg.TEXT.value):
             return
         
-        if wait_click(self.serial, DiceImg.BTN.value):
-            connection_retry(self.serial, vanish=DiceImg.BTN.value, retry=DiceImg.BTN.value, timeout=40.0)
+        if wait_click(self.serial, DiceImg.BTN.value, threshold=0.99):
+            connection_retry(self.serial, vanish=[(DiceImg.BTN.value, 0.99)], retry=DiceImg.BTN.value, timeout=40.0)
             self._on_pre_anime()
         else:
             raise GameError("無法進入骰子活動")

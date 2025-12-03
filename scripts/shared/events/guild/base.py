@@ -30,38 +30,33 @@ class BaseGuild:
         self._handle_enter()
 
     def _handle_anime(self):
-        has_anime = False
         for _ in range(7):
             if exist(self.serial, Guild.TEXT.value):
                 break
             if not wait_click(self.serial, Guild.ANIME.value, threshold=0.8):
                 break
-            has_anime = True
 
-        if not has_anime:
-            return
-        
         connection_retry(self.serial, appear=Guild.TEXT.value, timeout=40.0)
 
         cnt = 0
         while True:
-            if exist(self.serial, Leonard.TP_POINT2.value, threshold=0.85):
+            if exist_click(self.serial, Leonard.TP_POINT2.value, threshold=0.85):
                 cnt = 0
                 continue
-            if exist(self.serial, Leonard.TP_POINT_REV.value, threshold=0.9):
+            if exist_click(self.serial, Leonard.TP_POINT_REV.value, threshold=0.9):
                 cnt = 0
                 continue
-            if exist(self.serial, Leonard.TP_CLAP2.value, threshold=0.9):
+            if exist_click(self.serial, Leonard.TP_CLAP2.value, threshold=0.9):
                 cnt = 0
                 continue
-            if exist(self.serial, Leonard.TP_HAPPY2.value, threshold=0.9):
+            if exist_click(self.serial, Leonard.TP_HAPPY2.value, threshold=0.9):
                 cnt = 0
                 continue
-            if exist(self.serial, Leonard.TP_THUMBS_UP.value, threshold=0.9):
+            if exist_click(self.serial, Leonard.TP_THUMBS_UP.value, threshold=0.9):
                 cnt = 0
                 continue
             cnt += 1
-            if cnt >= 2:
+            if cnt >= 3:
                 break
 
 
@@ -132,7 +127,7 @@ class GuildRaid:
         if not wait_click(self.serial, Leonard.TP_POINT.value, threshold=0.8, timeout=3.0, wait_time=1.0):
             return
         
-        for _ in range(4):
+        for _ in range(2):
             wait_click(self.serial, Guild.RAID_TEXT.value, timeout=3.0, wait_time=1.0)
 
     def enter_raid_menu(self):

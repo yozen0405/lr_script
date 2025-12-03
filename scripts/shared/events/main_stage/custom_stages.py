@@ -4,7 +4,7 @@ from scripts.shared.utils.retry import connection_retry
 import time
 from core.base.exceptions import GameError
 from core.system.logger import log_msg
-from scripts.shared.constants import GameView, MainView, Battle, Confirm, Settlement
+from scripts.shared.constants import MainView, Battle, Confirm, Settlement
 from scripts.shared.events.main_stage.enum import MainStage
 from scripts.shared.events.main_stage.base import BaseMainStage
 
