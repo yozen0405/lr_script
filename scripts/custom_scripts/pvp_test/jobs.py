@@ -17,7 +17,8 @@ from scripts.shared.events.advent_stage.enum import Advent
 from scripts.shared.events.advent_stage.enum import AdventStageName
 from scripts.shared.events.lab.enum import MakeMenu
 from scripts.shared.events.dice.enum import DiceImg
-from scripts.shared.events.teams.enum import Teams
+from scripts.shared.events.teams.enum import TeamsImg
+from scripts.shared.events.gear.base import gear_enhance
 from scripts.shared.events.guild.base import guild_raid_battle
 from scripts.shared.events.main_stage.selector import main_stage_finish_custom
 from scripts.shared.events.advent_stage.base import advent_stage_battle
@@ -29,51 +30,52 @@ from scripts.shared.events.season_pass.base import claim_season_pass
 from scripts.shared.events.wheel.base import wheel_attempt
 from scripts.shared.events.train.base import train_stage_battle
 from scripts.shared.events.dice.base import dice_attempt
-from scripts.shared.events.teams.base import upgrade_ranger
+from scripts.shared.events.teams.sec import upgrade_ranger
 from core.actions.system import log_msg
 import time
 from scripts.custom_scripts.pvp_test.base import BaseJob
+from scripts.shared.controller.context import GameContext
 
 class LabJob(BaseJob):
     def __init__(self):
         super().__init__(name="Lab Quest", mode_name=None) 
 
-    def run(self, serial):
-        complete_lab_quest(serial)
+    def run(self, ctx: GameContext):
+        complete_lab_quest(ctx.serial)
 
 
 class AdventJob(BaseJob):
     def __init__(self):
         super().__init__(name="Advent Stage", mode_name="advent")
 
-    def run(self, serial):
-        advent_stage_battle(serial, repeat=3)
+    def run(self, ctx: GameContext):
+        advent_stage_battle(ctx.serial, repeat=3)
 
 
 class MainStageJob(BaseJob):
     def __init__(self):
         super().__init__(name="Main Stage Farming", mode_name="main_stage")
 
-    def run(self, serial):
+    def run(self, ctx: GameContext):
         for _ in range(3):
-            main_stage_finish_custom(serial, custom_stage=26, multiplier=2)
+            main_stage_finish_custom(ctx, custom_stage=26, multiplier=2)
 
 
 class GuildRaidJob(BaseJob):
     def __init__(self):
         super().__init__(name="Guild Raid", mode_name="guild_raid")
 
-    def run(self, serial):
-        guild_raid_battle(serial)
+    def run(self, ctx: GameContext):
+        guild_raid_battle(ctx.serial)
 
 
 class PvPJob(BaseJob):
     def __init__(self):
         super().__init__(name="PVP Arena", mode_name="pvp")
 
-    def run(self, serial):
+    def run(self, ctx: GameContext):
         for i in range(5):
-            if not pvp_loop_battle(serial):
+            if not pvp_loop_battle(ctx.serial):
                 break
 
 
@@ -81,40 +83,47 @@ class SpecialStageJob(BaseJob):
     def __init__(self):
         super().__init__(name="Special Stage", mode_name="special_stage")
 
-    def run(self, serial):
-        # special_stage_loop_game(serial, planet=Planet.COLLAB.value, stage=6)
-        special_stage_conquer_planet(serial, planet=Planet.COLLAB.value)
+    def run(self, ctx: GameContext):
+        # special_stage_loop_game(ctx.serial, planet=Planet.COLLAB.value, stage=6)
+        special_stage_conquer_planet(ctx.serial, planet=Planet.COLLAB.value)
         # for stage in range(4, 7):
-        #     special_stage_loop_game(serial, planet=Planet.IMMORTAL_SKULL.value, stage=stage)
+        #     special_stage_loop_game(ctx.serial, planet=Planet.IMMORTAL_SKULL.value, stage=stage)
 
 
 class TrainJob(BaseJob):
     def __init__(self):
         super().__init__(name="Train Stage", mode_name="train")
 
-    def run(self, serial):
-        train_stage_battle(serial)
-        train_stage_battle(serial)
+    def run(self, ctx: GameContext):
+        train_stage_battle(ctx.serial)
+        train_stage_battle(ctx.serial)
 
 
 class SeasonPassJob(BaseJob):
     def __init__(self):
         super().__init__(name="Claim Season Pass", mode_name=None)
 
-    def run(self, serial):
-        claim_season_pass(serial)
+    def run(self, ctx: GameContext):
+        claim_season_pass(ctx.serial)
 
 
 class DiceJob(BaseJob):
     def __init__(self):
         super().__init__(name="Dice Attempt", mode_name=None)
 
-    def run(self, serial):
-        dice_attempt(serial)
+    def run(self, ctx: GameContext):
+        dice_attempt(ctx.serial)
 
 class UpgradeRangerJob(BaseJob):
     def __init__(self):
         super().__init__(name="Upgrade Ranger", mode_name=None)
 
-    def run(self, serial):
-        upgrade_ranger(serial)
+    def run(self, ctx: GameContext):
+        upgrade_ranger(ctx.serial)
+
+class GearEnhanceJob(BaseJob):
+    def __init__(self):
+        super().__init__(name="Gear Enhance", mode_name=None)
+
+    def run(self, ctx: GameContext):
+        gear_enhance(ctx.serial)

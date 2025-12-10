@@ -1,6 +1,9 @@
 import time
 import os
 from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, back, drag
+from core.actions.system import force_close
+from scripts.shared.utils.mainview.base import on_main_view
+from scripts.shared.events.login.sec import guest_login
 from core.system.logger import log_msg
 from core.base.exceptions import GameError
 from scripts.custom_scripts.new_acc.phase6 import Phase6
@@ -14,6 +17,7 @@ from scripts.custom_scripts.new_acc.enum import PreStage, Phase1UI, Quests
 from scripts.shared.events.main_stage.enum import MainStage
 from scripts.shared.events.gacha.enum import Gacha
 from core.system.config import Config
+from scripts.shared.utils.hacks import apply_mode
 
 class NewAccFarm:
     def __init__(self, serial):
@@ -61,11 +65,15 @@ class NewAccFarm:
                     log_msg(self.serial, f"第 {i + 1} 階段發生錯誤: {e}")
                     is_broken = True
                     tmp = i
+                    force_close(self.serial)
+                    guest_login(self.serial)
+                    on_main_view(self.serial, timeout=60.0)
                     continue
                 
                 start_step_idx = 0
             start = 0
 
 def normal_stage(serial):
-    farm = NewAccFarm(serial)
-    farm.run(start_phase_idx=1, start_step_idx=0)
+    # farm = NewAccFarm(serial)
+    # farm.run(start_phase_idx=1, start_step_idx=0)
+    apply_mode(serial, mode_name="main_stage", state="on")

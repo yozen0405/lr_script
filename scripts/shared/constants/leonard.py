@@ -2,10 +2,13 @@ from enum import Enum
 
 class Leonard(str, Enum):    
     BG_POINT = "leonard_teacher_equip.png"
-    BG_HAPPY = "leonard_teacher_equip2.png"
+    BG_HAPPY = "leonard_bg_happy.png"
     BG_GIFT = "leonard_teacher_gift.png"
+    BG_JUMP = "leonard_bg_jump.png"
+    BG_CLAP = "leonard_bg_clap.png"
     TP_POINT = "leonard_teacher_pvp1.png"
     TP_POINT2 = "leonard_tp_point_2.png"
+    TP_POINT3 = "leonard_tp_point_3.png"
     TP_POINT_REV = "leonard_tp_point_reverse.png"
     TP_STICK = "leonard_tp_stick.png"
     TP_CLAP = "leonard_teacher_pvp2.png"
@@ -14,3 +17,4 @@ class Leonard(str, Enum):
     TP_HAPPY2 = "leonard_tp_happy_2.png"
     TP_JUMP = "leonard_teacher_jump.png"
     TP_THUMBS_UP = "leonard_tp_thumbs_up.png"
+    DIALOGUE_TAG = "leonard_dialogue_tag.png"

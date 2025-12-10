@@ -3,7 +3,8 @@ from core.system.adb import adb_cmd
 from core.actions.image_utils import (
     find_template_position, IMG_DIR,
     get_image_path, get_temp_screen_path, store_screen,
-    check_freeze
+    check_freeze, find_spotlight_center,
+    check_region_brightness
 )
 from core.system.logger import log_msg
 import pytesseract
@@ -119,7 +120,7 @@ def wait_vanish(serial, image_name, timeout=10.0, threshold=SIMILARITY, wait_tim
 def back(serial):
     adb_cmd(serial, ["shell", "input", "keyevent", "4"])
 
-def get_pos(serial, image_name, threshold=SIMILARITY, region=None):
+def get_pos(serial, image_name, threshold=SIMILARITY, region=None, return_center=True):
     if region is not None:
         assert isinstance(region, tuple) and len(region) == 4, "region 需為 (x1, y1, x2, y2)"
 
@@ -127,7 +128,7 @@ def get_pos(serial, image_name, threshold=SIMILARITY, region=None):
     screen_path = get_temp_screen_path(serial)
     store_screen(serial)
 
-    pos = find_template_position(screen_path, template, threshold, region=region)
+    pos = find_template_position(screen_path, template, threshold, region=region, return_center=return_center)
     if pos:
         log_msg(serial, f"找到 {image_name}，座標: {pos}" + (f"，region={region}" if region else ""))
     else:

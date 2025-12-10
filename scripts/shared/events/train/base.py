@@ -13,6 +13,7 @@ from scripts.shared.events.pvp.enum import PvP
 class BaseTrainStage:
     def __init__(self, serial):
         self.serial = serial
+        self.enter_pos = None
 
     def enter_menu(self):
         if exist(self.serial, TrainImg.TEXT.value):
@@ -35,12 +36,27 @@ class BaseTrainStage:
         if not wait(self.serial, TrainImg.TEXT.value, timeout=30.0):
             raise GameError("不在train關卡")
         
-        if wait_click(self.serial, PvP.BATTLE.value, timeout=7.0, threshold=0.8):
-            wait_click(self.serial, TrainImg.NORMAL_BTN.value)
-            connection_retry(self.serial, vanish=TrainImg.NORMAL_BTN.value, timeout=40.0)
-            return True
+        for _ in range(15):
+            if exist(self.serial, TrainImg.UNLOCK_BTN.value, threshold=0.9):
+                wait_click(self.serial, TrainImg.UNLOCK_BTN.value, threshold=0.9)
+                self.enter_pos = get_pos(self.serial, TrainImg.UNLOCK_BTN.value, threshold=0.9)
+                if wait(self.serial, TrainImg.UNLOCK_TEXT.value, threshold=0.9):
+                    wait_click(self.serial, Confirm.SMALL.value)
+                    break
+            elif exist(self.serial, TrainImg.UNLOCK_BTN_DARK.value, threshold=0.9):
+                break   
+
+            drag(self.serial, (595, 383), (439, 383))
+
+        if self.enter_pos is not None:
+            wait_click(self.serial, self.enter_pos)
+        elif exist(self.serial, PvP.BATTLE.value):
+            wait_click(self.serial, PvP.BATTLE.value)
         else:
-            return False
+            raise GameError("無法進入train關卡戰鬥")
+        
+        wait_click(self.serial, TrainImg.NORMAL_BTN.value)
+        connection_retry(self.serial, vanish=TrainImg.NORMAL_BTN.value, timeout=40.0)
         
     def _handle_introduction(self):
         if not wait(self.serial, TrainImg.INTRODUCTION.value, timeout=3.0):

@@ -35,12 +35,12 @@ def save_cache(connected_list):
     with open(CACHE_FILE, "w", encoding="utf-8") as f:
         json.dump(connected_list, f, ensure_ascii=False, indent=2)
         
-def connect_all_mumu_instances(goal=1, max_attempts=10, base_port=16384):
+def connect_all_mumu_instances(goal=1, max_attempts=10, base_port=16416):
     print(f"目標連線數: {goal}，最多嘗試組數: {max_attempts}")
 
     cached_ports = load_cache()
     current_devices = get_adb_devices()
-    final_connected = []
+    final_connected = [] 
 
     for addr in cached_ports:
         if addr in current_devices:

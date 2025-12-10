@@ -1,35 +1,12 @@
 from abc import ABC, abstractmethod
-import logging
 from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
 from core.actions.system import force_close
-from scripts.shared.constants import Settlement, Confirm, Battle, Leonard, Retry, MainView, Positions
 from scripts.shared.utils.retry import connection_retry
-from scripts.shared.events.pvp.base import pvp_loop_battle
 from scripts.shared.utils.hacks import apply_mode
-from scripts.shared.events.special_stage.selector import special_stage_single_game, special_stage_loop_game, special_stage_conquer_planet
-from scripts.shared.events.special_stage.enum import Planet
-from scripts.shared.events.main_stage.enum import MainStage
-from scripts.shared.events.special_stage.enum import SpecialStage
-from scripts.shared.events.pvp.enum import PvP
-from scripts.shared.events.guild.enum import Guild
-from scripts.shared.events.advent_stage.enum import Advent
-from scripts.shared.events.advent_stage.enum import AdventStageName
-from scripts.shared.events.lab.enum import MakeMenu
-from scripts.shared.events.dice.enum import DiceImg
-from scripts.shared.events.teams.enum import Teams
-from scripts.shared.events.guild.base import guild_raid_battle
-from scripts.shared.events.main_stage.selector import main_stage_finish_custom
-from scripts.shared.events.advent_stage.base import advent_stage_battle
-from scripts.shared.events.bingo.base import bingo_attempt
-from scripts.shared.events.login.sec import line_login
+from scripts.shared.events.login.sec import line_login, guest_login
 from scripts.shared.utils.mainview.base import on_main_view
-from scripts.shared.events.lab.base import complete_lab_quest
-from scripts.shared.events.season_pass.base import claim_season_pass
-from scripts.shared.events.wheel.base import wheel_attempt
-from scripts.shared.events.train.base import train_stage_battle
-from scripts.shared.events.dice.base import dice_attempt
-from scripts.shared.events.teams.base import upgrade_ranger
 from core.actions.system import log_msg
+from scripts.shared.controller.context import GameContext
 import time
 
 class BaseJob(ABC):
@@ -41,27 +18,33 @@ class BaseJob(ABC):
         self.name = name
         self.mode_name = mode_name
 
-    def pre_execute(self, serial):
-        log_msg(serial, f"[*] 準備執行任務: {self.name}")
+    def pre_execute(self, ctx: GameContext):
+        log_msg(ctx.serial, f"[*] 準備執行任務: {self.name}")
         if self.mode_name:
-            apply_mode(serial, mode_name=self.mode_name, state="on")
+            apply_mode(ctx.serial, mode_name=self.mode_name, state="on")
 
     @abstractmethod
-    def run(self, serial):
+    def run(self, ctx: GameContext):
         """子類別必須實作的具體邏輯"""
         pass
 
-    def post_execute(self, serial):
+    def post_execute(self, ctx: GameContext):
         if self.mode_name:
-            apply_mode(serial, mode_name=self.mode_name, state="off")
+            apply_mode(ctx.serial, mode_name=self.mode_name, state="off")
         
-        log_msg(serial, f"[*] 任務完成: {self.name}")
+        log_msg(ctx.serial, f"[*] 任務完成: {self.name}")
 
 class JobRunner:
     def __init__(self, serial):
         self.serial = serial
+        self.ctx = GameContext(serial)
         self.jobs: list[BaseJob] = []
         self.max_retries = 1
+
+    def start_game(self):
+        log_msg(self.serial, "[System] 正在啟動遊戲...")
+        line_login(self.serial, mode="")
+        on_main_view(self.serial)
 
     def restart_game(self):
         log_msg(self.serial, "[System] 正在執行遊戲重啟流程...")
@@ -82,8 +65,8 @@ class JobRunner:
                 task_status = "pending"
                 
                 try:
-                    job.pre_execute(self.serial)
-                    job.run(self.serial)
+                    job.pre_execute(self.ctx)
+                    job.run(self.ctx)
                     
                     task_status = "success"
                     break
@@ -107,7 +90,7 @@ class JobRunner:
                 finally:
                     if task_status == "success":
                         try:
-                            job.post_execute(self.serial)
+                            job.post_execute(self.ctx)
                         except:
                             pass
                         

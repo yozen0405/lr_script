@@ -6,6 +6,7 @@ from core.actions.system import force_close, force_close_line
 from core.base.exceptions import GameError
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_boot import open_game
+from scripts.shared.utils.mainview.base import is_on_main_view
 from scripts.shared.constants import GameView, MainView, Confirm, Retry
 from scripts.shared.events.login.enum import LoginState
 
@@ -13,207 +14,175 @@ class LoginStrategy(ABC):
     def __init__(self, serial):
         self.serial = serial
         self.max_retries = 3
+        self.max_unknowns = 3
         self.current_state = LoginState.GAME_NOT_STARTED
 
+    def process(self, mode: str):
+        """
+        look --> think --> act
+        """
+        log_msg(self.serial, "開始登入流程")
+        retry_count = 0
+        unkwown_count = 0
+        
+        while True:
+            try:
+                current_state = self.detect_state()
+                log_msg(self.serial, f"當前狀態: {current_state.name}")
+
+                if current_state == LoginState.GAME_NOT_STARTED:
+                    unkwown_count = 0
+                    open_game(self.serial, mode)
+                
+                elif current_state == LoginState.LOGIN_METHOD_PAGE:
+                    unkwown_count = 0
+                    self.handle_login_page()
+                
+                elif current_state == LoginState.TERMS_AGREEMENT_PAGE:
+                    unkwown_count = 0
+                    self.handle_terms_agreement()
+                
+                elif current_state == LoginState.LINE_APP_PAGE:
+                    unkwown_count = 0
+                    self.handle_line_app_page()
+                
+                elif current_state == LoginState.LOADING_PAGE:
+                    unkwown_count = 0
+                    self.handle_loading_page()
+                
+                elif current_state == LoginState.RETRY:
+                    unkwown_count = 0
+                    self.handle_retry()
+
+                elif current_state == LoginState.POPUP: # 也有可能誤判，其實是 in game
+                    unkwown_count = 0
+                    if not self.handle_popup():
+                        log_msg(self.serial, "登入流程完成")
+                        break
+
+                elif current_state == LoginState.IN_GAME:
+                    log_msg(self.serial, "登入流程完成")
+                    break
+
+                elif current_state == LoginState.UNKNOWN:
+                    self.handle_unknown_state()
+                    unkwown_count += 1
+                    if unkwown_count >= self.max_unknowns:
+                        log_msg(self.serial, "無法辨識當前狀態，重啟遊戲")
+                        force_close(self.serial)
+                        unkwown_count = 0
+                        retry_count += 1
+
+            except GameError as e:
+                log_msg(self.serial, f"發生錯誤: {e}, 重試中...")
+                retry_count += 1
+                force_close(self.serial)
+
+            if retry_count >= self.max_retries:
+                raise GameError("登入流程重試次數過多，終止執行")
+                
+
+    def detect_state(self) -> LoginState:
+        if exist(self.serial, GameView.ICON.value):
+            return LoginState.GAME_NOT_STARTED
+        elif exist(self.serial, Retry.TEXT1.value) or exist(self.serial, Retry.TEXT2.value):
+            return LoginState.RETRY
+        elif exist(self.serial, MainView.BOARD_END.value, threshold=0.95):
+            return LoginState.POPUP
+        elif exist(self.serial, GameView.WAITING.value, threshold=0.9):
+            return LoginState.LOGIN_METHOD_PAGE
+        elif exist(self.serial, GameView.LINE_GAME_TEXT.value, threshold=0.95):
+            return LoginState.TERMS_AGREEMENT_PAGE
+        elif exist(self.serial, GameView.LINE_APP_TEXT.value, threshold=0.9) or \
+           exist(self.serial, GameView.LINE_WEBSITE.value, threshold=0.9) or \
+           exist(self.serial, GameView.LINE_APP_TEXT_3.value, threshold=0.9):
+            return LoginState.LINE_APP_PAGE
+        elif exist(self.serial, GameView.LOADING.value):
+            return LoginState.LOADING_PAGE
+        elif is_on_main_view(self.serial):
+            return LoginState.IN_GAME
+        else:
+            return LoginState.UNKNOWN
+    
     @abstractmethod
-    def execute_login_action(self) -> LoginState:
+    def handle_line_app_page(self) -> LoginState:
         """
         子類別必須實作此方法。
         """
         pass
-
-    def process(self, mode: str):
-        """
-        標準登入模板流程
-        """
-        retry_count = 0
-        while True:
-            if self.current_state == LoginState.GAME_NOT_STARTED:
-                open_game(self.serial, mode)
-            elif self.current_state == LoginState.ON_LOGIN_METHOD_PAGE:
-                self.current_state = self._on_login_method_page()
-                continue
-            elif self.current_state == LoginState.ON_LOADING_PAGE:
-                self.current_state = self._wait_for_loading_completion()
-                continue
-            elif self.current_state == LoginState.ON_TERMS_AGREEMENT_PAGE:
-                self._handle_terms_agreement()
-            elif self.current_state == LoginState.ON_LINE_APP:
-                self.current_state = self.execute_login_action()
-                continue
-            elif self.current_state == LoginState.IN_GAME:
-                break
-            self.current_state = self.current_state.next()
-
-        if retry_count >= self.max_retries:
-            raise GameError(f"{self.__class__.__name__} 登入動作失敗")
-        log_msg(self.serial, "登入流程完成")
-
-    def _on_login_method_page(self) -> LoginState:
-        cnt = 0
-        for _ in range(10):
-            if wait(self.serial, GameView.WAITING.value, timeout=3.0) or wait(self.serial, GameView.WAITING_2.value, timeout=3.0): # 在選擇登入方式頁面
-                cnt = 0
-                if exist(self.serial, GameView.AUTH_FAILED.value): # 認證失敗
-                    wait_click(self.serial, Confirm.SMALL.value)
-                    return LoginState.ON_LOGIN_METHOD_PAGE
-
-                if exist(self.serial, Retry.TEXT1.value): # Retry 彈窗
-                    wait_click(self.serial, Confirm.SMALL.value, wait_time=2.0)
-                    wait_click(self.serial, GameView.PLAY_BTN.value, timeout=3.0)
-                    continue
-
-                if exist(self.serial, GameView.PLAY_BTN.value): # Play btn
-                    wait_click(self.serial, GameView.PLAY_BTN.value)
-                    connection_retry(self.serial, appear=GameView.LOADING.value, timeout=40.0)
-                    return LoginState.ON_LOADING_PAGE
-                
-                if exist(self.serial, GameView.LOGIN_LINE.value): # 條款頁面
-                    exist_click(self.serial, GameView.LOGIN_LINE.value)
-                    return LoginState.ON_TERMS_AGREEMENT_PAGE
-                
-                if exist(self.serial, GameView.ENG_BTN.value): # 語言選擇頁面
-                    wait_click(self.serial, Confirm.SMALL.value)
-                    connection_retry(self.serial, appear=GameView.LOADING.value, timeout=40.0)
-                    return LoginState.ON_LOADING_PAGE
-
-                # 成功登入頁面 ( mising guest login success)
-                if exist(self.serial, GameView.LINE_LOGIN_SUCCESS.value): # Line 登入成功頁面
-                    wait_click(self.serial, Confirm.SMALL.value)
-                    continue
-
-            elif exist(self.serial, GameView.LOADING.value): # 已經進入 Loading 頁面
-                cnt = 0
-                return LoginState.ON_LOADING_PAGE
-            else:
-                cnt += 1
-                if cnt >= 2:
-                    return LoginState.IN_GAME # 這邊不是很嚴謹
+    
+    def handle_popup(self) -> bool:
+        if exist(self.serial, GameView.AUTH_FAILED.value):
+            wait_click(self.serial, Confirm.SMALL.value)
+            return True
             
-        if exist(self.serial, GameView.ICON.value):
-            return LoginState.GAME_NOT_STARTED
-        raise GameError("無法判斷當前登入頁面狀態")
+        if exist(self.serial, GameView.ENG_BTN.value):
+            wait_click(self.serial, Confirm.SMALL.value)
+            return True
+            
+        if exist(self.serial, GameView.LINE_LOGIN_SUCCESS.value):
+            wait_click(self.serial, Confirm.SMALL.value)
+            return True
+            
+        if exist(self.serial, GameView.GUEST_LOGIN_TEXT.value):
+            wait_click(self.serial, GameView.GUEST_CONNECT.value, threshold=0.9)
+            return True
+            
+        if exist(self.serial, GameView.DOWNLOAD_TEXT.value, threshold=0.9):
+            wait_click(self.serial, Confirm.SMALL.value)
+            return True
 
-    def _handle_terms_agreement(self):
-        """處理條款同意流程"""
-        if not wait(self.serial, GameView.LINE_GAME_TEXT.value, threshold=0.5, timeout=10.0):
-            raise GameError("無法進入條款同意頁面")
+        return False
 
-        log_msg(self.serial, "檢測到條款，開始同意流程...")
-        for _ in range(15):
+    def handle_login_page(self):
+        if exist_click(self.serial, GameView.GUEST_LOGIN_BTN.value, threshold=0.9):
+            pass
+
+        if exist_click(self.serial, GameView.PLAY_BTN.value):
+            pass
+        
+        if exist_click(self.serial, GameView.LOGIN_LINE.value):
+            pass
+
+    def handle_retry(self):
+        if exist(self.serial, Retry.TEXT1.value):
+            wait_click(self.serial, Retry.BTN.value)
+
+    def handle_unknown_state(self):
+        time.sleep(1.0)
+
+    def handle_terms_agreement(self):
+        for _ in range(10):
             if exist(self.serial, GameView.TERMS_COMPLETE.value, threshold=0.99):
                 break
             exist_click(self.serial, GameView.TERMS.value, threshold=0.5)
-
-        if not exist(self.serial, GameView.TERMS_COMPLETE.value, threshold=0.99):
-            raise GameError("條款認證失敗：無法勾選所有條款")
-
         wait_click(self.serial, GameView.AGREE_TERMS.value, threshold=0.5)
 
-    def _wait_for_loading_completion(self, timeout: float = 900.0) -> LoginState:
-        """處理 Loading 條、下載資源、Retry 彈窗"""
-        start_time = time.time()
-        
-        while time.time() - start_time < timeout:
-            # 正在 Loading Page
-            if wait(self.serial, GameView.LOADING.value, timeout=3.0):
-                self._handle_popups_during_loading()
-            elif exist(self.serial, GameView.ICON.value):
-                return LoginState.GAME_NOT_STARTED
-            else: # 不太好的方法，但目前只能這樣判斷了
-                return LoginState.IN_GAME
-            
-            if exist(self.serial, Retry.TEXT1.value):
-                wait_click(self.serial, Retry.BTN.value, wait_time=1.0)
-                start_time = time.time() 
-                continue
-
-            if check_freeze(self.serial):
-                force_close(self.serial)
-                time.sleep(1.5)
-                return LoginState.GAME_NOT_STARTED
-                
-            time.sleep(1.0)
-            
-        raise GameError("登入 Timeout：卡在 Loading 過久")
-
-    def _handle_popups_during_loading(self):
-        """處理 Loading 過程中的突發彈窗 (下載確認、錯誤重試)"""
-        if exist(self.serial, Confirm.SMALL.value, threshold=0.8):
-            if not exist(self.serial, GameView.DOWNLOAD_TEXT.value):
-                wait_click(self.serial, Confirm.SMALL.value)
-                wait_click(self.serial, GameView.PLAY_BTN.value, timeout=25.0, wait_time=3.0)
-            else:
-                wait_click(self.serial, Confirm.SMALL.value, threshold=0.9)
+    def handle_loading_page(self):
+        if check_freeze(self.serial):
+            log_msg(self.serial, "Loading 畫面凍結，重啟遊戲")
+            force_close(self.serial)
 
 class GuestLoginStrategy(LoginStrategy):
     def __init__(self, serial):
         super().__init__(serial)
 
-        self.guest_login_retries = 0
-        self.max_guest_login_retries = 4
-    
-    def execute_login_action(self) -> LoginState:
-        """
-        嘗試點擊訪客登入。
-        """
-        if not self._do_line_app_job():
-            force_close(self.serial)
-            self.guest_login_retries = 0
-            return LoginState.GAME_NOT_STARTED
-
-        if self.guest_login_retries >= self.max_guest_login_retries:
-            force_close(self.serial)
-            time.sleep(1.5)
-            return LoginState.GAME_NOT_STARTED
-
-        if not exist_click(self.serial, GameView.GUEST_LOGIN.value, threshold=0.5):
-            self.guest_login_retries += 1
-
-        return LoginState.ON_LOGIN_METHOD_PAGE
-
-
-    def _do_line_app_job(self):
-        """
-        目的是為了讓隱藏的 Guest 按鈕出現
-        """
-        if not wait(self.serial, GameView.LINE_APP_TEXT.value, timeout=15.0):
-            log_msg(self.serial, "找不到 Line App 驗證頁面")
-            return False
-
+    def handle_line_app_page(self) -> LoginState:
         force_close_line(self.serial, timeout=3.0)
         
-        if wait(self.serial, GameView.LINE_WEBSITE.value, timeout=15.0):
+        if wait(self.serial, GameView.LINE_WEBSITE.value, timeout=3.0):
             for _ in range(3):
                 back(self.serial)
-        return True
 
 class LineLoginStrategy(LoginStrategy):
     def __init__(self, serial):
         super().__init__(serial)
 
-        self.login_retries = 0
-        self.max_login_retries = 3
-
-    def execute_login_action(self) -> LoginState:
-        if not wait(self.serial, GameView.LINE_APP_TEXT.value, timeout=15.0):
-            if exist(self.serial, GameView.LINE_WEBSITE.value):
-                raise GameError("你沒有登入 Line App，無法使用 Line 登入遊戲")
-            self.login_retries += 1
-            force_close_line(self.serial)
-            time.sleep(1.5)
-            return LoginState.ON_LOGIN_METHOD_PAGE
-        
-        if self.login_retries >= self.max_login_retries:
-            raise GameError("多次嘗試 Line 登入失敗")
-
+    def handle_line_app_page(self) -> LoginState:
         wait(self.serial, GameView.LINE_APP_TEXT_2.value, threshold=0.9)
         for _ in range(4):
             drag(self.serial, (100, 600), (100, 150))
-            
         wait_click(self.serial, GameView.LINE_APP_ALLOW_BTN.value, threshold=0.9)
-
-        return LoginState.ON_LOGIN_METHOD_PAGE
 
 
 def first_guest_login(serial):

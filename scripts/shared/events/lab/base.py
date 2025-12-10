@@ -30,19 +30,20 @@ class LabeMake:
             return
         cnt = 0
         for _ in range(10):
-            if exist_click(self.serial, Leonard.TP_STICK.value):
+            if exist_click(self.serial, Leonard.TP_STICK.value, wait_time=1.0):
                 cnt = 0
                 continue
-            if exist_click(self.serial, Leonard.TP_POINT2.value, threshold=0.85):
+            if exist_click(self.serial, Leonard.TP_POINT2.value, threshold=0.85, wait_time=1.0):
                 cnt = 0
                 continue
             if exist_click(self.serial, MakeMenu.CRAFT.value, threshold=0.9, wait_time=0.3):
                 wait_vanish(self.serial, MakeMenu.CRAFT.value, threshold=0.9, timeout=3.0, wait_time=1.0)
                 cnt = 0
                 continue
+            time.sleep(0.5)
             cnt += 1
             if cnt >= 3:
-                break
+                return
         raise GameError("進入lab製作頁面失敗")
 
 

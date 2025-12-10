@@ -10,8 +10,8 @@ from scripts.shared.events.main_stage.selector import main_stage_finish_new, mai
 from scripts.shared.constants import Settlement, Battle, Confirm, MainView, Leonard, Retry, Positions
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_view import on_main_view
-from scripts.shared.events.login.base import guest_login
-from scripts.shared.events.teams.enum import Teams
+from scripts.shared.events.login.sec import guest_login
+from scripts.shared.events.teams.enum import TeamsImg
 from scripts.shared.events.gacha.enum import Gacha
 
 from scripts.custom_scripts.new_acc.enum import Gear, Phase3UI, Phase4UI

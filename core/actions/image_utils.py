@@ -53,8 +53,7 @@ def safe_imread(path: str, serial: str = None, retries: int = 5, delay: float = 
     print(f"safe_imread 失敗：{path}")
     return None
 
-def find_template_position(screen_path, template_path, threshold=0.8, region=None):
-    """OpenCV 圖像比對，找出模板位置"""
+def find_template_position(screen_path, template_path, threshold=0.8, region=None, return_center=True):
     screen = safe_imread(screen_path)
     template = safe_imread(template_path)
 
@@ -75,7 +74,14 @@ def find_template_position(screen_path, template_path, threshold=0.8, region=Non
     if max_val >= threshold:
         h, w = template.shape[:2]
         offset_x, offset_y = (region[0], region[1]) if region else (0, 0)
-        return (max_loc[0] + w // 2 + offset_x, max_loc[1] + h // 2 + offset_y)
+        
+        tx = max_loc[0] + offset_x
+        ty = max_loc[1] + offset_y
+
+        if return_center:
+            return (tx + w // 2, ty + h // 2)
+        else:
+            return (tx, ty, tx + w, ty + h)
     else:
         return None
 
@@ -122,3 +128,67 @@ def check_freeze(serial, threshold=0.98, reset_time=600.0, minimum_interval=15.0
         print(f"比對過程發生錯誤: {e}")
         shutil.copy2(current_path, old_path)
         return False
+    
+def find_spotlight_center(serial):
+    current_path = store_screen(serial)
+
+    img = safe_imread(current_path, serial)
+    if img is None:
+        print(f"讀取圖片失敗")
+        return None
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    ksize = (51, 51) 
+    blurred = cv2.GaussianBlur(gray, ksize, 0)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(blurred)
+
+    if max_val < 50:
+        print(f"未偵測到明顯亮區 (Max val: {max_val})")
+        return None
+
+    print(f"找到亮區中心: {max_loc}, 亮度值: {max_val}")
+
+    # debug_img = img.copy()
+    # cv2.circle(debug_img, max_loc, 40, (0, 0, 255), 3)
+    # cv2.putText(debug_img, f"Val:{max_val:.0f}", (max_loc[0]-20, max_loc[1]-50), 
+    #             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+    
+    # result_path = os.path.join(TMP_DIR, "debug_result.png")
+    # cv2.imwrite(result_path, debug_img)
+    # print(f"-> 已儲存最終判定圖: {result_path}")
+    
+    return max_loc
+
+def check_region_brightness(serial, region, threshold=20):
+    """
+    檢查指定區域的平均亮度是否大於閾值
+    一般來說，有 dimmeer 的區域亮度 threshold = 18.81
+
+    :param serial: 裝置序號 (用於 store_screen)
+    :param region: tuple (x1, y1, x2, y2) 
+    :param threshold: 亮度閾值 (0~255)
+    :return: Boolean (True if bright enough)
+    """
+    current_path = store_screen(serial)
+    img = safe_imread(current_path, serial)
+    
+    if img is None:
+        print(f"讀取圖片失敗")
+        return False
+
+    x1, y1, x2, y2 = region
+    roi = img[y1:y2, x1:x2]
+
+    if roi.size == 0:
+        print(f"錯誤: 指定的區域無效或大小為 0: {region}")
+        return False
+
+    gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+    avg_brightness = cv2.mean(gray)[0]
+
+    print(f"區域 {region} 平均亮度: {avg_brightness:.2f} (閾值: {threshold})")
+
+    debug_path = os.path.join(TMP_DIR, "debug_brightness_region.png")
+    cv2.imwrite(debug_path, roi)
+
+    return avg_brightness > threshold

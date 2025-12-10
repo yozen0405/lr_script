@@ -26,6 +26,7 @@ class MainStage(Base):
     AUTO_BTN_HIGH_OFF = "main_stage_auto_btn_high_off.png"
     NORMAL_NAV = "main_stage_normal_nav.png"
     HARD_NAV = "main_stage_hard_nav.png"
+    METEOR_TEXT = "main_stage_stage_1_meteor_text.png"
     
 class Stages(str, Enum):
     LOCKED = "new_stage_locked.png"

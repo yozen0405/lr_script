@@ -6,12 +6,12 @@ from core.actions.system import force_close
 from core.base.exceptions import GameError
 from scripts.shared.utils.game_view import close_board, on_main_view
 from scripts.shared.utils.retry import connection_retry
-from scripts.shared.events.login.base import guest_login
+from scripts.shared.events.login.sec import guest_login
 from scripts.shared.utils.hacks import apply_mode
 from scripts.shared.events.main_stage.selector import main_stage_finish_new, main_stage_enter_menu
 from scripts.shared.events.main_stage.enum import Treasure, MainStage
 
-from scripts.shared.events.teams.enum import Teams
+from scripts.shared.events.teams.enum import TeamsImg
 from scripts.shared.constants import MainView, Confirm
 from scripts.custom_scripts.new_acc.enum import Quests  
 from scripts.custom_scripts.new_acc.enum import Phase2UI, Phase1UI, SevenDays
@@ -88,18 +88,18 @@ class Phase2(BasePhase):
         self._maybe_skip_and_confirm(skip_timeout=5.0, confirm_wait=3.0)
 
         wait_click(self.serial, Phase2UI.SHEEP.value, timeout=7.0, wait_time=2.0)
-        connection_retry(self.serial, appear=Teams.UPGRADE_BTN.value, retry=Phase2UI.SHEEP.value, timeout=40.0)
-        wait_click(self.serial, Teams.UPGRADE_BTN.value)
+        connection_retry(self.serial, appear=TeamsImg.UPGRADE_BTN.value, retry=Phase2UI.SHEEP.value, timeout=40.0)
+        wait_click(self.serial, TeamsImg.UPGRADE_BTN.value)
 
         if not wait(self.serial, MainView.BACK.value, timeout=20.0):
             raise GameError("無法進入升級頁面")
 
         drag(self.serial, (80, 574), (478, 341), wait_time=3.0, timeout=10.0)
-        wait_click(self.serial, Teams.UPGRADE_LVL_BTN.value)
-        connection_retry(self.serial, appear=Teams.UPGRADE_SUCCESS.value, retry=Teams.UPGRADE_LVL_BTN.value, timeout=40.0)
+        wait_click(self.serial, TeamsImg.UPGRADE_LVL_BTN.value)
+        connection_retry(self.serial, appear=TeamsImg.UPGRADE_SUCCESS.value, retry=TeamsImg.UPGRADE_LVL_BTN.value, timeout=40.0)
 
         for _ in range(3):
-            wait_click(self.serial, Teams.UPGRADE_SUCCESS.value, timeout=5.0, wait_time=1.0)
+            wait_click(self.serial, TeamsImg.UPGRADE_SUCCESS.value, timeout=5.0, wait_time=1.0)
 
         self._maybe_skip_and_confirm(skip_timeout=15.0, confirm_wait=0.5)
 

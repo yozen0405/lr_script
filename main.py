@@ -30,3 +30,5 @@ if __name__ == "__main__":
     #         print("\n偵測到中斷，正在關閉執行緒...")
     #         executor.shutdown(wait=False, cancel_futures=True)
     #         print("已停止所有任務。")
+
+

@@ -13,29 +13,29 @@ class MainStageHooks:
     def __init__(self, serial):
         self.serial = serial
 
-    def on_pre_start_page_prev(self, ctx):
+    def on_pre_start_page_prev(self, base):
         pass
 
-    def on_pre_start_page_next(self, ctx):
+    def on_pre_start_page_next(self, base):
         pass
 
-    def on_start_page(self, ctx):
+    def on_start_page(self, base):
         pass
 
-    def on_settlement_page(self, ctx):
+    def on_settlement_page(self, base):
         pass
 
-    def on_settlement_next_feature(self, ctx):
+    def on_settlement_next_feature(self, base):
         if not wait_click(self.serial, MainStage.NEXT_FEATURE.value, timeout=3.0):
             return
         wait_click(self.serial, Settlement.AGAIN.value, wait_time=1.2)
         wait_click(self.serial, Settlement.NEXT.value)
 
-    def handle_multiplier(self, times, ctx):
+    def handle_multiplier(self, times, base):
         if not exist(self.serial, Battle.MULTIPLIER_OFF.value):
             return
         for _ in range(5):
-            if ctx.is_low:
+            if base.is_low:
                 did_found = exist(self.serial, MainStage.MULTIPLIER_LOW_BTN(times=times), threshold=0.9)
             else:
                 did_found = exist(self.serial, MainStage.MULTIPLIER_HIGH_BTN(times=times), threshold=0.9)
@@ -44,7 +44,7 @@ class MainStageHooks:
                 return
             exist_click(self.serial, Battle.MULTIPLIER_OFF.value, wait_time=0.5)
 
-    def handle_loop_stage_tutorial(self, ctx):
+    def handle_loop_stage_tutorial(self, base):
         if not wait(self.serial, Battle.MULTIPLIER_TEXT.value, timeout=2.0):
             return
         wait_click(self.serial, Battle.CYCLE.value, wait_time=2.5)
@@ -53,27 +53,27 @@ class MainStageHooks:
         wait_click(self.serial, Battle.MULTIPLIER_ON.value, wait_time=1.0)
         wait_click(self.serial, Leonard.BG_HAPPY.value, wait_time=1.0)
 
-    def handle_team_num(self, ctx):
-        if ctx.is_low:
+    def handle_team_num(self, base):
+        if base.is_low:
             if not exist_click(self.serial, MainStage.TEAM_BTN_LOW.value):
                 return
-            if exist_click(self.serial, MainStage.TEAM_NUM_LOW_ON(num=ctx.team_num), threshold=0.999):
+            if exist_click(self.serial, MainStage.TEAM_NUM_LOW_ON(num=base.team_num), threshold=0.999):
                 return
-            exist_click(self.serial, MainStage.TEAM_NUM_LOW_OFF(num=ctx.team_num), threshold=0.9)
+            exist_click(self.serial, MainStage.TEAM_NUM_LOW_OFF(num=base.team_num), threshold=0.9)
         else:
             if not exist_click(self.serial, MainStage.TEAM_BTN_HIGH.value):
                 return
-            if exist_click(self.serial, MainStage.TEAM_NUM_HIGH_ON(num=ctx.team_num), threshold=0.999):
+            if exist_click(self.serial, MainStage.TEAM_NUM_HIGH_ON(num=base.team_num), threshold=0.999):
                 return
-            exist_click(self.serial, MainStage.TEAM_NUM_HIGH_OFF(num=ctx.team_num), threshold=0.9)
+            exist_click(self.serial, MainStage.TEAM_NUM_HIGH_OFF(num=base.team_num), threshold=0.9)
 
-    def handle_auto_btn(self, ctx):
-        if ctx.is_low:
+    def handle_auto_btn(self, base):
+        if base.is_low:
             exist_click(self.serial, MainStage.AUTO_BTN_LOW_OFF.value, threshold=0.99)
         else:
             exist_click(self.serial, MainStage.AUTO_BTN_HIGH_OFF.value, threshold=0.99)
 
-    def settlement_items(self, ctx):
+    def settlement_items(self, base):
         return [
             Settlement.ACQUIRED.value,
             (Confirm.BIG1.value, 0.9),

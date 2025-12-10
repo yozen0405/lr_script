@@ -10,22 +10,20 @@ from typing import Optional
 from core.system.logger import log_msg
 from scripts.shared.events.main_stage.hooks import MainStageHooks
 from core.system.config import Config
+from scripts.shared.controller.context import GameContext
 
 class MainStageTask:
-    def __init__(self, serial):
-        self.serial = serial
-        self.base_stage = BaseMainStage(serial)
+    def __init__(self, context: GameContext):
+        self.ctx = context
+        self.base_stage = BaseMainStage(context)
         config = Config()
         self.team_num = config.get_team_num()
 
-    def battle(self, custom_stage: Optional[int] = None, multiplier: int = 1):
-        self.base_stage.enter_menu()
-        hooks = self._proccess_stage(custom_stage=custom_stage)
-        current_stage = BaseMainStage(self.serial, hooks=hooks, is_low=self.is_low, team_num=self.team_num)
-        current_stage.enter_battle(multiplier=multiplier)
-
     def enter_menu(self):
         self.base_stage.enter_menu()
+
+    def leave_menu(self):
+        self.base_stage.leave_menu()
 
     def _get_hook_class(self, stage_num: int) -> MainStageHooks:
         self.is_low = stage_num < 100
@@ -38,22 +36,38 @@ class MainStageTask:
             30: FriendStage,
         }
         cls = stage_map.get(stage_num, MainStageHooks)
-        return cls(self.serial)
+        return cls(self.ctx.serial)
 
     def _proccess_stage(self, custom_stage: Optional[int] = None) -> MainStageHooks:
         stage_num = self.base_stage.enter_stage(custom_stage=custom_stage)
+        self.ctx.current_stage_num = stage_num
         hooks = self._get_hook_class(stage_num)
         return hooks
+    
+    def battle(self, custom_stage: Optional[int] = None, multiplier: int = 1, is_first: bool = False):
+        if is_first:
+            self.team_num = 1
+        self.base_stage.enter_menu()
+        hooks = self._proccess_stage(custom_stage=custom_stage)
 
-def main_stage_finish_new(serial):
-    main_stage_task = MainStageTask(serial)
-    main_stage_task.battle()
+        if self.ctx.max_main_stage_num is not None:
+            if self.ctx.current_stage_num > self.ctx.max_main_stage_num:
+                log_msg(self.ctx.serial, f"[MainStageTask] 當前關卡 {self.ctx.current_stage_num} 超過設定的最大關卡 {self.ctx.max_main_stage_num}，停止挑戰。")
+                self.leave_menu()
+                return
 
-def main_stage_enter_menu(serial):
-    main_stage_task = MainStageTask(serial)
+        current_stage = BaseMainStage(self.ctx.serial, hooks=hooks, is_low=self.is_low, team_num=self.team_num)
+        current_stage.enter_battle(multiplier=multiplier)
+
+def main_stage_finish_new(context: GameContext):
+    main_stage_task = MainStageTask(context)
+    main_stage_task.battle(is_first=True)
+
+def main_stage_enter_menu(context: GameContext):
+    main_stage_task = MainStageTask(context)
     main_stage_task.enter_menu()
 
-def main_stage_finish_custom(serial, custom_stage: int, multiplier: int = 1):
-    main_stage_task = MainStageTask(serial)
+def main_stage_finish_custom(context: GameContext, custom_stage: int, multiplier: int = 1):
+    main_stage_task = MainStageTask(context)
     main_stage_task.battle(custom_stage=custom_stage, multiplier=multiplier)
 

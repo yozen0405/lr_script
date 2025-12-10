@@ -8,3 +8,6 @@ class TrainImg(Base):
     INTRODUCTION = "train_introduction_text.png"
     SETTLEMENT_TEXT = "season_pass_congrats_text.png"
     SETTLEMENT_RESULT = "train_settlement_result.png"
+    UNLOCK_BTN = "train_unlock_btn.png"
+    UNLOCK_BTN_DARK = "train_unlock_btn_dark.png"
+    UNLOCK_TEXT = "train_unlock_text.png"

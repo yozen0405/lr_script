@@ -15,8 +15,7 @@ from scripts.shared.events.main_stage.selector import main_stage_finish_new, mai
 from scripts.shared.constants import Settlement, Battle, Confirm, MainView, Leonard, Retry, Positions
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.game_view import on_main_view
-from scripts.shared.events.login.base import guest_login
-from scripts.shared.events.teams.enum import Teams
+from scripts.shared.events.teams.enum import TeamsImg
 from scripts.shared.events.gacha.enum import Gacha
 
 from scripts.custom_scripts.new_acc.enum import Phase5UI, Gear, Diamond, SeasonPass, SevenDays
@@ -42,27 +41,27 @@ class Phase5(BasePhase):
         if not wait_click(self.serial, MainView.BACK.value):
             raise GameError("未知狀態")
         on_main_view(self.serial)
-        wait_click(self.serial, Teams.ICON_LIGHT.value)
-        connection_retry(self.serial, appear=Teams.TEXT.value, retry=Teams.ICON_LIGHT.value, timeout=40.0)
+        wait_click(self.serial, TeamsImg.ICON_LIGHT.value)
+        connection_retry(self.serial, appear=TeamsImg.TEXT.value, retry=TeamsImg.ICON_LIGHT.value, timeout=40.0)
         wait_click(self.serial, Leonard.TP_POINT.value)
         wait_click(self.serial, Leonard.TP_HAPPY.value, wait_time=2.0)
         wait_click(self.serial, Phase5UI.JESSICA.value, wait_time=1.5)
-        wait_click(self.serial, Teams.UPGRADE_BTN.value)
-        connection_retry(self.serial, appear=MainView.BACK.value, retry=Teams.UPGRADE_BTN.value, timeout=40.0)
+        wait_click(self.serial, TeamsImg.UPGRADE_BTN.value)
+        connection_retry(self.serial, appear=MainView.BACK.value, retry=TeamsImg.UPGRADE_BTN.value, timeout=40.0)
         time.sleep(3.0)
         for _ in range(2):
             drag(self.serial, (449, 605), (449, 357), timeout=10.0)
-        wait_click(self.serial, Teams.UPGRADE_LVL_BTN.value)
+        wait_click(self.serial, TeamsImg.UPGRADE_LVL_BTN.value)
         if not wait_click(self.serial, Confirm.SMALL.value, wait_time=3.0):
             raise GameError("升級失敗")
 
-        connection_retry(self.serial, appear=Teams.UPGRADE_SUCCESS.value, retry=[(Teams.UPGRADE_LVL_BTN.value), (Confirm.SMALL.value)], timeout=40.0)
+        connection_retry(self.serial, appear=TeamsImg.UPGRADE_SUCCESS.value, retry=[(TeamsImg.UPGRADE_LVL_BTN.value), (Confirm.SMALL.value)], timeout=40.0)
 
         for _ in range(3):
-            if not wait_click(self.serial, Teams.UPGRADE_SUCCESS.value, timeout=5.0, wait_time=1.0):
+            if not wait_click(self.serial, TeamsImg.UPGRADE_SUCCESS.value, timeout=5.0, wait_time=1.0):
                 break
         wait_click(self.serial, MainView.BACK.value)
-        wait(self.serial, Teams.TEXT.value, timeout=20.0)
+        wait(self.serial, TeamsImg.TEXT.value, timeout=20.0)
         wait_click(self.serial, MainView.BACK.value, timeout=20.0)
         on_main_view(self.serial, timeout=40.0)
 

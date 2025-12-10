@@ -78,5 +78,4 @@ class PolicyHandler(BaseStateHandler):
 
 class UnknownHandler(BaseStateHandler):
     def handle(self):
-        log_msg(self.serial, "Unknown Main View State Detected.")
         time.sleep(0.5)

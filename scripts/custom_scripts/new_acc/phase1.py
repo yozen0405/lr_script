@@ -4,10 +4,10 @@ from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.hacks import apply_mode
 from core.base.exceptions import GameError
 from scripts.shared.events.main_stage.selector import main_stage_finish_new
-from scripts.shared.events.login.base import first_guest_login
+from scripts.shared.events.login.sec import first_guest_login
 from scripts.shared.constants import Settlement, Battle, Confirm, MainView, Leonard, Retry, Positions
 from scripts.custom_scripts.new_acc.enum import PreStage, Phase1UI, Quests
-from scripts.shared.events.teams.enum import Teams
+from scripts.shared.events.teams.enum import TeamsImg
 from scripts.shared.events.gacha.enum import Gacha
 from scripts.custom_scripts.new_acc.base import BasePhase
 
@@ -91,7 +91,7 @@ class Phase1(BasePhase):
         if wait_click(self.serial, MainView.SKIP.value, timeout=3):
             wait_click(self.serial, Confirm.SMALL.value)
 
-        wait_click(self.serial, Teams.ICON_LIGHT.value)
+        wait_click(self.serial, TeamsImg.ICON_LIGHT.value)
         connection_retry(self.serial, appear=Leonard.BG_HAPPY.value, timeout=35.0)
         wait_click(self.serial, Leonard.BG_HAPPY.value)
         wait_click(self.serial, Leonard.BG_HAPPY.value)
@@ -102,7 +102,7 @@ class Phase1(BasePhase):
 
         wait_click(self.serial, MainView.SKIP.value)
         wait_click(self.serial, Confirm.SMALL.value)
-        wait_click(self.serial, Teams.SAVE.value, wait_time=3.0)
+        wait_click(self.serial, TeamsImg.SAVE.value, wait_time=3.0)
         connection_retry(self.serial, appear=MainView.SETTINGS.value, timeout=35.0)
         for _ in range(3):
             if wait_click(self.serial, MainView.SKIP.value, timeout=5, wait_time=1.0):
