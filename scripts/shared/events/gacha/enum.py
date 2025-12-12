@@ -1,17 +1,20 @@
 from enum import Enum
 
-class Gacha(Enum):
+class GachaImg(Enum):
     FALLBACK_POOL = "gacha_boss_pool.png"
-    ICON = "gacha_icon.png"
+    BTN = "gacha_icon.png"
     TEXT = "gacha_text.png"
-    EQUIP_NAV = "gacha_equip_nav.png"
-    EQUIP_SHIRT_PULL =  "gacha_equip_shirt_pull.png"
-    GEAR_GAUGE = "gacha_gear_gauge.png"
+    GEAR_NAV = "gacha_equip_nav.png"
+    GEAR_SHIRT_PULL =  "gacha_equip_shirt_pull.png"
     SHOP = "gacha_shop.png"
     TICKET_PULL = "gacha_pull_tickets.png"
     ACC_NAV = "settings_account_nav.png"
     ACC_UID_COPY = "settings_uid_copy.png"
     SKIP = "gacha_skip.png"
     CONFIRM = "gacha_confirm.png"
-    JESSICA = "gacha_jessica.png"
-    
+    JESSICA_PULL_BTN = "gacha_jessica.png"
+    JESSICA_POOL_TEXT = "gacha_jessica_pool_text.png"
+    SUCCESS_TEXT = "gacha_success_text.png"
+    GUARANTEE_TEXT = "gacha_guarantee_text.png"
+    GEAR_SUCCESS_TEXT = "gacha_gear_success_text.png"
+    GEAR_SKIP = "gacha_gear_skip.png"

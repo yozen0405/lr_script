@@ -39,7 +39,7 @@ class JobRunner:
         self.serial = serial
         self.ctx = GameContext(serial)
         self.jobs: list[BaseJob] = []
-        self.max_retries = 1
+        self.max_retries = 0
 
     def start_game(self):
         log_msg(self.serial, "[System] 正在啟動遊戲...")

@@ -28,6 +28,7 @@ class TeamsImg(Enum):
     SELL_BTN = "team_sell_btn.png"
     UPGRADE_PAGE_RENE = "team_upgrade_page_rene.png"
     RENE_MAINVIEW = "rene.png"
+    SHEEP_MAINVIEW = "sheep.png"
     RENE_UPGRADE_TEXT = "rene_level_up_text.png"
 
 class GearImg(Enum):

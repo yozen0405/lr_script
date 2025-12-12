@@ -16,12 +16,11 @@ from scripts.shared.events.lab.enum import MakeMenu
 from scripts.shared.events.dice.enum import DiceImg
 from scripts.shared.events.teams.enum import TeamsImg
 from scripts.shared.events.season_pass.enum import SeasonPassImg
-from scripts.shared.events.gear.enum import GearImg
+from scripts.shared.events.teams.enum import GearImg
 from scripts.shared.events.guild.base import guild_raid_battle
 from scripts.shared.events.main_stage.selector import main_stage_finish_custom
 from scripts.shared.events.advent_stage.base import advent_stage_battle
 from scripts.shared.events.bingo.base import bingo_attempt
-from scripts.shared.events.login.base import guest_login
 from scripts.shared.utils.game_view import on_main_view
 from scripts.shared.events.lab.base import complete_lab_quest
 from scripts.shared.events.season_pass.base import claim_season_pass
@@ -52,22 +51,24 @@ def normal_stage(serial):
 
     # runner.start_game()
 
-    detect(serial)
+    # detect(serial)
     # check_brightness(serial)
     # apply_mode(serial, mode_name="pre_stage", state="on")
+
+    apply_mode(serial, mode_name="main_stage", state="off")
 
     # runner.add_job(GearEnhanceJob())
     # runner.add_job(LabJob())
     # runner.add_job(AdventJob())
     # runner.add_job(MainStageJob())
     # runner.add_job(GuildRaidJob())
-    # runner.add_job(PvPJob())
+    runner.add_job(PvPJob())
     # runner.add_job(SpecialStageJob())
     # runner.add_job(TrainJob())
     
     # runner.add_job(UpgradeRangerJob())
     
-    # runner.add_job(SeasonPassJob())
-    # runner.add_job(DiceJob())
+    runner.add_job(SeasonPassJob())
+    runner.add_job(DiceJob())
 
     runner.execute_all()

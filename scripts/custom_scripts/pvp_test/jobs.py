@@ -18,19 +18,17 @@ from scripts.shared.events.advent_stage.enum import AdventStageName
 from scripts.shared.events.lab.enum import MakeMenu
 from scripts.shared.events.dice.enum import DiceImg
 from scripts.shared.events.teams.enum import TeamsImg
-from scripts.shared.events.gear.base import gear_enhance
+from scripts.shared.events.teams.base import upgrade_ranger, gear_enhance
 from scripts.shared.events.guild.base import guild_raid_battle
 from scripts.shared.events.main_stage.selector import main_stage_finish_custom
 from scripts.shared.events.advent_stage.base import advent_stage_battle
 from scripts.shared.events.bingo.base import bingo_attempt
-from scripts.shared.events.login.base import guest_login
 from scripts.shared.utils.game_view import on_main_view
 from scripts.shared.events.lab.base import complete_lab_quest
 from scripts.shared.events.season_pass.base import claim_season_pass
 from scripts.shared.events.wheel.base import wheel_attempt
 from scripts.shared.events.train.base import train_stage_battle
 from scripts.shared.events.dice.base import dice_attempt
-from scripts.shared.events.teams.sec import upgrade_ranger
 from core.actions.system import log_msg
 import time
 from scripts.custom_scripts.pvp_test.base import BaseJob
@@ -119,11 +117,11 @@ class UpgradeRangerJob(BaseJob):
         super().__init__(name="Upgrade Ranger", mode_name=None)
 
     def run(self, ctx: GameContext):
-        upgrade_ranger(ctx.serial)
+        upgrade_ranger(ctx)
 
 class GearEnhanceJob(BaseJob):
     def __init__(self):
         super().__init__(name="Gear Enhance", mode_name=None)
 
     def run(self, ctx: GameContext):
-        gear_enhance(ctx.serial)
+        gear_enhance(ctx)

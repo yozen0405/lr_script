@@ -1,14 +1,15 @@
 from enum import Enum, auto
 
 class MainViewState(Enum):
-    NO_AVATAR = auto()
-    RETRY = auto()
-    DIMMED = auto()
-    CLEAR = auto()
-    UNKNOWN = auto()
-
-class MainViewEventType(Enum):
-    TEAM = auto()
-    GACHA = auto()
-    MAIN_STAGE = auto()
+    SPECIAL_STAGE = "special_stage"
+    MAIN_STAGE = "main_stage"
+    GACHA = "gacha"
+    TEAM = "team"
+    UPGRADE = "upgrade"
+    SEVEN_DAYS = "seven_days"
+    SPECIAL_QUEST = "special_quest"
+    TO_DOWNLOAD = "to_download"
+    PRE_STAGE = "pre_stage"
+    NONE = "none"
+    UNKNOWN = "unknown"
     

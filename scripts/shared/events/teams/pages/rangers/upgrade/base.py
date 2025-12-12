@@ -8,10 +8,7 @@ from typing import Optional, Tuple
 from scripts.shared.events.main_stage.enum import MainStage
 from scripts.shared.events.teams.enum import TeamsImg
 from scripts.shared.constants.leonard import Leonard
-from scripts.shared.events.teams.pages.rangers.upgrade.interrupt.upgrade_success import UpgradeSuccessStrategy
-from scripts.shared.events.teams.pages.rangers.upgrade.interrupt.rene_bright import ReneBrightStrategy
-from scripts.shared.events.teams.pages.rangers.upgrade.interrupt.rene_dark import ReneDarkStrategy
-from scripts.shared.controller.enum import TaskStatus
+from scripts.shared.events.teams.pages.rangers.upgrade.interrupt.guide import UpgradeGuideStrategy
 from scripts.shared.controller.context import GameContext
 
 import time
@@ -19,9 +16,7 @@ import time
 class RangerUpgradePage():
     def __init__(self, context: GameContext):
         self.ctx = context
-        self.upgrade_success_strategy = UpgradeSuccessStrategy(context.serial)
-        self.rene_bright_strategy = ReneBrightStrategy(context.serial)
-        self.rene_dark_strategy = ReneDarkStrategy(context.serial)
+        self.upgrade_guide_strategy = UpgradeGuideStrategy(self.ctx.serial)
 
     def on_page(self) -> bool:
         has_filter = exist(self.ctx.serial, TeamsImg.FILTER_BTN.value, threshold=0.9)
@@ -41,10 +36,8 @@ class RangerUpgradePage():
             return True
         return False
 
-    def on_rene_upgrade(self):
-        self.rene_bright_strategy.proccess()
-        self.upgrade_success_strategy.proccess()
-        self.rene_dark_strategy.proccess()
+    def on_event(self):
+        self.upgrade_guide_strategy.proccess()
 
     def enter_menu(self):
         if not self.on_page():
@@ -84,6 +77,6 @@ class RangerUpgradePage():
             if exist_click(self.ctx.serial, TeamsImg.UPGRADE_LVL_BTN.value, threshold=0.9):
                 continue
             else:
-                drag(self.ctx.serial, (609, 618), (609, 358)) 
+                drag(self.ctx.serial, (609, 618), (609, 358), duration=500) 
                 continue
         raise GameError("Ranger upgrade timed out.")

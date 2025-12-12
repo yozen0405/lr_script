@@ -20,7 +20,7 @@ class LeonardBgHappyStrategy():
         
         start_time = time.time()
         saved = False
-        while time.time() - start_time < 30.0:
+        while time.time() - start_time < 60.0:
             if exist(self.serial, Retry.TEXT1.value, threshold=0.9) or exist(self.serial, Retry.TEXT2.value, threshold=0.9):
                 wait_click(self.serial, Retry.BTN.value)
                 continue

@@ -121,7 +121,8 @@ class BaseSpecialStage:
             wait_click(self.serial, self.MEMBER4_POS)
 
         cnt = 0
-        while True:
+        start_time = time.time()    
+        while time.time() - start_time < 120:
             for img in [
                 Confirm.BIG1.value, Confirm.BIG2.value, Settlement.ONE_REWARD.value, 
                 Confirm.SMALL.value, Settlement.STOP.value, Settlement.SILVER_BOX.value, 
@@ -130,8 +131,6 @@ class BaseSpecialStage:
                 exist_click(self.serial, img, wait_time=1.5)
             if exist(self.serial, Retry.TEXT1.value) or exist(self.serial, Retry.TEXT2.value):
                 exist_click(self.serial, Retry.BTN.value)
-                cnt += 1
             if exist(self.serial, SpecialStage.TEXT.value):
-                break
-            if cnt >= 5:
-                raise GameError("結算異常，跳出")
+                return
+        raise GameError("結算超時")

@@ -10,20 +10,35 @@ from scripts.shared.events.teams.enum import TeamsImg
 from scripts.shared.constants.leonard import Leonard
 import time
 
-class ReneDarkStrategy():
+class UpgradeGuideStrategy():
     def __init__(self, serial):
         self.serial = serial
-    
-    def _has_rene(self) -> bool:
-        pos = get_pos(self.serial, TeamsImg.UPGRADE_PAGE_RENE.value, threshold=0.8, return_center=False)
-        if pos is not None and not check_region_brightness(self.serial, region=pos, threshold=45):
-            return True
-        return False
 
-    def proccess(self):
-        if not self._has_rene():
-            raise GameError("Rene not found on upgrade page.")
+    def pull_ranger_up(self):
+        start_time = time.time()
+        succ = False
+
+        while time.time() - start_time < 30.0:
+            if exist_click(self.serial, TeamsImg.UPGRADE_SUCCESS.value, threshold=0.9):
+                succ = True
+                continue
+            
+            if succ and exist(self.serial, TeamsImg.LVL_UP_PAGE_TEXT.value, threshold=0.9):
+                return
+            
+            if exist(self.serial, Retry.TEXT1.value, threshold=0.9) or exist(self.serial, Retry.TEXT2.value, threshold=0.9):
+                wait_click(self.serial, Retry.BTN.value)
+                continue
         
+            if exist_click(self.serial, TeamsImg.UPGRADE_LVL_BTN.value, threshold=0.9):
+                continue
+            else:
+                drag(self.serial, (80, 574), (478, 341))
+                continue
+        
+        raise GameError("Upgrade success interrupt handling timed out.")
+    
+    def handle_end(self):
         start_time = time.time()
         while time.time() - start_time < 30.0:
             if not exist(self.serial, TeamsImg.LVL_UP_PAGE_TEXT.value, threshold=0.9):
@@ -43,3 +58,10 @@ class ReneDarkStrategy():
                 
         
         raise GameError("Upgrade success interrupt handling timed out.")
+
+    def proccess(self):
+        if not exist(self.serial, Leonard.BG_JUMP.value, threshold=0.8):
+            raise GameError("Something wrong in upgrade success interrupt handling")
+        
+        self.pull_ranger_up()
+        self.handle_end()

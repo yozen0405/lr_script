@@ -99,7 +99,7 @@ class LoginStrategy(ABC):
             return LoginState.LINE_APP_PAGE
         elif exist(self.serial, GameView.LOADING.value):
             return LoginState.LOADING_PAGE
-        elif is_on_main_view(self.serial):
+        elif is_on_main_view(self.serial): # or pre stage
             return LoginState.IN_GAME
         else:
             return LoginState.UNKNOWN
@@ -135,14 +135,7 @@ class LoginStrategy(ABC):
         return False
 
     def handle_login_page(self):
-        if exist_click(self.serial, GameView.GUEST_LOGIN_BTN.value, threshold=0.9):
-            pass
-
-        if exist_click(self.serial, GameView.PLAY_BTN.value):
-            pass
-        
-        if exist_click(self.serial, GameView.LOGIN_LINE.value):
-            pass
+        pass
 
     def handle_retry(self):
         if exist(self.serial, Retry.TEXT1.value):
@@ -167,6 +160,16 @@ class GuestLoginStrategy(LoginStrategy):
     def __init__(self, serial):
         super().__init__(serial)
 
+    def handle_login_page(self):
+        if exist_click(self.serial, GameView.GUEST_LOGIN_BTN.value, threshold=0.9):
+            pass
+
+        if exist_click(self.serial, GameView.PLAY_BTN.value):
+            pass
+        
+        if exist_click(self.serial, GameView.LOGIN_LINE.value):
+            pass
+
     def handle_line_app_page(self) -> LoginState:
         force_close_line(self.serial, timeout=3.0)
         
@@ -177,6 +180,13 @@ class GuestLoginStrategy(LoginStrategy):
 class LineLoginStrategy(LoginStrategy):
     def __init__(self, serial):
         super().__init__(serial)
+
+    def handle_login_page(self):
+        if exist_click(self.serial, GameView.LOGIN_LINE.value, threshold=0.9):
+            pass
+
+        if exist_click(self.serial, GameView.PLAY_BTN.value):
+            pass
 
     def handle_line_app_page(self) -> LoginState:
         wait(self.serial, GameView.LINE_APP_TEXT_2.value, threshold=0.9)

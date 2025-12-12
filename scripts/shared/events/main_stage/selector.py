@@ -19,6 +19,9 @@ class MainStageTask:
         config = Config()
         self.team_num = config.get_team_num()
 
+    def on_page(self) -> bool:
+        return self.base_stage.on_page()
+
     def enter_menu(self):
         self.base_stage.enter_menu()
 
@@ -38,9 +41,11 @@ class MainStageTask:
         cls = stage_map.get(stage_num, MainStageHooks)
         return cls(self.ctx.serial)
 
-    def _proccess_stage(self, custom_stage: Optional[int] = None) -> MainStageHooks:
+    def _find_stage(self, custom_stage: Optional[int] = None) -> int:
         stage_num = self.base_stage.enter_stage(custom_stage=custom_stage)
-        self.ctx.current_stage_num = stage_num
+        return stage_num
+    
+    def _get_hooks(self, stage_num: int) -> MainStageHooks:
         hooks = self._get_hook_class(stage_num)
         return hooks
     
@@ -48,7 +53,8 @@ class MainStageTask:
         if is_first:
             self.team_num = 1
         self.base_stage.enter_menu()
-        hooks = self._proccess_stage(custom_stage=custom_stage)
+        stage_num = self._find_stage(custom_stage=custom_stage)
+        hooks = self._get_hooks(stage_num)
 
         if self.ctx.max_main_stage_num is not None:
             if self.ctx.current_stage_num > self.ctx.max_main_stage_num:
@@ -56,8 +62,12 @@ class MainStageTask:
                 self.leave_menu()
                 return
 
-        current_stage = BaseMainStage(self.ctx.serial, hooks=hooks, is_low=self.is_low, team_num=self.team_num)
+        current_stage = BaseMainStage(self.ctx, hooks=hooks, is_low=self.is_low, team_num=self.team_num, stage=stage_num, is_first=is_first)
         current_stage.enter_battle(multiplier=multiplier)
+
+def on_main_stage_page(context: GameContext) -> bool:
+    main_stage_task = MainStageTask(context)
+    return main_stage_task.on_page()
 
 def main_stage_finish_new(context: GameContext):
     main_stage_task = MainStageTask(context)

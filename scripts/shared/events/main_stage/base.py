@@ -14,7 +14,7 @@ from scripts.shared.events.main_stage.hooks import MainStageHooks
 from scripts.shared.controller.context import GameContext
 
 class BaseMainStage:
-    def __init__(self, context: GameContext, hooks=None, is_low=True, team_num=1):
+    def __init__(self, context: GameContext, hooks=None, is_low=True, team_num=1, stage=None, is_first=False):
         self.ctx = context
         self.MEMBER3_POS = Positions.MEMBER3.value
         self.MEMBER4_POS = Positions.MEMBER4.value
@@ -22,8 +22,14 @@ class BaseMainStage:
         self.finder = MainStageFinder(self.ctx.serial)
         self.is_low = is_low
         self.team_num = team_num
+        self.stage = stage
+        self.is_first = is_first
+
         self.hooks = hooks or MainStageHooks(self.ctx.serial)
         self.helper = MainStageHelper(self.ctx.serial)
+
+    def on_page(self) -> bool:
+        return self.helper.on_page()
 
     def enter_menu(self):
         if self.helper.is_clear():
@@ -83,41 +89,46 @@ class BaseMainStage:
         raise GameError("無法離開主要關卡選單")
 
              
-    def _battle_loop(self, timeout=300) -> bool:
+    def _battle_loop(self, timeout=600) -> bool:
         start_time = time.time()
 
+        retry_time = 0
         while time.time() - start_time < timeout:
             if exist(self.ctx.serial, Settlement.TEXT.value, threshold=0.9):
                 return
 
             if exist(self.ctx.serial, Retry.TEXT1.value) or exist(self.ctx.serial, Retry.TEXT2.value):
                 exist_click(self.ctx.serial, Retry.BTN.value)
+                retry_time += 1
+                if retry_time >= 5:
+                    break
                 continue
 
             if exist(self.ctx.serial, Battle.START.value):
                 wait_click(self.ctx.serial, Battle.START.value)
                 continue
 
-            if not exist(self.ctx.serial, Battle.AUTO_BTN_ON.value):
+            if self.stage < 13 and self.is_first:
                 wait_click(self.ctx.serial, self.MEMBER3_POS)
                 wait_click(self.ctx.serial, self.MEMBER4_POS)
                 continue
             
             if exist(self.ctx.serial, Battle.PAUSE.value, threshold=0.9):
                 self.hooks.on_start_page(self)
+        raise GameError("戰鬥超時")
                 
 
     def enter_battle(self, multiplier: int):
         log_msg(self.ctx.serial, "Main Stage 戰鬥開始")
 
         self.hooks.on_pre_start_page_prev(self)
-        self.hooks.handle_auto_btn(ctx=self)
-        self.hooks.handle_multiplier(times=multiplier, ctx=self)
+        self.hooks.handle_auto_btn(base=self)
+        self.hooks.handle_multiplier(times=multiplier, base=self)
         
-        self.hooks.handle_team_num(ctx=self)
+        self.hooks.handle_team_num(base=self)
 
         wait_click(self.ctx.serial, Battle.NEXT.value, timeout=3.0)
-        self.hooks.on_pre_start_page_next(ctx=self)
+        self.hooks.on_pre_start_page_next(base=self)
 
         self._battle_loop()
 
@@ -131,9 +142,12 @@ class BaseMainStage:
         for _ in range(3):
             wait_click(self.ctx.serial, self.MEMBER4_POS)
 
-        cnt = 0
-        while True:
-            for item in self.hooks.settlement_items(ctx=self):
+        self.ctx.current_stage_num = self.stage
+
+        start_time = time.time()    
+
+        while time.time() - start_time < 240.0:
+            for item in self.hooks.settlement_items(base=self):
                 if isinstance(item, tuple):
                     img, threshold = item
                     exist_click(self.ctx.serial, img, threshold=threshold, wait_time=1.5)
@@ -143,13 +157,12 @@ class BaseMainStage:
             if exist(self.ctx.serial, Retry.TEXT1.value):
                 exist_click(self.ctx.serial, Retry.BTN.value)
 
-            self.hooks.on_settlement_page(ctx=self)
-            self.hooks.on_settlement_next_feature(ctx=self)
+            self.hooks.on_settlement_page(base=self)
+            self.hooks.on_settlement_next_feature(base=self)
 
             if exist(self.ctx.serial, MainView.CLOSE_BOARD.value):
                 if exist(self.ctx.serial, Retry.TEXT1.value) or exist(self.ctx.serial, Retry.TEXT2.value):
                     exist_click(self.ctx.serial, Retry.BTN.value)
-                    cnt += 1
                 else:
                     return
 
@@ -158,6 +171,4 @@ class BaseMainStage:
                     return
             if exist(self.ctx.serial, MainStage.TEXT.value, threshold=0.9):
                 return
-            
-            if cnt >= 5:
-                raise GameError("無法完成結算")
+        raise GameError("結算超時")

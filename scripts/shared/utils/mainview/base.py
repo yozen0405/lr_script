@@ -15,75 +15,80 @@ from scripts.shared.constants import MainView
 from scripts.shared.events.special_stage.enum import SpecialStage
 from scripts.shared.utils.mainview.interrupt.dimmed.base import DimmedStrategy
 from scripts.shared.utils.mainview.interrupt.no_avatar.base import NoAvatarStrategy
-from scripts.shared.utils.mainview.interrupt.retry.base import RetryStrategy
-from scripts.shared.utils.mainview.interrupt.base import BaseStrategy
+from scripts.shared.controller.context import GameContext
+from scripts.shared.events.pre_stage.base import on_pre_stage_page
+from scripts.shared.events.main_stage.selector import on_main_stage_page
 
-# 目標進入到mainview以外的(若遊戲強制)介面，若否則停留在mainview
-
-class MainViewHandler(BaseStrategy):
-    def __init__(self, serial):
-        self.serial = serial
+class MainViewHandler():
+    def __init__(self, context: GameContext):
+        self.ctx = context
         
-        # 原則:有影響到我們的目標(例如在new acc就是打main stage), 就直接視為interrupt
-        # 不管是點sheep要升級什麼的都算interrupt
-        self.interrupt_strategies: dict[MainViewState, BaseStrategy] = {
-            MainViewState.DIMMED: DimmedStrategy(serial),
-            MainViewState.NO_AVATAR: NoAvatarStrategy(serial),
-            MainViewState.RETRY: RetryStrategy(serial),
-        }
+        self.dimmed_strategy = DimmedStrategy(self.ctx)
+        self.no_avatar_strategy = NoAvatarStrategy(self.ctx)
 
-    def _detect_state(self) -> MainViewState:
-        if exist(self.serial, MainView.AVATAR.value, threshold=0.95):
-            loc = get_pos(self.serial, MainView.AVATAR.value, threshold=0.95, return_center=False)
-            if check_region_brightness(self.serial, region=loc):
-                return MainViewState.CLEAR
-            else:
-                return MainViewState.DIMMED
-            
-        if self.interrupt_strategies[MainViewState.NO_AVATAR].check():
-            return MainViewState.NO_AVATAR
-        
-        if self.interrupt_strategies[MainViewState.RETRY].check():
-            return MainViewState.RETRY
-        
-        return MainViewState.UNKNOWN
+    def on_page(self) -> bool:
+        if exist(self.ctx.serial, MainView.AVATAR.value, threshold=0.95):
+            return True
+        if self.no_avatar_strategy.handle_supported():
+            return True
+        if on_pre_stage_page(self.ctx):
+            return True
+        return False
 
-    def check(self):
-        current_state = self._detect_state()
-
-        if current_state == MainViewState.UNKNOWN:
-            return False
-        
-        if current_state == MainViewState.RETRY:
-            return False
-       
-        return True
-
-    def proccess(self, timeout=40.0):
+    def proccess(self, timeout=120.0) -> MainViewState:
         start_time = time.time()
-        unkwown_count = 0
+
+        if on_pre_stage_page(self.ctx):
+            return MainViewState.PRE_STAGE
+        
+        if on_main_stage_page(self.ctx):
+            return MainViewState.MAIN_STAGE
+
+        prev_state = None
+        cnt = 0 # the time that stable state maintained
+        max_cnt = 3
+
+        def update_state(state: MainViewState):
+            nonlocal prev_state, cnt, max_cnt
+            if state == MainViewState.NONE or \
+               state == MainViewState.UNKNOWN:
+                max_cnt = 3
+            else:
+                max_cnt = 2
+
+            if prev_state != state:
+                prev_state = state
+                cnt = 0
+            else:
+                cnt += 1
         
         while time.time() - start_time < timeout:
-            current_state = self._detect_state()
-            log_msg(self.serial, f"[MainViewHandler] 當前狀態: {current_state.name}")
-
-            if current_state in self.interrupt_strategies:
-                handler = self.interrupt_strategies[current_state]
-                handler.proccess()
+            if cnt >= max_cnt:
+                return prev_state
+            
+            if exist(self.ctx.serial, Retry.TEXT1.value, threshold=0.8) or \
+                exist(self.ctx.serial, Retry.TEXT2.value, threshold=0.8):
+                exist_click(self.ctx.serial, Retry.BTN.value, threshold=0.8)
                 continue
-            
-            if current_state == MainViewState.CLEAR: # 目前來說是這樣
-                return
-            
-            if current_state == MainViewState.UNKNOWN:
-                time.sleep(1.0)
-                unkwown_count += 1
-                if unkwown_count >= 2:
-                    log_msg(self.serial, f"[MainViewHandler] 已經不在主畫面了，跳出")
-                    return
 
-        raise GameError(f"[MainViewHandler] 超過等待主畫面時間上限")
-        
+            if exist(self.ctx.serial, MainView.AVATAR.value, threshold=0.95):
+                loc = get_pos(self.ctx.serial, MainView.AVATAR.value, threshold=0.95, return_center=False)
+
+                if check_region_brightness(self.ctx.serial, region=loc):
+                    update_state(MainViewState.NONE)
+                    continue
+                elif self.dimmed_strategy.handle_supported():
+                    continue
+                else:
+                    update_state(self.dimmed_strategy.handle_event())
+                    continue
+                
+            if self.no_avatar_strategy.handle_supported():
+                continue
+            else:
+                update_state(MainViewState.UNKNOWN)
+                continue
+        return MainViewState.UNKNOWN
             
 def on_main_view(serial, timeout=150.0):
     handler = MainViewHandler(serial)
@@ -91,4 +96,4 @@ def on_main_view(serial, timeout=150.0):
 
 def is_on_main_view(serial) -> bool:
     handler = MainViewHandler(serial)
-    return handler.check()
+    return handler.on_page()

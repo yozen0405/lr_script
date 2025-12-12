@@ -11,46 +11,35 @@ from core.actions.screen import wait_click, exist_click, exist, wait
 from core.base.exceptions import GameError
 from scripts.shared.events.season_pass.enum import SeasonPassImg
 from scripts.shared.constants import MainView
-from scripts.shared.utils.mainview.interrupt.base import BaseStrategy
-from .enum import NoAvatarState
+from scripts.shared.controller.context import GameContext
 
-class NoAvatarStrategy(BaseStrategy):
+class NoAvatarStrategy():
     """
     cant find avatar
     """
-    def __init__(self, serial):
-        self.serial = serial
+    def __init__(self, context: GameContext):
+        self.ctx = context
 
-    def check(self) -> bool:
-        return self._detect_state() != NoAvatarState.UNKNOWN
-
-    def _detect_state(self) -> NoAvatarState:
-        if exist(self.serial, MainView.BOARD_DONT_SHOW.value, threshold=0.9):
-            return NoAvatarState.BOARD_DONT_SHOW
+    def handle_supported(self) -> bool:
+        if exist(self.ctx.serial, MainView.BOARD_DONT_SHOW.value, threshold=0.9):
+            wait_click(self.ctx.serial, MainView.BOARD_DONT_SHOW.value)
+            wait_click(self.ctx.serial, MainView.CLOSE_BOARD2.value)
+            return True
         
-        if exist(self.serial, MainView.BOARD_END.value, threshold=0.95) and exist(self.serial, MainView.CLOSE_BOARD2.value, threshold=0.9):
-            return NoAvatarState.BOARD_END
+        if exist(self.ctx.serial, MainView.BOARD_END.value, threshold=0.95) and exist(self.ctx.serial, MainView.CLOSE_BOARD2.value, threshold=0.9):
+            wait_click(self.ctx.serial, MainView.CLOSE_BOARD2.value)
+            return True
         
-        if exist(self.serial, MainView.COMEBACK.value, threshold=0.99):
-            return NoAvatarState.COMEBACK
+        if exist(self.ctx.serial, MainView.COMEBACK.value, threshold=0.99):
+            wait_click(self.ctx.serial, MainView.CLOSE_BOARD2.value)
+            return True
         
-        if exist(self.serial, MainView.SPECIAL_OFFERS.value, threshold=0.99):
-            return NoAvatarState.SPECIAL_OFFERS
+        if exist(self.ctx.serial, MainView.SPECIAL_OFFERS.value, threshold=0.99):
+            wait_click(self.ctx.serial, MainView.CLOSE_BOARD2.value)
+            return True
     
-        if exist(self.serial, MainView.BUFF_EVENT.value, threshold=0.9):
-            return NoAvatarState.BUFF_EVENT
-        
-        return NoAvatarState.UNKNOWN
+        if exist(self.ctx.serial, MainView.BUFF_EVENT.value, threshold=0.9):
+            wait_click(self.ctx.serial, MainView.CLOSE_BOARD2.value)
+            return True
+        return False
     
-    def proccess(self):
-        state = self._detect_state()
-
-        if state == NoAvatarState.BOARD_DONT_SHOW:
-            wait_click(self.serial, MainView.BOARD_DONT_SHOW.value)
-            wait_click(self.serial, MainView.CLOSE_BOARD2.value)
-            return
-        
-        if state in [NoAvatarState.BOARD_END, NoAvatarState.COMEBACK, 
-                     NoAvatarState.SPECIAL_OFFERS, NoAvatarState.BUFF_EVENT]:
-            wait_click(self.serial, MainView.CLOSE_BOARD2.value)
-            return

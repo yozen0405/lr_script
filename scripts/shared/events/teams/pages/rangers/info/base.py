@@ -10,7 +10,6 @@ from typing import Optional, Tuple
 from scripts.shared.events.main_stage.enum import MainStage
 from scripts.shared.events.teams.enum import TeamsImg
 from scripts.shared.constants.leonard import Leonard
-from scripts.shared.controller.enum import TaskStatus
 from scripts.shared.controller.context import GameContext
 import time
 
@@ -63,7 +62,7 @@ class RangerInfoPage():
                 return True
         raise GameError("Talent animation handling timed out.")
 
-    def _on_rene_event(self):
+    def on_event(self):
         if not self.on_page():
             raise GameError("Not on ranger info page.")
 
@@ -144,10 +143,10 @@ class RangerInfoPage():
         raise GameError("Cannot enter ranger upgrade page.")
 
     def _get_loc(self) -> Optional[Tuple[int, int]]:
-        loc = get_pos(self.ctx.serial, TeamsImg.POP_UP_BASIC_NAV_LIGHT.value, threshold=0.95)
+        loc = get_pos(self.ctx.serial, TeamsImg.POP_UP_BASIC_NAV_LIGHT.value, threshold=0.95, return_center=False)
         if loc:
             return loc
-        loc = get_pos(self.ctx.serial, TeamsImg.POP_UP_BASIC_NAV_DARK.value, threshold=0.95)
+        loc = get_pos(self.ctx.serial, TeamsImg.POP_UP_BASIC_NAV_DARK.value, threshold=0.95, return_center=False)
         if loc:
             return loc
         return None

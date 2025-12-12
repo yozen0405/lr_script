@@ -7,3 +7,4 @@ class GameContext:
     serial: str
     max_main_stage_num: int = None
     current_stage_num: int = None
+    pulled_rangers: list[str] = None

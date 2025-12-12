@@ -11,12 +11,13 @@ from scripts.shared.events.teams.enum import GearImg, WeaponType, EnhancePageImg
 from scripts.shared.constants.leonard import Leonard
 from scripts.shared.events.teams.enum import TeamsImg
 from scripts.shared.events.teams.pages.gears.main.base import GearsMainPage
+from scripts.shared.controller.context import GameContext
 import time
 
 class GearBase:
-    def __init__(self, serial):
-        self.serial = serial
-        self.gears_main_page = GearsMainPage(serial)
+    def __init__(self, context: GameContext):
+        self.ctx = context
+        self.gears_main_page = GearsMainPage(context)
 
         self.FILTER_POS = (1106, 108)
         self.FILTER_GRADE_DESC = (1076, 236)
@@ -26,62 +27,63 @@ class GearBase:
     def find_gear(self):
         start_time = time.time()
         while time.time() - start_time < 120.0:
-            if exist_click(self.serial, WeaponType.WAND.value, threshold=0.95):
-                log_msg(self.serial, "找到裝備")
+            if exist_click(self.ctx.serial, WeaponType.WAND.value, threshold=0.95):
+                log_msg(self.ctx.serial, "找到裝備")
                 continue
 
-            if exist_click(self.serial, EnhancePageImg.BTN.value):
+            if exist_click(self.ctx.serial, EnhancePageImg.BTN.value):
                 continue
 
-            if exist(self.serial, EnhancePageImg.TEXT.value):
+            if exist(self.ctx.serial, EnhancePageImg.TEXT.value):
                 return True
 
-            drag(self.serial, self.DRAG_START_POS, self.DRAG_END_POS)
+            drag(self.ctx.serial, self.DRAG_START_POS, self.DRAG_END_POS)
         return False
     
     def enhance_gear(self):
-        if not wait(self.serial, EnhancePageImg.TEXT.value):
-            raise GameError(self.serial, "未進入強化頁面")
+        if not wait(self.ctx.serial, EnhancePageImg.TEXT.value):
+            raise GameError(self.ctx.serial, "未進入強化頁面")
 
-        if not exist(self.serial, GearImg.FILTER_GRADE_DESC.value, threshold=0.99):
-            wait_click(self.serial, self.FILTER_POS)
-            wait_click(self.serial, self.FILTER_GRADE_DESC)
+        if not exist(self.ctx.serial, GearImg.FILTER_GRADE_DESC.value, threshold=0.99):
+            wait_click(self.ctx.serial, self.FILTER_POS)
+            wait_click(self.ctx.serial, self.FILTER_GRADE_DESC)
 
-        if not exist(self.serial, GearImg.FILTER_GRADE_DESC.value):
-            raise GameError(self.serial, "無法開啟稀有度篩選")
+        if not exist(self.ctx.serial, GearImg.FILTER_GRADE_DESC.value):
+            raise GameError(self.ctx.serial, "無法開啟稀有度篩選")
 
-        wait_click(self.serial, EnhancePagePos.GEAR1.value)
-        if not exist(self.serial, EnhancePageImg.CHECKED.value):
-            raise GameError(self.serial, "無法選擇裝備")
+        wait_click(self.ctx.serial, EnhancePagePos.GEAR1.value)
+        if not exist(self.ctx.serial, EnhancePageImg.CHECKED.value):
+            raise GameError(self.ctx.serial, "無法選擇裝備")
         
         suc = False
         while True:
-            if exist_click(self.serial, EnhancePageImg.SUCCESS_TEXT.value):
-                if wait_vanish(self.serial, EnhancePageImg.SUCCESS_TEXT.value):
-                    log_msg(self.serial, "強化完成")
-                    suc = True
+            if exist_click(self.ctx.serial, EnhancePageImg.SUCCESS_TEXT.value):
+                log_msg(self.ctx.serial, "強化完成")
+                suc = True
+                continue
 
-            if suc == True and exist(self.serial, EnhancePageImg.TEXT.value):
+            if suc == True and exist(self.ctx.serial, EnhancePageImg.TEXT.value):
                 break
 
-            if exist(self.serial, EnhancePageImg.UPGRADE_TEXT.value):
-                wait_click(self.serial, Confirm.SMALL.value)
+            if exist(self.ctx.serial, EnhancePageImg.UPGRADE_TEXT.value):
+                wait_click(self.ctx.serial, Confirm.SMALL.value)
+                continue
             
-            if exist_click(self.serial, EnhancePageImg.ENHANCE.value):
+            if exist_click(self.ctx.serial, EnhancePageImg.ENHANCE.value):
                 pass
         
     def do_filter(self):
         pass
 
-    def handle_event(self):
+    def on_event(self):
         self.gears_main_page.handle_event()
 
     def run(self):
         self.find_gear()
         self.enhance_gear()
 
-        wait_click(self.serial, MainView.BACK.value)
-        connection_retry(self.serial, vanish=[(EnhancePageImg.TEXT.value, 0.95)], retry=MainView.BACK.value)
-        wait_click(self.serial, MainView.BACK.value)
-        connection_retry(self.serial, vanish=[(GearImg.TEXT.value, 0.95)], retry=MainView.BACK.value)
+        wait_click(self.ctx.serial, MainView.BACK.value)
+        connection_retry(self.ctx.serial, vanish=[(EnhancePageImg.TEXT.value, 0.95)], retry=MainView.BACK.value)
+        wait_click(self.ctx.serial, MainView.BACK.value)
+        connection_retry(self.ctx.serial, vanish=[(GearImg.TEXT.value, 0.95)], retry=MainView.BACK.value)
         

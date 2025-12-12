@@ -10,7 +10,6 @@ from scripts.shared.events.teams.enum import TeamsImg
 from scripts.shared.constants.leonard import Leonard
 from scripts.shared.events.teams.pages.rangers.teams.interrupt.leonard_bg_happy import LeonardBgHappyStrategy
 from scripts.shared.events.teams.pages.rangers.teams.interrupt.other import OtherStrategy
-from scripts.shared.controller.enum import TaskStatus
 from scripts.shared.controller.context import GameContext
 import time
 
@@ -29,7 +28,7 @@ class TeamsPage():
     def on_interrupt(self) -> bool:
         if not self.on_page():
             return False
-        loc = get_pos(self.ctx.serial, TeamsImg.SELL_BTN.value, threshold=0.95)
+        loc = get_pos(self.ctx.serial, TeamsImg.SELL_BTN.value, threshold=0.95, return_center=False)
         if not check_region_brightness(self.ctx.serial, region=loc, threshold=45):
             return True
         return False
