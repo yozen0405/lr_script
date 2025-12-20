@@ -49,35 +49,42 @@ class MainStageTask:
         hooks = self._get_hook_class(stage_num)
         return hooks
     
+    def on_event(self):
+        self.battle(is_first=True)
+        self.leave_menu()
+    
     def battle(self, custom_stage: Optional[int] = None, multiplier: int = 1, is_first: bool = False):
         if is_first:
             self.team_num = 1
-        self.base_stage.enter_menu()
+        if self.base_stage.enter_menu():
+            return
         stage_num = self._find_stage(custom_stage=custom_stage)
         hooks = self._get_hooks(stage_num)
 
         if self.ctx.max_main_stage_num is not None:
-            if self.ctx.current_stage_num > self.ctx.max_main_stage_num:
-                log_msg(self.ctx.serial, f"[MainStageTask] 當前關卡 {self.ctx.current_stage_num} 超過設定的最大關卡 {self.ctx.max_main_stage_num}，停止挑戰。")
+            if stage_num > self.ctx.max_main_stage_num:
+                self.ctx.current_stage_num = stage_num - 1
+                log_msg(self.ctx.serial, f"[MainStageTask] 當前關卡 {stage_num} 超過設定的最大關卡 {self.ctx.max_main_stage_num}，停止挑戰。")
                 self.leave_menu()
                 return
 
         current_stage = BaseMainStage(self.ctx, hooks=hooks, is_low=self.is_low, team_num=self.team_num, stage=stage_num, is_first=is_first)
-        current_stage.enter_battle(multiplier=multiplier)
+        current_stage.enter_battle(multiplier=multiplier, timeout=120 if is_first else 600)
 
 def on_main_stage_page(context: GameContext) -> bool:
     main_stage_task = MainStageTask(context)
     return main_stage_task.on_page()
 
+def on_main_stage_event(context: GameContext):
+    main_stage_task = MainStageTask(context)
+    main_stage_task.on_event()
+
 def main_stage_finish_new(context: GameContext):
     main_stage_task = MainStageTask(context)
     main_stage_task.battle(is_first=True)
 
-def main_stage_enter_menu(context: GameContext):
-    main_stage_task = MainStageTask(context)
-    main_stage_task.enter_menu()
-
-def main_stage_finish_custom(context: GameContext, custom_stage: int, multiplier: int = 1):
+def main_stage_finish_custom(context: GameContext, custom_stage: int, multiplier: int = 1, leave_menu: bool = False):
     main_stage_task = MainStageTask(context)
     main_stage_task.battle(custom_stage=custom_stage, multiplier=multiplier)
-
+    if leave_menu:
+        main_stage_task.leave_menu()

@@ -24,12 +24,13 @@ class MainStageHelper:
             return True
         return False
 
-    def handle_treasure(self):
+    def handle_treasure(self) -> bool:
         if not exist(self.serial, Leonard.DIALOGUE_TAG.value, threshold=0.9):
-            return
+            return False
         wait_click(self.serial, Treasure.ICON.value)
         connection_retry(self.serial, appear=[(Treasure.TEXT.value, 0.9)], timeout=30.0)
         wait_click(self.serial, MainView.SKIP.value)
         wait_click(self.serial, Confirm.SMALL.value)
         wait_click(self.serial, MainView.BACK.value)
         connection_retry(self.serial, vanish=[(Treasure.TEXT.value, 0.9)], timeout=30.0)
+        return True

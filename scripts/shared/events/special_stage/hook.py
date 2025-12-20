@@ -32,4 +32,10 @@ class SpecialStageHooks:
             return
         if exist_click(self.serial, SpecialStage.TEAM_NUM_ON(num=ctx.team_num), threshold=0.99):
             return
-        exist_click(self.serial, SpecialStage.TEAM_NUM_OFF(num=ctx.team_num), threshold=0.9)
+        elif exist_click(self.serial, SpecialStage.TEAM_NUM_OFF(num=ctx.team_num), threshold=0.9):
+            return
+        elif not exist_click(self.serial, SpecialStage.TEAM_NUM_ON(num=1), threshold=0.9):
+            raise GameError("無法設定隊伍人數")
+        
+    def handle_auto_btn(self, base):
+        exist_click(self.serial, MainStage.AUTO_BTN_HIGH_OFF.value, threshold=0.99)

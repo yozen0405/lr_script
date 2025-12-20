@@ -28,33 +28,37 @@ class TeamsPage():
     def on_interrupt(self) -> bool:
         if not self.on_page():
             return False
-        loc = get_pos(self.ctx.serial, TeamsImg.SELL_BTN.value, threshold=0.95, return_center=False)
-        if not check_region_brightness(self.ctx.serial, region=loc, threshold=45):
+        loc = get_pos(self.ctx.serial, TeamsImg.TOTAL_TEXT.value, threshold=0.9, return_center=False)
+        if loc and not check_region_brightness(self.ctx.serial, region=loc, threshold=50):
             return True
         return False
     
-    def on_jessica_event(self):
-        self.leonard_bg_happy_strategy.proccess()
-
-    def enter_menu(self):
+    def _enter_menu(self):
         if not self.on_page():
             if exist_click(self.ctx.serial, TeamsImg.BTN.value, threshold=0.9):
                 connection_retry(self.ctx.serial, vanish=TeamsImg.BTN.value, retry=TeamsImg.BTN.value, timeout=40.0)
             else:
                 raise GameError("Not on teams page.")
+    
+    def on_jessica_event(self):
+        self._enter_menu()
+        self.leonard_bg_happy_strategy.proccess()
+
+    def enter_menu(self):
+        self._enter_menu()
 
         if self.on_interrupt():
             if not self.other_strategy.proccess():
-                raise GameError("Cannot resolve interrupt in teams page.")
-
+                raise GameError("Failed to handle interrupt in teams page.")
+        
     def leave_menu(self):
         if not self.on_page():
             return
         
         if self.on_interrupt():
             if not self.other_strategy.proccess():
-                raise GameError("Cannot resolve interrupt in teams page.")
-
+                raise GameError("Failed to handle interrupt in teams page.")
+            
         if not exist_click(self.ctx.serial, MainView.BACK.value):
             raise GameError("Cannot exit teams page.")
         connection_retry(self.ctx.serial, vanish=(TeamsImg.TEXT.value, 0.9), timeout=40.0)

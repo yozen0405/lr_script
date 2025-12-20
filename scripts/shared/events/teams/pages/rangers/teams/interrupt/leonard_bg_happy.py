@@ -30,10 +30,10 @@ class LeonardBgHappyStrategy():
 
             if exist_click(self.serial, Leonard.BG_HAPPY.value, threshold=0.8):
                 if exist(self.serial, TeamsImg.ARRANGE_DIALOGUE_UP.value, threshold=0.9):
-                    drag(self.serial, (641, 285), (182, 576))
+                    drag(self.serial, (182, 576), (641, 285), duration=500, wait_time=1.0)
                     continue
                 elif exist(self.serial, TeamsImg.ARRANGE_DIALOGUE_DOWN.value, threshold=0.9):
-                    drag(self.serial, (182, 576), (641, 285))
+                    drag(self.serial, (641, 285), (182, 576), duration=500, wait_time=1.0)
                     continue
                 continue
 

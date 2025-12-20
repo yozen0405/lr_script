@@ -30,6 +30,7 @@ class TeamsImg(Enum):
     RENE_MAINVIEW = "rene.png"
     SHEEP_MAINVIEW = "sheep.png"
     RENE_UPGRADE_TEXT = "rene_level_up_text.png"
+    TOTAL_TEXT = "team_total_text.png"
 
 class GearImg(Enum):
     BTN = "rene_go_equip.png"

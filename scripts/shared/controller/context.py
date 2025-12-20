@@ -8,3 +8,4 @@ class GameContext:
     max_main_stage_num: int = None
     current_stage_num: int = None
     pulled_rangers: list[str] = None
+    complete_special_stage: bool = None

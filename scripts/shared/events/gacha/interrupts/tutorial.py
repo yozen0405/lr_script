@@ -22,7 +22,7 @@ class TutorialStrategy:
         for _ in range(5):
             wait_click(self.ctx.serial, GachaImg.TEXT.value)
 
-        wait_click(self.ctx.serial, GachaImg.GEAR_NAV.value, threshold=0.9)
+        wait_click(self.ctx.serial, GachaImg.GEAR_NAV.value)
         wait_click(self.ctx.serial, GachaImg.TEXT.value, threshold=0.9)
         wait_click(self.ctx.serial, (1024, 583), wait_time=1.0)
 

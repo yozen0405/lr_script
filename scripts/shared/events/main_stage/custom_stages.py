@@ -14,10 +14,8 @@ class FirstStage(MainStageHooks):
         wait_click(self.serial, MainStage.METEOR.value, threshold=0.5)
 
     def on_start_page(self, base: BaseMainStage):
-        exist_click(self.serial, MainStage.METEOR_TEXT.value, threshold=0.9)
-
-    def settlement_items(self, base: BaseMainStage):
-        return [Settlement.ONE_REWARD.value, Confirm.BIG1.value,Confirm.BIG2.value]
+        if exist(self.serial, MainStage.METEOR_TEXT.value, threshold=0.9):
+            wait_click(self.serial, base.METEOR)
 
 class SecondStage(MainStageHooks):
     def on_settlement_page(self):
@@ -50,11 +48,15 @@ class FriendStage(MainStageHooks):
             wait_click(self.serial, base.FRIEND)
 
         if exist_click(self.serial, MainView.SKIP.value):
-            exist_click(self.serial, Confirm.SMALL.value)
+            wait_click(self.serial, Confirm.SMALL.value, timeout=3.0)
 
     def on_pre_start_page_next(self, base: BaseMainStage):
         if wait_click(self.serial, MainView.SKIP.value, timeout=5.0):
             wait_click(self.serial, Confirm.SMALL.value, wait_time=1.0)
         wait_click(self.serial, MainView.SKIP.value, timeout=5.0, wait_time=1.0)
-        (x, y) = get_pos(self.serial, MainStage.JAMES_FRIEND.value)
+        loc = get_pos(self.serial, MainStage.JAMES_FRIEND.value)
+        if loc is not None:
+            x, y = loc
+        else:
+            raise GameError("無法找到好友位置")
         wait_click(self.serial, (x, y - 50), wait_time=1.0)

@@ -26,7 +26,7 @@ class MainStageHooks:
         pass
 
     def on_settlement_next_feature(self, base):
-        if not wait_click(self.serial, MainStage.NEXT_FEATURE.value, timeout=3.0):
+        if not exist(self.serial, MainStage.NEXT_FEATURE.value):
             return
         wait_click(self.serial, Settlement.AGAIN.value, wait_time=1.2)
         wait_click(self.serial, Settlement.NEXT.value)
@@ -59,7 +59,10 @@ class MainStageHooks:
                 return
             if exist_click(self.serial, MainStage.TEAM_NUM_LOW_ON(num=base.team_num), threshold=0.999):
                 return
-            exist_click(self.serial, MainStage.TEAM_NUM_LOW_OFF(num=base.team_num), threshold=0.9)
+            elif exist_click(self.serial, MainStage.TEAM_NUM_LOW_OFF(num=base.team_num), threshold=0.9):
+                return
+            elif not exist_click(self.serial, MainStage.TEAM_NUM_LOW_ON(num=1), threshold=0.9):
+                raise GameError("無法設定隊伍人數")
         else:
             if not exist_click(self.serial, MainStage.TEAM_BTN_HIGH.value):
                 return
@@ -80,5 +83,6 @@ class MainStageHooks:
             (Confirm.BIG2.value, 0.9),
             Settlement.ONE_REWARD.value,
             (Confirm.SMALL2.value, 0.9),
-            Settlement.STOP.value
+            Settlement.STOP.value,
+            (MainStage.SETTLEMENT.value, 0.9)
         ]

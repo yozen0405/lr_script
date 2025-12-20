@@ -158,7 +158,8 @@ class GuildRaid:
         exist_click(self.serial, Guild.AUTO_BTN_OFF.value, threshold=0.999)
         wait_click(self.serial, Guild.RAID_ATTACK.value)
 
-        while True:
+        start_time = time.time()
+        while time.time() - start_time < 120.0:
             if exist(self.serial, Guild.RAID_LIMITED.value):
                 exist_click(self.serial, Confirm.CANCEL.value, wait_time=1.0)
                 wait_click(self.serial, MainView.BACK.value)
@@ -172,8 +173,8 @@ class GuildRaid:
                 exist_click(self.serial, Confirm.SMALL.value, wait_time=1.0)
                 wait(self.serial, Guild.RAID_ATTACK.value)
             if exist(self.serial, Battle.PAUSE.value):
-                break
-        return True
+                return True
+        raise GameError("進入公會副本失敗")
 
     def raid_run(self, side: int = 1):
         log_msg(self.serial, "公會副本任務開始")

@@ -3,7 +3,7 @@ from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanis
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.hacks import apply_mode
 from core.base.exceptions import GameError
-from scripts.shared.constants import Settlement, Battle, Confirm, MainView, Leonard, Retry, Positions
+from scripts.shared.constants import Settlement, GameView, Battle, Confirm, MainView, Leonard, Retry, Positions
 from scripts.shared.events.teams.enum import TeamsImg
 from scripts.shared.events.pre_stage.enum import PreStageImg
 from scripts.shared.controller.context import GameContext
@@ -70,6 +70,8 @@ class PreStage():
                 return
             if exist_click(self.ctx.serial, MainView.SKIP.value):
                 wait_click(self.ctx.serial, Confirm.SMALL.value)
+            if exist(self.ctx.serial, GameView.ICON.value, threshold=0.9):
+                break
         raise GameError("前置關卡超時")
 
     def run(self):

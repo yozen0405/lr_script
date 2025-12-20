@@ -41,16 +41,14 @@ class UpgradeGuideStrategy():
     def handle_end(self):
         start_time = time.time()
         while time.time() - start_time < 30.0:
-            if not exist(self.serial, TeamsImg.LVL_UP_PAGE_TEXT.value, threshold=0.9):
-                return
-            
             if exist(self.serial, Retry.TEXT1.value, threshold=0.9) or exist(self.serial, Retry.TEXT2.value, threshold=0.9):
                 wait_click(self.serial, Retry.BTN.value)
                 continue
+                 
+            if not exist(self.serial, TeamsImg.LVL_UP_PAGE_TEXT.value, threshold=0.9):
+                return
         
             if exist_click(self.serial, MainView.SKIP.value):
-                continue
-            elif exist(self.serial, MainView.SKIP_TUTORIAL_TEXT.value, threshold=0.9):
                 wait_click(self.serial, Confirm.SMALL.value)
                 continue
             elif exist_click(self.serial, MainView.BACK.value):

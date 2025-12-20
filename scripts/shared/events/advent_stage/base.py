@@ -94,7 +94,12 @@ class BaseAdventStage:
             return False
 
         if wait_click(self.serial, Battle.ENTER.value, region=region, timeout=7.0, threshold=0.8):
-            wait_click(self.serial, difficulty)
+            if not wait_click(self.serial, difficulty):
+                if exist(self.serial, Advent.NOT_OPEN_TEXT.value, threshold=0.9):
+                    log_msg(self.serial, f"關卡 {boss} 未開放")
+                    wait_click(self.serial, Confirm.SMALL.value)
+                    return False
+                raise GameError("無法選擇關卡難度")
             connection_retry(self.serial, vanish=difficulty, timeout=40.0)
             return True
         else:

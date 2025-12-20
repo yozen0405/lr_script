@@ -16,45 +16,32 @@ class SpecialStageUtils:
         self.MEMBER4_POS = Positions.MEMBER4.value
         self.hooks = hooks
 
-    def _battle_loop(self, end_targets: list, auto_mode: bool = True, timeout=300) -> bool:
+    def _battle_loop(self, timeout=300) -> bool:
         start_time = time.time()
-        battle_started_trigger = False
         retry_count = 0
 
-        while True:
-            if time.time() - start_time > timeout:
-                log_msg(self.serial, "戰鬥等待超時")
-                return False
-
-            for target in end_targets:
-                if exist(self.serial, target, threshold=0.9):
-                    return True
-
+        while time.time() - start_time < timeout:
+            if exist(self.serial, MainStage.SETTLEMENT.value, threshold=0.9) or \
+                exist(self.serial, Settlement.LEVEL_UP_TEXT.value) or \
+                    exist(self.serial, Battle.LOOP_END_TEXT.value):
+                return
+            
             if exist(self.serial, Retry.TEXT1.value) or exist(self.serial, Retry.TEXT2.value):
-                log_msg(self.serial, "偵測到重試訊號，嘗試繼續")
-                exist_click(self.serial, Retry.BTN.value, wait_time=2.0)
+                wait_click(self.serial, Retry.BTN.value)
                 retry_count += 1
-                if retry_count >= 3:
-                    log_msg(self.serial, "重試次數過多")
-                    return False
+                if retry_count >= 20:
+                    break
                 continue
 
-            if exist(self.serial, Battle.START.value):
-                wait_click(self.serial, Battle.START.value)
+            if exist_click(self.serial, Battle.START.value):
+                state = 1
                 continue
+            elif state == 1:
+                state = 2
 
-            if exist(self.serial, Battle.PAUSE.value, threshold=0.9):
-                if not battle_started_trigger:
-                    log_msg(self.serial, "確認進入戰鬥/迴圈")
-                    self.hooks.on_start_page()
-                    battle_started_trigger = True
-                
-                if not auto_mode:
-                    self._combat_routine()
-
-    def _combat_routine(self):
-        wait_click(self.serial, self.MEMBER3_POS, threshold=0.8, wait_time=0.1)
-        wait_click(self.serial, self.MEMBER4_POS, threshold=0.8, wait_time=0.1)
+            if state == 2:
+                self.hooks.on_start_page()
+        raise GameError("戰鬥超時")
 
     def find_target_planet(self, planet: Optional[str] = None, crop_region: Optional[Tuple[int, int, int, int]] = None) -> None:
         if planet is None or planet == "":

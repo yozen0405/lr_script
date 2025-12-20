@@ -11,7 +11,7 @@ from scripts.shared.events.bingo.enum import Bingo, BingoAdPositions
 class BingoBase:
     def __init__(self, serial):
         self.serial = serial
-        self.BINGO_CLOSE_AD_LEN = 14
+        self.BINGO_CLOSE_AD_LEN = 3
 
     def enter_menu(self):
         if exist(self.serial, Bingo.TEXT.value):
@@ -118,11 +118,11 @@ class BingoBase:
         log_msg(self.serial,"賓果活動開始")
         self.enter_menu()
         self._claim_mission()
-        while self._do_random():
-            pass
+        # while self._do_random():
+        #     pass
         log_msg(self.serial, "賓果活動結束")
 
 def bingo_attempt(serial):
     bingo = BingoBase(serial)
-    # bingo.run()
-    bingo.fake_draw()
+    bingo.run()
+    # bingo.fake_draw()

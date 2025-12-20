@@ -28,10 +28,11 @@ class TeamsBase():
 
     def enter_menu(self):
         self.teams_page.enter_menu()
+        log_msg(self.ctx.serial, "Entered teams menu.")
 
     def on_upgrade_event(self):
-        if not exist_click(self.ctx.serial, TeamsImg.RENE_MAINVIEW.value, threshold=0.9, wait_time=1.0) and \
-           not exist_click(self.ctx.serial, TeamsImg.SHEEP_MAINVIEW.value, threshold=0.9, wait_time=1.0):
+        if not exist_click(self.ctx.serial, TeamsImg.RENE_MAINVIEW.value, wait_time=1.0) and \
+           not exist_click(self.ctx.serial, TeamsImg.SHEEP_MAINVIEW.value, wait_time=1.0):
             raise GameError("Not on Rene main view.")
         
         if exist(self.ctx.serial, TeamsImg.RENE_UPGRADE_TEXT.value, threshold=0.9):
@@ -42,7 +43,6 @@ class TeamsBase():
             self.gear_page.on_event()
     
     def on_team_event(self):
-        self.enter_menu()
         self.teams_page.on_jessica_event()
 
     def upgrade_ranger(self, type: int = 1):
@@ -63,10 +63,10 @@ class TeamsBase():
         self.ranger_info_page.leave_menu()
         self.teams_page.leave_menu()    
 
-def upgrade_ranger(context: GameContext):
+def upgrade_ranger(context: GameContext, type: int = 1):
     teams = TeamsBase(context)
     teams.enter_menu()
-    teams.upgrade_ranger()
+    teams.upgrade_ranger(type=type)
 
 def gear_enhance(context: GameContext):
     teams = TeamsBase(context)

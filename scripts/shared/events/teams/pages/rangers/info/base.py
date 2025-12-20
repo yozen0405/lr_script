@@ -80,7 +80,7 @@ class RangerInfoPage():
             if not self.on_page():
                 return
 
-            pos = find_spotlight_center(self.ctx.serial)
+            pos = find_spotlight_center(self.ctx.serial, region=(190, 428, 550, 675))
             if pos and Positions.is_in_region(pos, self.GEAR_REGION):
                 exist_click(self.ctx.serial, GearImg.BTN.value)
                 continue

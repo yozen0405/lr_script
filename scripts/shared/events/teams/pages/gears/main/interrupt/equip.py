@@ -16,7 +16,7 @@ class EquipStrategy():
         self.serial = serial
     
     def proccess(self) -> bool:
-        if not exist_click(self.serial, Leonard.BG_POINT.value, threshold=0.8):
+        if not wait_click(self.serial, Leonard.BG_POINT.value, threshold=0.8, timeout=7.0):
             return False
         
         start_time = time.time()

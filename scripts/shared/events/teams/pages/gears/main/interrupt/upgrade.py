@@ -40,7 +40,7 @@ class UpgradeStrategy():
             raise GameError("Cannot find upgrade button.")
         connection_retry(self.serial, appear=[(EnhancePageImg.SUCCESS_TEXT.value, 0.9)], timeout=30.0)
         wait_click(self.serial, EnhancePageImg.SUCCESS_TEXT.value, threshold=0.9)
-        if not exist_click(self.serial, MainView.SKIP.value):
+        if not wait_click(self.serial, MainView.SKIP.value, timeout=10.0):
             raise GameError("Cannot back to main view after upgrading shield.")
         wait_click(self.serial, Confirm.SMALL.value)
         wait_click(self.serial, MainView.BACK.value)

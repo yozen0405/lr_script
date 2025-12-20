@@ -18,3 +18,4 @@ class GachaImg(Enum):
     GUARANTEE_TEXT = "gacha_guarantee_text.png"
     GEAR_SUCCESS_TEXT = "gacha_gear_success_text.png"
     GEAR_SKIP = "gacha_gear_skip.png"
+    READY_PULL_TEXT = "gacha_ready_pull_text.png"

@@ -58,8 +58,8 @@ class BasePvP:
 
     def enter_stage(self):
         for _ in range(3):
-            wait_click(self.serial, PvP.BATTLE.value)
-            if wait(self.serial, PvP.MATCHING_TEXT.value, timeout=3.0):
+            wait_click(self.serial, PvP.BATTLE.value, wait_time=1.0)
+            if exist(self.serial, PvP.MATCHING_TEXT.value):
                 break
 
         for _ in range(5):
@@ -75,7 +75,7 @@ class BasePvP:
 
         connection_retry(self.serial, appear=PvP.MATCHED.value, timeout=40.0)
         wait_click(self.serial, PvP.CHALLENGE.value)
-        connection_retry(self.serial, appear=Battle.NEXT.value, timeout=40.0)
+        connection_retry(self.serial, appear=[(Battle.NEXT.value, 0.8), (Battle.START.value, 0.8)], timeout=40.0)
 
     def _cancel_match_up(self):
         wait_click(self.serial, Confirm.CANCEL.value)
@@ -110,25 +110,22 @@ class BasePvP:
 
     def settlement(self):
         connection_retry(self.serial, appear=PvP.SETTLEMENT_TEXT.value, timeout=40.0)
-        exist_click(self.serial, PvP.SETTLEMENT_TEXT.value)
 
-        cnt = 0
-        while True:
-            if not exist(self.serial, PvP.SETTLEMENT_TEXT.value):
-                time.sleep(2.0)
+        start_time = time.time()
+        while time.time() - start_time < 120.0:
+            if not exist_click(self.serial, PvP.SETTLEMENT_TEXT.value):
                 if exist(self.serial, Settlement.PUZZLE_FOUND_TEXT.value):
-                    exist_click(self.serial, Confirm.BIG2.value, wait_time=2.0)
-
-                if not wait(self.serial, PvP.TEXT.value, timeout=40.0, wait_time=3.0, threshold=0.9):
-                    cnt += 1
+                    exist_click(self.serial, Confirm.BIG2.value)
                     continue
-                if cnt >= 3:
-                    raise GameError("結算後未回到 PVP 主畫面")
-                
-                exist_click(self.serial, PvP.LVL_UP.value, wait_time=2.0)
-                return
+
+                if not exist(self.serial, PvP.TEXT.value, wait_time=3.0, threshold=0.9):
+                    continue
+                else:
+                    wait_click(self.serial, PvP.LVL_UP.value, timeout=3.0, wait_time=2.0)
+                    return
             if exist(self.serial, Retry.TEXT1.value):
                 exist_click(self.serial, Retry.TEXT1.value)
+        raise GameError("結算過程異常")
 
 def pvp_loop_battle(serial):
     pvp = BasePvP(serial)

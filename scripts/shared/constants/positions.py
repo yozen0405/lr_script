@@ -11,6 +11,7 @@ class Positions(Enum):
     MEMBER1 = (370, 700)
     MISSILE = (200, 700)
     THOMSON = (640, 190)
+    METEOR = (75, 75)
 
     @staticmethod
     def is_in_region(pos: tuple, region: tuple) -> bool:

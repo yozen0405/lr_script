@@ -1,7 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from core.system.adb import connect_all_mumu_instances
-# from scripts.custom_scripts.new_acc.main import normal_stage
-from scripts.custom_scripts.pvp_test.main import normal_stage
+from scripts.custom_scripts.new_acc_test.base import normal_stage
+# from scripts.custom_scripts.pvp_test.main import normal_stage
 
 from core.system.config import Config
 

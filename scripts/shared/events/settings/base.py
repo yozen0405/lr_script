@@ -1,5 +1,5 @@
 from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
-from core.actions.system import get_clipboard_text, pull_account_file
+from core.actions.system import get_clipboard_text, pull_account_file, clear_game_storage, force_close_all_apps
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.constants import Settlement, Confirm, Battle, MainView, Retry, Positions
 from core.base.exceptions import GameError
@@ -27,6 +27,8 @@ class SettingsBase:
             self.store_acc()
         else:
             log_msg(self.ctx.serial, f"沒抽到任何角色，捨棄帳號。")
+            force_close_all_apps(self.ctx.serial)
+            clear_game_storage(self.ctx.serial)
 
     def store_acc(self):
         log_msg(self.ctx.serial, f"已抽中足夠的腳色，準備拉帳號檔")

@@ -24,7 +24,7 @@ class GearsMainPage():
     def on_page(self) -> bool:
         has_text = exist(self.ctx.serial, GearImg.TEXT.value, threshold=0.9)
         has_btn = exist(self.ctx.serial, GearImg.MAIN_PAGE_SWITCH_BTN.value, threshold=0.9)
-        return has_text and has_btn
+        return has_text or has_btn
 
     def enter_menu(self):
         if not self.on_page():

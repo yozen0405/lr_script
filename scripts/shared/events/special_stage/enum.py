@@ -8,6 +8,7 @@ class Planet(str, Enum):
     COLLAB = "special_stage_collab_planet.png"
     LIBRARY = "special_stage_library.png"
     LEONARD = "special_stage_leonard_planet.png"
+    CHRISTMAS = "special_stage_christmas_planet.png"
 
 class SpecialStage(Base):
     TEXT = "special_stage_text.png"

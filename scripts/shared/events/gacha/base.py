@@ -70,26 +70,7 @@ class BaseGacha:
     def pull_ranger(self, attempts: int = 15):
         self.enter_menu()
         self.pull_ranger_module.pull(attempts)
-
-    # def finalize_acc(self, success: bool):
-    #     if success:
-    #         self._log_gacha_rangers()
-    #         self.store_acc()
-    #     else:
-    #         wait_click(self.serial, MainView.BACK.value, timeout=20.0)
-    #         print(f"只抽到 {len(self.rangers)} 名角色，捨棄帳號。")
-
-    # def store_acc(self):
-    #     log_msg(self.serial, f"已抽中足夠的腳色，準備拉帳號檔")
-
-    #     wait_click(self.serial, MainView.BACK.value, timeout=20.0)
-    #     on_main_view(self.serial, skip_included=True)
-    #     wait_click(self.serial, MainView.SETTINGS.value, timeout=10.0, wait_time=1.5)
-    #     wait_click(self.serial, Gacha.ACC_NAV.value)
-    #     wait_click(self.serial, Gacha.ACC_UID_COPY.value)
-    #     wait_click(self.serial, Confirm.SMALL.value)
-    #     uid = get_clipboard_text(self.serial).strip()
-    #     pull_account_file(self.serial, uid, self.rangers_short_names)
+        self.leave_menu()
 
 def pull_ranger(context: GameContext, attempts: int = 15):
     gacha = BaseGacha(context)

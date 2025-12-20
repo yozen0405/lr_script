@@ -8,6 +8,7 @@ from scripts.shared.events.special_stage.enum import SpecialStage
 from scripts.shared.events.special_stage.hook import SpecialStageHooks
 from scripts.shared.events.special_stage.utils import SpecialStageUtils
 from scripts.shared.utils.retry import connection_retry
+from scripts.shared.utils.hacks import apply_mode
 from typing import Optional, Tuple
 
 class BaseSpecialStage:
@@ -35,7 +36,25 @@ class BaseSpecialStage:
                 drag(self.serial, (800, 400), (200, 400))
 
         raise GameError("無法進入特殊關卡")
+    
+    def leave_menu(self):
+        start_time = time.time()
+        bein = False
 
+        while time.time() - start_time < 60:
+            if exist(self.serial, Retry.TEXT1.value) or exist(self.serial, Retry.TEXT2.value):
+                exist_click(self.serial, Retry.BTN.value)
+                continue
+
+            if exist(self.serial, SpecialStage.TEXT.value):
+                exist_click(self.serial, MainView.BACK.value)
+                bein = True
+                continue
+            
+            if bein and not exist(self.serial, SpecialStage.TEXT.value):
+                return
+        raise GameError("無法離開特殊關卡選單")
+    
     def enter_stage(
         self,
         stage_num: int,
@@ -47,7 +66,8 @@ class BaseSpecialStage:
         if wait_click(self.serial, SpecialStage.STAGE(stage=stage_num), region=region, timeout=7.0, threshold=0.8):
             connection_retry(self.serial, appear=[(SpecialStage.ENTER.value)], timeout=40.0)
             wait_click(self.serial, SpecialStage.ENTER.value, timeout=25.0)
-            while True:
+            start_time = time.time()
+            while time.time() - start_time < 120:
                 if exist(self.serial, Retry.TEXT1.value):
                     exist_click(self.serial, Retry.BTN.value)
                 elif not exist(self.serial, SpecialStage.ENTER.value):
@@ -57,36 +77,36 @@ class BaseSpecialStage:
                     wait_click(self.serial, MainView.BACK.value)
                     connection_retry(self.serial, appear=[(SpecialStage.LAB.value)], timeout=40.0)
                     return False
+            raise GameError("進入特殊關卡超時")
         else:
             return False
             
     def single_mode_run(self):
         log_msg(self.serial, "Special Stage 進場")
+        apply_mode(self.serial, mode_name="special_stage", state="on")
 
         self.hooks.handle_team_num(self)
-        wait_click(self.serial, Battle.NEXT.value)
-        
-        is_victory = self.utils._battle_loop(
-            end_targets=[Settlement.TEXT.value], 
-            auto_mode=False
-        )
+        self.hooks.handle_auto_btn(self)
 
-        if not is_victory:
-            raise GameError("Special Stage 戰鬥異常或超時")
+        if not wait_click(self.serial, Battle.NEXT.value, timeout=15.0):
+            raise GameError("無法點擊下一步按鈕")
+        
+        self.utils._battle_loop()
 
         log_msg(self.serial, "結算中")
         self.settlement()
 
         wait_click(self.serial, MainView.BACK.value, timeout=20.0)
         connection_retry(self.serial, appear=[(SpecialStage.LAB.value)], timeout=40.0)
-        
+        apply_mode(self.serial, mode_name="special_stage", state="off")
+
         log_msg(self.serial, "Special Stage 任務完成")
 
     def loop_mode_run(self):
         log_msg(self.serial, "Special Stage 迴圈進場")
 
         self.hooks.handle_team_num(self)
-        exist_click(self.serial, Battle.AUTO_BTN_OFF2.value, threshold=0.99)
+        self.hooks.handle_auto_btn(self)
 
         wait_click(self.serial, Battle.CYCLE.value)
         if wait(self.serial, Confirm.SMALL.value):
@@ -96,14 +116,7 @@ class BaseSpecialStage:
                 return False
 
         wait_click(self.serial, Battle.NEXT.value)
-        is_finished = self.utils._battle_loop(
-            end_targets=[Battle.LOOP_END_TEXT.value], 
-            auto_mode=True,
-            timeout=600
-        )
-
-        if not is_finished:
-             raise GameError("Special Stage 迴圈執行異常")
+        self.utils._battle_loop()
         
         log_msg(self.serial, "結算中")
         wait_click(self.serial, Confirm.BIG2.value)
@@ -116,19 +129,14 @@ class BaseSpecialStage:
         return True
 
     def settlement(self):
-        connection_retry(self.serial, appear=[(Settlement.TEXT.value)], timeout=40.0)
-        for _ in range(3):
-            wait_click(self.serial, self.MEMBER4_POS)
-
-        cnt = 0
         start_time = time.time()    
         while time.time() - start_time < 120:
             for img in [
                 Confirm.BIG1.value, Confirm.BIG2.value, Settlement.ONE_REWARD.value, 
                 Confirm.SMALL.value, Settlement.STOP.value, Settlement.SILVER_BOX.value, 
-                Settlement.BRONZE_BOX.value
+                Settlement.BRONZE_BOX.value, Settlement.TEXT.value
             ]:
-                exist_click(self.serial, img, wait_time=1.5)
+                exist_click(self.serial, img)
             if exist(self.serial, Retry.TEXT1.value) or exist(self.serial, Retry.TEXT2.value):
                 exist_click(self.serial, Retry.BTN.value)
             if exist(self.serial, SpecialStage.TEXT.value):

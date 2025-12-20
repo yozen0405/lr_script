@@ -129,35 +129,50 @@ def check_freeze(serial, threshold=0.98, reset_time=600.0, minimum_interval=15.0
         shutil.copy2(current_path, old_path)
         return False
     
-def find_spotlight_center(serial):
+def find_spotlight_center(serial, region=None):
+    """
+    在螢幕中尋找最亮點（聚光燈中心）。
+    :param serial: 設備序號
+    :param region: 選擇性範圍 (x1, y1, x2, y2)
+    :return: 亮點在全螢幕下的座標 (x, y) 或 None
+    """
     current_path = store_screen(serial)
-
     img = safe_imread(current_path, serial)
+    
     if img is None:
         print(f"讀取圖片失敗")
         return None
 
+    offset_x, offset_y = 0, 0
+    if region:
+        x1, y1, x2, y2 = region
+        img = img[y1:y2, x1:x2]
+        offset_x, offset_y = x1, y1
+        
+        # debug_region_path = os.path.join(TMP_DIR, "spotlight_region_debug.png")
+        # cv2.imwrite(debug_region_path, img)
+
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     ksize = (51, 51) 
     blurred = cv2.GaussianBlur(gray, ksize, 0)
+    
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(blurred)
 
     if max_val < 50:
         print(f"未偵測到明顯亮區 (Max val: {max_val})")
         return None
 
-    print(f"找到亮區中心: {max_loc}, 亮度值: {max_val}")
+    final_loc = (max_loc[0] + offset_x, max_loc[1] + offset_y)
+    
+    print(f"找到亮區中心: {final_loc}, 亮度值: {max_val}")
 
-    # debug_img = img.copy()
-    # cv2.circle(debug_img, max_loc, 40, (0, 0, 255), 3)
-    # cv2.putText(debug_img, f"Val:{max_val:.0f}", (max_loc[0]-20, max_loc[1]-50), 
-    #             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-    
-    # result_path = os.path.join(TMP_DIR, "debug_result.png")
+    # --- Debug 繪圖邏輯 (可視需求取消註解) ---
+    # debug_img = safe_imread(current_path, serial) # 讀取原圖來畫畫
+    # cv2.circle(debug_img, final_loc, 40, (0, 0, 255), 3)
+    # result_path = os.path.join(TMP_DIR, "debug_spotlight_result.png")
     # cv2.imwrite(result_path, debug_img)
-    # print(f"-> 已儲存最終判定圖: {result_path}")
     
-    return max_loc
+    return final_loc
 
 def check_region_brightness(serial, region, threshold=20):
     """

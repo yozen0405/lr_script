@@ -18,7 +18,7 @@ class OtherStrategy():
         start_time = time.time()
         cnt = 0
         fg = False
-        while time.time() - start_time < 15.0:
+        while time.time() - start_time < 30.0:
             if exist_click(self.serial, TeamsImg.SAVE.value, threshold=0.85):
                 cnt = 0
                 fg = True

@@ -43,14 +43,14 @@ class JobRunner:
 
     def start_game(self):
         log_msg(self.serial, "[System] 正在啟動遊戲...")
-        line_login(self.serial, mode="")
-        on_main_view(self.serial)
+        line_login(self.ctx)
+        on_main_view(self.ctx)
 
     def restart_game(self):
         log_msg(self.serial, "[System] 正在執行遊戲重啟流程...")
         force_close(self.serial)
-        line_login(self.serial, mode="")
-        on_main_view(self.serial)
+        line_login(self.ctx)
+        on_main_view(self.ctx)
 
     def add_job(self, job: BaseJob):
         self.jobs.append(job)
@@ -95,4 +95,4 @@ class JobRunner:
                             pass
                         
                         wait_click(self.serial, "back.png")
-                        on_main_view(self.serial, timeout=30.0)
+                        on_main_view(self.ctx, timeout=30.0)

@@ -63,7 +63,7 @@ class ImageProcceser:
             pre = cv2.GaussianBlur(scaled, (3, 3), 0)
             config = "--psm 6"
 
-        cv2.imwrite(f"debug_output.png", pre)
+        cv2.imwrite(f"debug_output_{x1}_{y1}.png", pre)
 
         pil = Image.fromarray(pre)
         text = pytesseract.image_to_string(pil, config=config, lang="eng")

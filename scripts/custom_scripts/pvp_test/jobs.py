@@ -25,7 +25,7 @@ from scripts.shared.events.advent_stage.base import advent_stage_battle
 from scripts.shared.events.bingo.base import bingo_attempt
 from scripts.shared.utils.game_view import on_main_view
 from scripts.shared.events.lab.base import complete_lab_quest
-from scripts.shared.events.season_pass.base import claim_season_pass
+from scripts.shared.events.season_pass.sec import claim_season_pass
 from scripts.shared.events.wheel.base import wheel_attempt
 from scripts.shared.events.train.base import train_stage_battle
 from scripts.shared.events.dice.base import dice_attempt
@@ -83,18 +83,10 @@ class SpecialStageJob(BaseJob):
 
     def run(self, ctx: GameContext):
         # special_stage_loop_game(ctx.serial, planet=Planet.COLLAB.value, stage=6)
-        special_stage_conquer_planet(ctx.serial, planet=Planet.COLLAB.value)
+        # special_stage_conquer_planet(ctx, planet=Planet.COLLAB.value)
         # for stage in range(4, 7):
         #     special_stage_loop_game(ctx.serial, planet=Planet.IMMORTAL_SKULL.value, stage=stage)
-
-
-class TrainJob(BaseJob):
-    def __init__(self):
-        super().__init__(name="Train Stage", mode_name="train")
-
-    def run(self, ctx: GameContext):
-        train_stage_battle(ctx.serial)
-        train_stage_battle(ctx.serial)
+        special_stage_conquer_planet(ctx, planet=Planet.COLLAB.value)
 
 
 class SeasonPassJob(BaseJob):
@@ -102,15 +94,14 @@ class SeasonPassJob(BaseJob):
         super().__init__(name="Claim Season Pass", mode_name=None)
 
     def run(self, ctx: GameContext):
-        claim_season_pass(ctx.serial)
+        claim_season_pass(ctx)
 
-
-class DiceJob(BaseJob):
+class BingoJob(BaseJob):
     def __init__(self):
-        super().__init__(name="Dice Attempt", mode_name=None)
+        super().__init__(name="Bingo Attempt", mode_name=None)
 
     def run(self, ctx: GameContext):
-        dice_attempt(ctx.serial)
+        bingo_attempt(ctx.serial)
 
 class UpgradeRangerJob(BaseJob):
     def __init__(self):

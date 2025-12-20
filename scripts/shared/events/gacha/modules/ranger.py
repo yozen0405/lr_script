@@ -81,6 +81,7 @@ class PullRangerModule:
                 continue
 
             if not fg and exist_click(self.ctx.serial, GachaImg.TICKET_PULL.value):
+                wait_click(self.ctx.serial, Confirm.SMALL.value)
                 continue
 
             if fg and exist(self.ctx.serial, GachaImg.TEXT.value, threshold=0.8):

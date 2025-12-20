@@ -6,6 +6,7 @@ class MainView(str, Enum):
     CLOSE_BOARD = "close_board.png"
     CLOSE_BOARD2 = "close_board2.png"
     CLOSE_PVP = "close_to_pvp.png"
+    CLOSE_BOARD_YELLOW = "close_board_yellow.png"
     SKIP = "skip.png"
     SKIP_2 = "mainview_skip_bottom_left.png"
     BOARD_DONT_SHOW = "board_dont_show.png"
@@ -20,6 +21,7 @@ class MainView(str, Enum):
     AVATAR = "mainview_avatar.png"
     SKIP_TUTORIAL_TEXT = "skip_tutorial_text.png"
     TO_DOWNLOAD_TEXT = "mainview_to_download_text.png"
+    LEVEL_POP_TEXT = "mainview_level_pop_up_text.png"
 
 class GameView(str, Enum):
     GAME_OPENED = "open_game.png"
