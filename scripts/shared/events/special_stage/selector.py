@@ -1,9 +1,9 @@
 from scripts.shared.events.special_stage.base import BaseSpecialStage
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
 from scripts.shared.utils.retry import connection_retry
 from core.base.exceptions import GameError
 from typing import Optional
-from core.system.logger import log_msg
+from core.system.logging.logger import log_msg
 from scripts.shared.events.special_stage.enum import Planet
 from scripts.shared.controller.context import GameContext
 from core.system.config import Config

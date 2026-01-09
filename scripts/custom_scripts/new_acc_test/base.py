@@ -1,4 +1,4 @@
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
 from core.actions.system import force_close
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.hacks import apply_mode
@@ -14,6 +14,7 @@ from scripts.shared.events.teams.base import upgrade_ranger
 from scripts.shared.events.settings.base import finalize_account
 from scripts.shared.events.seven_days.base import seven_days_event, seven_days_claim
 from scripts.shared.events.special_quest.base import special_quest_event
+from scripts.shared.events.gift_box.base import claim_gift_box
 from scripts.shared.utils.mainview.enum import MainViewState
 from core.actions.system import log_msg
 from scripts.shared.controller.context import GameContext
@@ -26,8 +27,6 @@ import time
 class NewAccBase:
     def __init__(self, serial):
         self.ctx = GameContext(serial)
-        self.mainview_handler = MainViewHandler(self.ctx)
-
         self.reset()
 
     def reset(self):
@@ -38,19 +37,21 @@ class NewAccBase:
         self.mineral_upgrade = False
         self.seven_days_done = False
         self.season_pass_done = False
+        self.gift_box_done = False
         self.ctx.pulled_rangers = None
         self.ctx.max_main_stage_num = 30
         self.done = False
         self.error_count = 0
 
     def setup(self):
-        # self.complete_stage_30 = False
-        # self.ctx.current_stage_num = None
-        # self.ctx.complete_special_stage = False
-        # self.team_upgrade = False
-        # self.mineral_upgrade = False
-        # self.seven_days_done = False
-        # self.season_pass_done = False
+        self.complete_stage_30 = True
+        self.ctx.current_stage_num = 30
+        self.ctx.complete_special_stage = True
+        self.team_upgrade = True
+        self.mineral_upgrade = True
+        self.seven_days_done = True
+        self.season_pass_done = True
+        self.gift_box_done = True
         pass
 
     def _start_game(self):
@@ -95,6 +96,12 @@ class NewAccBase:
         if not self.season_pass_done:
             claim_tickets(self.ctx)
             self.season_pass_done = True
+            return
+
+        if not self.gift_box_done:
+            claim_gift_box(self.ctx)
+            self.gift_box_done = True
+            return
 
         if self.ctx.pulled_rangers is None:
             pull_ranger(self.ctx)
@@ -112,7 +119,7 @@ class NewAccBase:
                 if self.done:
                     log_msg(self.ctx.serial, "New account completed.")
                     return
-                event = self.mainview_handler.proccess()
+                event = on_main_view(self.ctx)
                 log_msg(self.ctx.serial, f"Detected main view event: {event.value}")
 
                 if event == MainViewState.PRE_STAGE:
@@ -138,7 +145,7 @@ class NewAccBase:
                 self._start_game()
 
     def run(self):
-        self._start_game()
+        # self._start_game()
         self._task()
 
 def normal_stage(serial):

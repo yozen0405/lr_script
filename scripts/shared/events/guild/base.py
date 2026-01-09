@@ -1,11 +1,11 @@
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
 from scripts.shared.constants import Settlement, Confirm, Battle, Retry, MainView, Leonard
 from scripts.shared.events.guild.enum import Guild, GuildRaidSide
-from scripts.shared.events.main_stage.enum import MainStage
+from scripts.shared.events.main_stage.enum import MainStageImg
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.events.pvp.enum import PvP
 from core.base.exceptions import GameError
-from core.system.logger import log_msg
+from core.system.logging.logger import log_msg
 from scripts.shared.utils.hacks import apply_mode
 import time
 
@@ -19,7 +19,7 @@ class BaseGuild:
             connection_retry(self.serial, appear=Guild.TEXT.value, retry=MainView.BACK.value, timeout=40.0)
             return
         
-        if exist(self.serial, MainStage.BTN.value):
+        if exist(self.serial, MainStageImg.BTN.value):
             drag(self.serial, (200, 400), (800, 400))
             drag(self.serial, (200, 400), (800, 400))
 
@@ -68,7 +68,7 @@ class BaseGuild:
             exist_click(self.serial, Guild.WAR_REWARD_POP.value)
             if exist(self.serial, Guild.PURCHASE_POP.value):
                 if not exist_click(self.serial, Confirm.SMALL.value):
-                    exist_click(self.serial, MainView.CLOSE_BOARD2.value)
+                    exist_click(self.serial, MainView.CLOSE_BOARD.value)
             if exist(self.serial, Guild.ACCEPT_SUPPORT_POP.value):
                 exist_click(self.serial, Confirm.SMALL.value)
             if exist(self.serial, Retry.TEXT1.value):
@@ -112,8 +112,8 @@ class BaseGuild:
         wait_click(self.serial, Guild.WEEKLY_QUEST_NAV.value)
         self._do_quest()
         
-        wait_click(self.serial, MainView.CLOSE_BOARD2.value, threshold=0.9, timeout=3.0)
-        connection_retry(self.serial, vanish=Guild.QUEST_TEXT.value, retry=[(MainView.CLOSE_BOARD2.value, 0.9)], timeout=40.0)
+        wait_click(self.serial, MainView.CLOSE_BOARD.value, threshold=0.9, timeout=3.0)
+        connection_retry(self.serial, vanish=Guild.QUEST_TEXT.value, retry=[(MainView.CLOSE_BOARD.value, 0.9)], timeout=40.0)
 
 class GuildRaid:
     def __init__(self, serial):
@@ -153,7 +153,7 @@ class GuildRaid:
             if wait(self.serial, Guild.RAID_ATTACK.value, threshold=0.999):
                 break
             wait_click(self.serial, Guild.TOUCH_SCREEN.value, timeout=3.0)
-            wait_click(self.serial, MainView.CLOSE_BOARD2.value, threshold=0.9, timeout=3.0)
+            wait_click(self.serial, MainView.CLOSE_BOARD.value, threshold=0.9, timeout=3.0)
         
         exist_click(self.serial, Guild.AUTO_BTN_OFF.value, threshold=0.999)
         wait_click(self.serial, Guild.RAID_ATTACK.value)
@@ -161,7 +161,7 @@ class GuildRaid:
         start_time = time.time()
         while time.time() - start_time < 120.0:
             if exist(self.serial, Guild.RAID_LIMITED.value):
-                exist_click(self.serial, Confirm.CANCEL.value, wait_time=1.0)
+                exist_click(self.serial, Confirm.CANCEL_SMALL.value, wait_time=1.0)
                 wait_click(self.serial, MainView.BACK.value)
                 connection_retry(self.serial, appear=Battle.ENTER.value, timeout=40.0)
                 return False

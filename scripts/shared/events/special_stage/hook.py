@@ -1,9 +1,9 @@
 import time
-from core.system.logger import log_msg
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, get_pos, drag
+from core.system.logging.logger import log_msg
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, get_pos, drag
 from core.base.exceptions import GameError
 from scripts.shared.constants import Settlement, Confirm, Battle, Retry, MainView, Positions
-from scripts.shared.events.main_stage.enum import MainStage
+from scripts.shared.events.main_stage.enum import MainStageImg
 from scripts.shared.events.special_stage.enum import SpecialStage
 from scripts.shared.utils.retry import connection_retry
 from typing import Optional, Tuple
@@ -38,4 +38,4 @@ class SpecialStageHooks:
             raise GameError("無法設定隊伍人數")
         
     def handle_auto_btn(self, base):
-        exist_click(self.serial, MainStage.AUTO_BTN_HIGH_OFF.value, threshold=0.99)
+        exist_click(self.serial, MainStageImg.AUTO_BTN_HIGH_OFF.value, threshold=0.99)

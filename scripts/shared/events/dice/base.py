@@ -1,11 +1,11 @@
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
-from core.actions.screen import back
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
+from core.actions.vision import back
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.constants import Settlement, Confirm, Battle, MainView, Retry, Positions
 from core.base.exceptions import GameError
-from core.system.logger import log_msg
+from core.system.logging.logger import log_msg
 from typing import Optional, Tuple
-from scripts.shared.events.main_stage.enum import MainStage
+from scripts.shared.events.main_stage.enum import MainStageImg
 from scripts.shared.events.dice.enum import DiceImg
 
 class DiceBase:
@@ -38,8 +38,8 @@ class DiceBase:
             elif wait_click(self.serial, DiceImg.GET.value, timeout=3.0):
                 continue
             else:
-                wait_click(self.serial, MainView.CLOSE_BOARD2.value, threshold=0.9, timeout=3.0)
-                if not wait_vanish(self.serial, MainView.CLOSE_BOARD2.value, threshold=0.9, timeout=3.0):
+                wait_click(self.serial, MainView.CLOSE_BOARD.value, threshold=0.9, timeout=3.0)
+                if not wait_vanish(self.serial, MainView.CLOSE_BOARD.value, threshold=0.9, timeout=3.0):
                     continue
                 else:
                     break

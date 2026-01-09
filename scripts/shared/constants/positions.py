@@ -1,17 +1,16 @@
 from enum import Enum
 
 class Positions(Enum):
-    FRIEND  = (75, 75)
-    FIRE    = (150, 75)
-    DIAMOND = (1080, 700)
-    MEMBER5 = (910, 700)
-    MEMBER4 = (780, 700)
-    MEMBER3 = (640, 700)
-    MEMBER2 = (515, 700)
-    MEMBER1 = (370, 700)
-    MISSILE = (200, 700)
-    THOMSON = (640, 190)
-    METEOR = (75, 75)
+    FRIEND  = (33, 41)
+    DIAMOND = (812, 487)
+    MEMBER5 = (683, 505)
+    MEMBER4 = (585, 505)
+    MEMBER3 = (486, 505)
+    MEMBER2 = (380, 505)
+    MEMBER1 = (274, 505)
+    MISSILE = (141, 507)
+    THOMSON = (480, 193)
+    METEOR = (33, 41)
 
     @staticmethod
     def is_in_region(pos: tuple, region: tuple) -> bool:

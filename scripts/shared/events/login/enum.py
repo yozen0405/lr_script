@@ -5,9 +5,10 @@ class LoginState(Enum):
     LOGIN_METHOD_PAGE = auto()
     TERMS_AGREEMENT_PAGE = auto()
     LINE_APP_PAGE = auto()
+    APPLE_PAGE = auto()
     LOADING_PAGE = auto()
     IN_GAME = auto()
     RETRY = auto()
-    POPUP = auto()
+    POP_UP = auto()
     UNKNOWN = auto()
-    
+    CONFIRM_PERM = auto()

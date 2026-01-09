@@ -1,8 +1,8 @@
 import time
 from core.system.adb import adb_cmd
-from core.system.logger import log_msg
+from core.system.logging.logger import log_msg
 import os
-import subprocess
+import pyperclip
 
 SIMILARITY=0.7
 CHECK_INTERVAL=0.5
@@ -21,14 +21,15 @@ def force_close_all_apps(serial, timeout: float = 10.0, delay: float = 0.5):
     start = time.time()
     closed_total = 0
 
-    allow_list = {
+    target_packages = {
         "com.android.browser",
         "com.android.vending",
-        "com.linecorp.LGRGS"
+        "com.linecorp.LGRGS",
+        "com.android.settings" 
     }
 
     while time.time() - start < timeout:
-        for pkg in allow_list:
+        for pkg in target_packages:
             r = adb_cmd(serial, ["shell", "am", "force-stop", pkg])
             if r.returncode == 0:
                 log_msg(serial, f"已關閉：{pkg}")
@@ -36,8 +37,9 @@ def force_close_all_apps(serial, timeout: float = 10.0, delay: float = 0.5):
             else:
                 log_msg(serial, f"無法關閉：{pkg}")
             time.sleep(delay)
+        break 
 
-    log_msg(serial, f"共關閉 {closed_total} 個 App")
+    log_msg(serial, f"清理完成，共執行關閉指令 {closed_total} 次")
 
 def force_close_line(serial, timeout: float = 5.0, delay: float = 0.5):
     target_pkg = "jp.naver.line.android"
@@ -82,21 +84,26 @@ def pull_account_file(serial: str, uid: str, ranger_list: list, local_path="./bi
         adb_cmd(serial, ["shell", "su", "-c", f"rm {remote_tmp}"])
         hero_str = "+".join(ranger_list)
         final_path = os.path.join(local_path, f"{uid}_{hero_str}.xml")
-        os.rename(local_tmp, final_path)
+        os.replace(local_tmp, final_path)
         log_msg(serial, f"檔案已儲存為 {final_path}")
         return True
     else:
         log_msg(serial, f"拉取失敗: {result.stderr.strip()}")
         return False
 
-def get_clipboard_text(serial: str, cooldown: float = 1.5) -> str:
-    time.sleep(cooldown)
-
-    try:
-        return subprocess.check_output("powershell Get-Clipboard", universal_newlines=True).strip()
-    except Exception as e:
-        print(f"無法讀取剪貼簿：{e}")
-        return "unknown_uid"
+def get_clipboard_text(serial: str) -> str:
+    max_retries = 5
+    for i in range(max_retries):
+        try:
+            content = pyperclip.paste()
+            if content and content.strip():
+                return content.strip()
+            
+        except Exception as e:
+            log_msg(serial, f"取得剪貼簿文字失敗: {e}")
+            pass
+        time.sleep(0.5)
+    return ""
 
 def clear_game_storage(serial: str):
     log_msg(serial, f"清除 {PACKAGE_NAME} 的儲存空間")
@@ -120,3 +127,19 @@ def open_external_url(serial: str, url: str, wait_time: float = 3.0):
     else:
         log_msg(serial, f"打開網址失敗：{result.stderr.strip()}")
         return False
+
+def is_armeabi_v7a(serial):
+    log_msg(serial, f"正在檢查 {PACKAGE_NAME} 的路徑架構...")
+    
+    result = adb_cmd(serial, ["shell", "pm", "path", PACKAGE_NAME])
+    
+    output = result.stdout.strip()
+    
+    for line in output.splitlines():
+        path = line.replace("package:", "").strip()
+        if "split_config.armeabi_v7a" in path:
+            log_msg(serial, f"確認架構為: armeabi-v7a")
+            return True
+            
+    log_msg(serial, f"未在 {PACKAGE_NAME} 中發現 armeabi-v7a 路徑")
+    return False

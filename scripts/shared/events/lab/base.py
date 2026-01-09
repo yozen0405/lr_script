@@ -1,13 +1,13 @@
 import time
-from core.system.logger import log_msg
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
-from core.actions.ocr import get_main_stage_num
+from core.system.logging.logger import log_msg
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
+from core.actions.vision import get_main_stage_num
 from core.base.exceptions import GameError
 from scripts.shared.constants.positions import Positions
 from scripts.shared.utils.retry import connection_retry
 from typing import Optional
 from scripts.shared.constants import Settlement, Battle, Confirm, MainView, Leonard, Retry
-from scripts.shared.events.main_stage.enum import MainStage
+from scripts.shared.events.main_stage.enum import MainStageImg
 from scripts.shared.events.lab.enum import LabMenu, MakeMenu, ExtractMenu
 
 class LabeMake:
@@ -43,7 +43,7 @@ class LabeMake:
                 cnt = 0
                 continue
             cnt += 1
-            if cnt >= 4:
+            if cnt >= 8:
                 return
         raise GameError("進入lab製作頁面失敗")
 
@@ -132,7 +132,7 @@ class LabBase:
         if exist(self.serial, LabMenu.TEXT.value, threshold=0.9):
             return
         
-        if exist(self.serial, MainStage.BTN.value):
+        if exist(self.serial, MainStageImg.BTN.value):
             drag(self.serial, (200, 400), (800, 400))
             drag(self.serial, (200, 400), (800, 400))
             drag(self.serial, (200, 400), (800, 400))

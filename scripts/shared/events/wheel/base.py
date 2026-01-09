@@ -1,11 +1,11 @@
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
-from core.actions.screen import back
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
+from core.actions.vision import back
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.constants import Settlement, Confirm, Battle, MainView, Retry, Positions
 from core.base.exceptions import GameError
-from core.system.logger import log_msg
+from core.system.logging.logger import log_msg
 from typing import Optional, Tuple
-from scripts.shared.events.main_stage.enum import MainStage
+from scripts.shared.events.main_stage.enum import MainStageImg
 from scripts.shared.events.wheel.enum import WheelImg
 
 class WheelBase:
@@ -21,7 +21,7 @@ class WheelBase:
                 connection_retry(self.serial, vanish=WheelImg.BTN.value, timeout=40.0)
                 self._on_pre_anime()
                 return
-            elif exist(self.serial, MainStage.BTN.value):
+            elif exist(self.serial, MainStageImg.BTN.value):
                 drag(self.serial, (800, 400), (200, 400))
 
         raise GameError("無法進入賓果活動")
@@ -42,8 +42,8 @@ class WheelBase:
             elif wait_click(self.serial, WheelImg.GET.value, timeout=3.0):
                 continue
             else:
-                wait_click(self.serial, MainView.CLOSE_BOARD2.value, threshold=0.9, timeout=3.0)
-                if not wait_vanish(self.serial, MainView.CLOSE_BOARD2.value, threshold=0.9, timeout=3.0):
+                wait_click(self.serial, MainView.CLOSE_BOARD.value, threshold=0.9, timeout=3.0)
+                if not wait_vanish(self.serial, MainView.CLOSE_BOARD.value, threshold=0.9, timeout=3.0):
                     continue
                 else:
                     break

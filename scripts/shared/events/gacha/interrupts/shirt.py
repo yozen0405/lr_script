@@ -1,14 +1,14 @@
 import os
 import time
-from core.system.logger import log_msg
-from core.actions.screen import (
+from core.system.logging.logger import log_msg
+from core.actions.vision import (
     exist_click, wait_click, wait, wait_vanish,
     drag, back, exist
 )
 from scripts.shared.utils.retry import connection_retry
 from core.base.exceptions import GameError
 from scripts.shared.events.gacha.enum import GachaImg
-from scripts.shared.events.main_stage.enum import MainStage
+from scripts.shared.events.main_stage.enum import MainStageImg
 from scripts.shared.constants import MainView, Confirm, Leonard, Retry
 from scripts.shared.controller.context import GameContext
 

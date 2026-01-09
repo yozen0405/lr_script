@@ -1,12 +1,10 @@
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
-from core.actions.screen import back
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
+from core.actions.vision import back
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.constants import Settlement, Confirm, Battle, MainView, Retry, Positions
 from core.base.exceptions import GameError
-from core.system.logger import log_msg
+from core.system.logging.logger import log_msg
 from typing import Optional, Tuple
-from scripts.shared.events.main_stage.enum import MainStage
-from scripts.shared.events.teams.sec import TeamsBase
 from scripts.shared.events.teams.enum import GearImg, WeaponType, EnhancePageImg, EnhancePagePos
 from scripts.shared.constants.leonard import Leonard
 from scripts.shared.events.teams.enum import TeamsImg
@@ -29,6 +27,10 @@ class GearBase:
         while time.time() - start_time < 120.0:
             if exist_click(self.ctx.serial, WeaponType.WAND.value, threshold=0.95):
                 log_msg(self.ctx.serial, "找到裝備")
+                continue
+
+            if exist(self.ctx.serial, GearImg.EQUIP_CONFIRM_TEXT.value, threshold=0.9):
+                wait_click(self.ctx.serial, Confirm.CANCEL_SMALL.value)
                 continue
 
             if exist_click(self.ctx.serial, EnhancePageImg.BTN.value):

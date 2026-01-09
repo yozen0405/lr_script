@@ -1,4 +1,4 @@
-from core.actions.screen import wait, drag, exist, exist_click, log_msg
+from core.actions.vision import wait, drag, exist, exist_click, log_msg
 from core.actions.system import open_external_url, launch_game
 from core.system.config import Config
 from scripts.shared.events.url.enum import Url
@@ -52,5 +52,5 @@ class LinkNavigator:
             log_msg(self.serial, "無法開啟外部網址")
             return
 
-        if not wait(self.serial, MainView.SETTINGS):
+        if not wait(self.serial, MainView.SKIP_CONFIRM_TEXT):
             launch_game(self.serial)

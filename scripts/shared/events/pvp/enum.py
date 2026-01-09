@@ -14,3 +14,4 @@ class PvP(str, Enum):
     LVL_DOWN = "pvp_lvl_downgrade.png"
     SEASON_END_TEXT = "pvp_season_end_text.png"
     CLOSE_TIPS = "close_lose_tips.png"
+    PRE_START_PAGE = "pre_start_page_high.png"

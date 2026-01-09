@@ -1,6 +1,6 @@
 from enum import Enum
 
 class Retry(str, Enum):    
-    TEXT1 = "retry_text.png"
-    TEXT2 = "retry_text2.png"
-    BTN = "retry.png"
+    TEXT1 = "shared/retry/text1.png"
+    TEXT2 = "shared/retry/text2.png"
+    BTN = "shared/retry/btn.png"

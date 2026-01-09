@@ -1,5 +1,5 @@
-from core.system.logger import log_msg
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, back, drag
+from core.system.logging.logger import log_msg
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, back, drag, is_game_foreground
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.hacks import apply_mode
 from core.base.exceptions import GameError
@@ -7,6 +7,8 @@ from scripts.shared.constants import Settlement, GameView, Battle, Confirm, Main
 from scripts.shared.events.teams.enum import TeamsImg
 from scripts.shared.events.pre_stage.enum import PreStageImg
 from scripts.shared.controller.context import GameContext
+from scripts.shared.events.pre_stage.exception import PreStageTimeoutError
+from scripts.shared.events.settings.enum import SettingsImg
 import time
 
 class PreStage():
@@ -40,6 +42,9 @@ class PreStage():
 
         start_time = time.time()
         while time.time() - start_time < 60:
+            if not is_game_foreground(self.ctx.serial):
+                break
+
             if exist(self.ctx.serial, Retry.TEXT1.value, threshold=0.8):
                 exist_click(self.ctx.serial, Retry.BTN.value)
                 continue
@@ -51,7 +56,7 @@ class PreStage():
 
             if exist(self.ctx.serial, PreStageImg.MOON_DIALOGUE.value, threshold=0.9):
                 return
-        raise GameError("設定暱稱超時")
+        raise PreStageTimeoutError("設定暱稱超時")
 
     def _handle_battle(self):
         log_msg(self.ctx.serial, "進去前置關卡")
@@ -61,18 +66,18 @@ class PreStage():
         
         start_time = time.time()
         
-        while time.time() - start_time < 240:
+        while time.time() - start_time < 360:
             if exist(self.ctx.serial, Battle.PAUSE.value, threshold=0.8):
                 self._spam_click_members()
             if exist(self.ctx.serial, Retry.TEXT1.value, threshold=0.8):
                 exist_click(self.ctx.serial, Retry.BTN.value)
-            if exist(self.ctx.serial, MainView.SETTINGS.value):
+            if exist(self.ctx.serial, SettingsImg.BTN.value):
                 return
             if exist_click(self.ctx.serial, MainView.SKIP.value):
                 wait_click(self.ctx.serial, Confirm.SMALL.value)
-            if exist(self.ctx.serial, GameView.ICON.value, threshold=0.9):
+            if exist(self.ctx.serial, GameView.ICON.value) or exist(self.ctx.serial, GameView.GAME_NOT_RESPONDING_TEXT.value):
                 break
-        raise GameError("前置關卡超時")
+        raise PreStageTimeoutError("前置關卡超時")
 
     def run(self):
         self._handle_nickname()

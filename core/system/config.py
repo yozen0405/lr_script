@@ -69,3 +69,6 @@ class Config(BaseConfig):
     
     def get_team_num(self):
         return self.get("team_num", fallback=1)
+    
+    def get_is_debug(self):
+        return self.get("debug", fallback=True)

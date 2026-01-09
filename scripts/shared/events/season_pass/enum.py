@@ -14,7 +14,7 @@ class SeasonPassImg(Enum):
     HISTORY_TEXT = "season_pass_history_text.png"
     CONGRATS = "season_pass_congrats_text.png"
     POP_TEXT = "season_pass_pop_text.png"
-    POP_DETAIL_TEXT = "season_pass_pop_detail_text.png"
+    POP_DETAIL_TEXT = "season_pass/pop_detail_text.png"
     EXP_UP_TEXT = "season_pass_exp_up_text.png"
     LVL1 = "season_pass_level1_text.png"
     TICKETS = "season_pass_tickets.png"

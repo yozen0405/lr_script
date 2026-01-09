@@ -1,9 +1,9 @@
 import time
-from core.system.logger import log_msg
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, get_pos, drag
+from core.system.logging.logger import log_msg
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, get_pos, drag
 from core.base.exceptions import GameError
 from scripts.shared.constants import Settlement, Confirm, Battle, Retry, MainView, Positions
-from scripts.shared.events.main_stage.enum import MainStage
+from scripts.shared.events.main_stage.enum import MainStageImg
 from scripts.shared.events.special_stage.enum import SpecialStage
 from scripts.shared.events.special_stage.hook import SpecialStageHooks
 from scripts.shared.utils.retry import connection_retry
@@ -16,15 +16,18 @@ class SpecialStageUtils:
         self.MEMBER4_POS = Positions.MEMBER4.value
         self.hooks = hooks
 
-    def _battle_loop(self, timeout=300) -> bool:
+    def _battle_loop(self, timeout=300, loop_mode: bool = False) -> bool:
         start_time = time.time()
         retry_count = 0
 
         while time.time() - start_time < timeout:
-            if exist(self.serial, MainStage.SETTLEMENT.value, threshold=0.9) or \
-                exist(self.serial, Settlement.LEVEL_UP_TEXT.value) or \
-                    exist(self.serial, Battle.LOOP_END_TEXT.value):
-                return
+            if loop_mode:
+                if exist(self.serial, Battle.LOOP_END_TEXT.value):
+                    return
+            else:
+                if exist(self.serial, MainStageImg.SETTLEMENT.value, threshold=0.9) or \
+                    exist(self.serial, Settlement.LEVEL_UP_TEXT.value):
+                    return
             
             if exist(self.serial, Retry.TEXT1.value) or exist(self.serial, Retry.TEXT2.value):
                 wait_click(self.serial, Retry.BTN.value)
@@ -71,7 +74,7 @@ class SpecialStageUtils:
         return region
     
     def quit_game(self):
-        wait_click(self.serial, Confirm.CANCEL.value, wait_time=1.0)
+        wait_click(self.serial, Confirm.CANCEL_SMALL.value, wait_time=1.0)
         wait_click(self.serial, MainView.BACK.value)
         connection_retry(self.serial, appear=[(SpecialStage.TEXT.value)], timeout=40.0)
         wait_click(self.serial, MainView.BACK.value, timeout=20.0)

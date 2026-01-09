@@ -1,7 +1,7 @@
 import time
 import os
-from core.system.logger import log_msg
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, back, drag
+from core.system.logging.logger import log_msg
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, back, drag
 from core.base.exceptions import GameError
 from scripts.shared.constants import Retry, Confirm
 
@@ -41,25 +41,32 @@ def connection_retry(
     vanish = _norm(vanish)
     appear = _norm(appear)
     retry = _norm(retry)
+    cnt = 0
 
     start_time = time.time()
     while time.time() - start_time < timeout:
-        for img, th, _ in vanish:
-            if not exist(serial, img, threshold=th):
-                return
-        for img, th, _ in appear:
-            if exist(serial, img, threshold=th):
-                return
-
         if exist(serial, Retry.TEXT1.value):
             if not exist_click(serial, Retry.BTN.value):
                 exist_click(serial, Confirm.SMALL.value)
+            cnt = 0
 
         if exist(serial, Retry.TEXT2.value):
+            cnt = 0
             if not exist_click(serial, Retry.BTN.value):
                 wait_click(serial, Confirm.SMALL.value, wait_time=1.0)
                 for img, th, tm in retry:
                     wait_click(serial, img, threshold=th, timeout=tm)
+
+        for img, th, _ in vanish:
+            if not exist(serial, img, threshold=th):
+                cnt += 1
+                if cnt >= 2:
+                    return
+                else:
+                    break
+        for img, th, _ in appear:
+            if exist(serial, img, threshold=th):
+                return
 
         time.sleep(0.2)
 

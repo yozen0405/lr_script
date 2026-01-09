@@ -1,11 +1,10 @@
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos, check_region_brightness
-from core.actions.screen import back
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos, check_region_brightness
+from core.actions.vision import back
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.constants import Settlement, Confirm, Battle, MainView, Retry, Positions
 from core.base.exceptions import GameError
-from core.system.logger import log_msg
+from core.system.logging.logger import log_msg
 from typing import List, Optional, Tuple
-from scripts.shared.events.main_stage.enum import MainStage
 from scripts.shared.events.teams.enum import TeamsImg
 from scripts.shared.constants.leonard import Leonard
 from scripts.shared.controller.context import GameContext
@@ -20,7 +19,7 @@ class RangerFilterPage():
 
     def filter(self, 
                filter_list: Optional[List[TeamsImg]] = [TeamsImg.FILTER_EIGHT_STARS, TeamsImg.FILTER_RANGER],
-                sort: TeamsImg = TeamsImg.LVL_DESC
+                sort: TeamsImg = TeamsImg.LVL_ASC
                ):
         wait_click(self.ctx.serial, TeamsImg.FILTER_BTN.value, wait_time=0.0)
         if not wait_click(self.ctx.serial, TeamsImg.RESET.value, wait_time=0.0):

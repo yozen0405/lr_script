@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
 from core.actions.system import force_close
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.utils.hacks import apply_mode
 from scripts.shared.events.login.sec import line_login, guest_login
 from scripts.shared.utils.mainview.base import on_main_view
+from scripts.shared.controller.lifecycle.manager import ensure_main_view
 from core.actions.system import log_msg
 from scripts.shared.controller.context import GameContext
 import time
@@ -43,14 +44,12 @@ class JobRunner:
 
     def start_game(self):
         log_msg(self.serial, "[System] 正在啟動遊戲...")
-        line_login(self.ctx)
-        on_main_view(self.ctx)
+        ensure_main_view(self.ctx)
 
     def restart_game(self):
         log_msg(self.serial, "[System] 正在執行遊戲重啟流程...")
         force_close(self.serial)
-        line_login(self.ctx)
-        on_main_view(self.ctx)
+        ensure_main_view(self.ctx)
 
     def add_job(self, job: BaseJob):
         self.jobs.append(job)
@@ -94,5 +93,6 @@ class JobRunner:
                         except:
                             pass
                         
-                        wait_click(self.serial, "back.png")
-                        on_main_view(self.ctx, timeout=30.0)
+                        if job.name != "Main Stage Farming":
+                            wait_click(self.serial, "back.png")
+                        ensure_main_view(self.ctx, timeout=30.0)

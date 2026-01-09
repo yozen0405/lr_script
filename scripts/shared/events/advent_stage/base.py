@@ -1,11 +1,11 @@
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.constants import Settlement, Confirm, Battle, MainView, Retry, Positions
 from core.base.exceptions import GameError
-from core.system.logger import log_msg
-from .enum import Advent, AdventStageName
+from core.system.logging.logger import log_msg
+from .enum import AdventImg, AdventStageName
 from typing import Optional, Tuple
-from scripts.shared.events.main_stage.enum import MainStage
+from scripts.shared.events.main_stage.enum import MainStageImg
 from core.system.config import Config
 from scripts.shared.constants import Leonard
 
@@ -18,15 +18,15 @@ class BaseAdventStage:
         self.team_num = cfg.get_team_num()
 
     def enter_menu(self):
-        if exist(self.serial, Advent.TEXT.value):
+        if exist(self.serial, AdventImg.TEXT.value):
             return
         
         for _ in range(5):
-            if wait_click(self.serial, Advent.BTN.value):
-                connection_retry(self.serial, vanish=Advent.BTN.value, timeout=40.0)
+            if wait_click(self.serial, AdventImg.BTN.value):
+                connection_retry(self.serial, vanish=AdventImg.BTN.value, timeout=40.0)
                 self._on_pre_anime()
                 return
-            elif exist(self.serial, MainStage.BTN.value):
+            elif exist(self.serial, MainStageImg.BTN.value):
                 drag(self.serial, (800, 400), (200, 400))
 
         raise GameError("無法進入降臨關卡")
@@ -34,7 +34,7 @@ class BaseAdventStage:
     def _on_pre_anime(self):
         is_anime = False
         for _ in range(7):
-            if exist(self.serial, Advent.TEXT.value):
+            if exist(self.serial, AdventImg.TEXT.value):
                 break
             if wait_click(self.serial, Battle.ANIME.value, threshold=0.999):
                 is_anime = True
@@ -45,13 +45,13 @@ class BaseAdventStage:
             return
         wait_click(self.serial, Leonard.TP_POINT.value)
         wait_click(self.serial, Battle.ENTER.value)
-        wait_click(self.serial, Advent.VERY_HARD.value, wait_time=1.0)
-        wait_click(self.serial, Advent.VERY_HARD.value)
+        wait_click(self.serial, AdventImg.VERY_HARD.value, wait_time=1.0)
+        wait_click(self.serial, AdventImg.VERY_HARD.value)
         connection_retry(self.serial, appear=Leonard.TP_POINT2.value, timeout=40.0)
         wait_click(self.serial, Leonard.TP_POINT2.value)
         wait_click(self.serial, Leonard.TP_POINT2.value)
         wait_click(self.serial, MainView.BACK.value)
-        connection_retry(self.serial, appear=Advent.SCHEDULE.value, timeout=40.0)
+        connection_retry(self.serial, appear=AdventImg.SCHEDULE.value, timeout=40.0)
 
     def find_target_boss(self, boss: Optional[str] = None) -> None:
         if boss is None or boss == "":
@@ -85,8 +85,8 @@ class BaseAdventStage:
 
         return region
 
-    def enter_stage(self, boss: str, difficulty: Optional[str] = Advent.VERY_HARD.value) -> bool:
-        if not wait(self.serial, Advent.TEXT.value, timeout=30.0):
+    def enter_stage(self, boss: str, difficulty: Optional[str] = AdventImg.VERY_HARD.value) -> bool:
+        if not wait(self.serial, AdventImg.TEXT.value, timeout=30.0):
             raise GameError("不在降臨關卡")
         
         region = self.find_target_boss(boss=boss)
@@ -95,7 +95,7 @@ class BaseAdventStage:
 
         if wait_click(self.serial, Battle.ENTER.value, region=region, timeout=7.0, threshold=0.8):
             if not wait_click(self.serial, difficulty):
-                if exist(self.serial, Advent.NOT_OPEN_TEXT.value, threshold=0.9):
+                if exist(self.serial, AdventImg.NOT_OPEN_TEXT.value, threshold=0.9):
                     log_msg(self.serial, f"關卡 {boss} 未開放")
                     wait_click(self.serial, Confirm.SMALL.value)
                     return False
@@ -106,10 +106,10 @@ class BaseAdventStage:
             return False
         
     def _handle_team_num(self):
-        if exist_click(self.serial, Advent.TEAM_BTN.value):
-            if exist_click(self.serial, Advent.TEAM_NUM_ON(num=self.team_num), threshold=0.999):
+        if exist_click(self.serial, AdventImg.TEAM_BTN.value):
+            if exist_click(self.serial, AdventImg.TEAM_NUM_ON(num=self.team_num), threshold=0.999):
                 return
-            exist_click(self.serial, Advent.TEAM_NUM_OFF(num=self.team_num), threshold=0.9)
+            exist_click(self.serial, AdventImg.TEAM_NUM_OFF(num=self.team_num), threshold=0.9)
 
     def battle(self, repeat: int = 1) -> bool:
         log_msg(self.serial, "Advent 任務開始")
@@ -117,9 +117,9 @@ class BaseAdventStage:
         self._handle_team_num()
 
         if repeat > 1:
-            wait_click(self.serial, Advent.CYCLE.value)
+            wait_click(self.serial, AdventImg.CYCLE.value)
             for _ in range(repeat - 1):
-                wait_click(self.serial, Advent.PLUS.value, wait_time=0.0)
+                wait_click(self.serial, AdventImg.PLUS.value, wait_time=0.0)
             wait_click(self.serial, Confirm.SMALL.value)
 
         wait_click(self.serial, Battle.NEXT.value)
@@ -153,10 +153,10 @@ class BaseAdventStage:
                 exist_click(self.serial, img, wait_time=1.5)
             if exist(self.serial, Retry.TEXT1.value):
                 exist_click(self.serial, Retry.BTN.value)
-            if exist(self.serial, Advent.TEXT.value):
+            if exist(self.serial, AdventImg.TEXT.value):
                 break
 
-def advent_stage_battle(serial: str, repeat: int = 1, boss: Optional[str] = None, difficulty: Optional[str] = Advent.VERY_HARD.value):
+def advent_stage_battle(serial: str, repeat: int = 1, boss: Optional[str] = None, difficulty: Optional[str] = AdventImg.VERY_HARD.value):
     advent = BaseAdventStage(serial)
     advent.enter_menu()
     if not boss:

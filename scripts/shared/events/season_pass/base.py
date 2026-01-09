@@ -1,6 +1,6 @@
 from scripts.shared.events.season_pass.enum import SeasonPassImg, SeasonPassState
 from scripts.shared.constants import Confirm, MainView, Retry
-from core.actions.screen import wait_click, exist_click, exist, wait
+from core.actions.vision import wait_click, exist_click, exist, wait
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.controller.context import GameContext
 import time
@@ -98,7 +98,7 @@ class SeasonPassBase:
             wait_click(self.ctx.serial, SeasonPassImg.TEXT.value, wait_time=1.0)
 
     def handle_history(self):
-        wait_click(self.ctx.serial, MainView.CLOSE_BOARD2.value, threshold=0.9)
+        wait_click(self.ctx.serial, MainView.CLOSE_BOARD.value, threshold=0.9)
 
     def handle_exp_up(self):
         wait_click(self.ctx.serial, Confirm.BIG2.value)

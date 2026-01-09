@@ -1,13 +1,12 @@
-from core.actions.image_utils import find_spotlight_center
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos, check_region_brightness
-from core.actions.screen import back
+from core.actions.vision import find_spotlight_center
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, drag, get_pos, check_region_brightness
+from core.actions.vision import back
 from scripts.shared.events.teams.enum import GearImg
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.constants import Settlement, Confirm, Battle, MainView, Retry, Positions
 from core.base.exceptions import GameError
-from core.system.logger import log_msg
+from core.system.logging.logger import log_msg
 from typing import Optional, Tuple
-from scripts.shared.events.main_stage.enum import MainStage
 from scripts.shared.events.teams.enum import TeamsImg
 from scripts.shared.constants.leonard import Leonard
 from scripts.shared.controller.context import GameContext
@@ -73,7 +72,7 @@ class RangerInfoPage():
                 continue
 
             if exist_click(self.ctx.serial, MainView.SKIP.value):
-                if exist(self.ctx.serial, MainView.SKIP_TUTORIAL_TEXT.value):
+                if exist(self.ctx.serial, MainView.SKIP_CONFIRM_TEXT.value):
                     wait_click(self.ctx.serial, Confirm.SMALL.value)
                 continue
             
@@ -102,7 +101,7 @@ class RangerInfoPage():
     def leave_menu(self):
         if not self.on_page():
             return
-        if not exist_click(self.ctx.serial, MainView.CLOSE_BOARD2.value, threshold=0.9):
+        if not exist_click(self.ctx.serial, MainView.CLOSE_BOARD.value, threshold=0.9):
             raise GameError("Cannot exit ranger upgrade page.")
     
     def go_gear_page(self):

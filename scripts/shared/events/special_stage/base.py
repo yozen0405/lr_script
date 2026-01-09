@@ -1,9 +1,9 @@
 import time
-from core.system.logger import log_msg
-from core.actions.screen import wait_click, exist_click, exist, wait, wait_vanish, get_pos, drag
+from core.system.logging.logger import log_msg
+from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanish, get_pos, drag
 from core.base.exceptions import GameError
 from scripts.shared.constants import Settlement, Confirm, Battle, Retry, MainView, Positions
-from scripts.shared.events.main_stage.enum import MainStage
+from scripts.shared.events.main_stage.enum import MainStageImg
 from scripts.shared.events.special_stage.enum import SpecialStage
 from scripts.shared.events.special_stage.hook import SpecialStageHooks
 from scripts.shared.events.special_stage.utils import SpecialStageUtils
@@ -32,7 +32,7 @@ class BaseSpecialStage:
                 connection_retry(self.serial, vanish=[(SpecialStage.BTN.value)], retry=[(SpecialStage.BTN.value)])
                 self.hooks.on_pre_anime()
                 return
-            elif exist(self.serial, MainStage.BTN.value):
+            elif exist(self.serial, MainStageImg.BTN.value):
                 drag(self.serial, (800, 400), (200, 400))
 
         raise GameError("無法進入特殊關卡")
@@ -116,10 +116,11 @@ class BaseSpecialStage:
                 return False
 
         wait_click(self.serial, Battle.NEXT.value)
-        self.utils._battle_loop()
+        self.utils._battle_loop(loop_mode=True)
         
         log_msg(self.serial, "結算中")
-        wait_click(self.serial, Confirm.BIG2.value)
+        wait_click(self.serial, Confirm.BIG2.value, wait_time=1.0)
+        exist_click(self.serial, Confirm.BIG2.value)
 
         connection_retry(self.serial, appear=[(SpecialStage.TEXT.value)], timeout=80.0)
         wait_click(self.serial, MainView.BACK.value, timeout=20.0)

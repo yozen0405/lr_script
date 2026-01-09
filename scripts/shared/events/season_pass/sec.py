@@ -1,6 +1,6 @@
 from scripts.shared.events.season_pass.enum import SeasonPassImg, SeasonPassState
 from scripts.shared.constants import Confirm, MainView, Retry, Leonard
-from core.actions.screen import wait_click, exist_click, exist, wait
+from core.actions.vision import wait_click, exist_click, exist, wait
 from scripts.shared.utils.retry import connection_retry
 from core.base.exceptions import GameError
 from scripts.shared.controller.context import GameContext
@@ -80,7 +80,7 @@ class SeasonPassBase:
         connection_retry(self.ctx.serial, appear=[(SeasonPassImg.CONGRATS.value, 0.9)], retry=[(SeasonPassImg.TICKETS.value, 0.9)], timeout=40.0)
         wait_click(self.ctx.serial, Confirm.BIG2.value)
         connection_retry(self.ctx.serial, appear=[(SeasonPassImg.HISTORY_TEXT.value, 0.8)], retry=[(Confirm.BIG2.value, 0.9)], timeout=40.0)
-        wait_click(self.ctx.serial, MainView.CLOSE_BOARD2.value)
+        wait_click(self.ctx.serial, MainView.CLOSE_BOARD.value)
 
 def claim_tickets(ctx: GameContext):
     sp = SeasonPassBase(ctx)
