@@ -9,3 +9,5 @@ bin/cache.json
 bin/.DS_Store
 debug_*
 .DS_Store
+*.apk
+*.apks
