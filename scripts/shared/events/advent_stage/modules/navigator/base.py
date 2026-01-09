@@ -20,7 +20,7 @@ class StageNavigator:
         self.session = session
 
         self.tutorial_interrupt = TutorialInterrupt(self.ctx)
-        self.utils = StageNavigatorUtils(context)
+        self.utils = StageNavigatorUtils(self.ctx)
     
     def on_interrupt(self):
         loc = get_pos(self.ctx.serial, AdventImg.TEXT.value, threshold=0.9, return_center=False)
@@ -36,7 +36,7 @@ class StageNavigator:
 
     def leave_menu(self):
         wait_click(self.ctx.serial, MainView.BACK.value)
-        connection_retry(self.ctx.serial, vanish=[(AdventImg.TEXT.value, 0.9)], timeout=40.0)
+        connection_retry(self.ctx.serial, vanish=[(AdventImg.TEXT.value, 0.9)], retry=MainView.BACK.value, timeout=40.0)
 
     def handle_interrupt(self):
         start_time = time.time()    

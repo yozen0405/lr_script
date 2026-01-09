@@ -22,10 +22,10 @@ import time
 class StageFinder:
     def __init__(self, 
                  context: GameContext, 
-                 # session: AdventStageSession
-                 ):
+                 session: AdventStageSession
+                ):
         self.ctx = context
-        # self.session = session
+        self.session = session
 
     def collect_stage_info(self) -> Dict[str, int]:
         # 找畫面上的綠色青蛙
@@ -89,6 +89,7 @@ class StageFinder:
             log_msg(self.ctx.serial, f"嘗試進入關卡: {name}，他的 Leonard: {names[name]}")
             if self.attempt_enter_stage(AdventStageName[name]):
                 log_msg(self.ctx.serial, f"成功進入關卡: {name}")
-                return
+                return True
             else:
                 log_msg(self.ctx.serial, f"無法進入關卡: {name}，嘗試下一個關卡")
+        return False
