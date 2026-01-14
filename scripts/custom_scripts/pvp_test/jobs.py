@@ -4,13 +4,13 @@ from core.actions.vision import wait_click, exist_click, exist, wait, wait_vanis
 from core.actions.system import force_close
 from scripts.shared.constants import Settlement, Confirm, Battle, Leonard, Retry, MainView, Positions
 from scripts.shared.utils.retry import connection_retry
-from scripts.shared.events.pvp.base import pvp_loop_battle
+from scripts.shared.events.pvp.sec import pvp_loop_battle
 from scripts.shared.utils.hacks import apply_mode
 from scripts.shared.events.special_stage.selector import special_stage_single_game, special_stage_loop_game, special_stage_conquer_planet
 from scripts.shared.events.special_stage.enum import Planet
 from scripts.shared.events.main_stage.enum import MainStageImg
 from scripts.shared.events.special_stage.enum import SpecialStage
-from scripts.shared.events.pvp.enum import PvP
+from scripts.shared.events.pvp.enum import PvPImg
 from scripts.shared.events.guild.enum import Guild
 from scripts.shared.events.advent_stage.enum import AdventImg
 from scripts.shared.events.advent_stage.enum import AdventStageName
@@ -20,7 +20,7 @@ from scripts.shared.events.teams.enum import TeamsImg
 from scripts.shared.events.teams.base import upgrade_ranger, gear_enhance
 from scripts.shared.events.guild.base import guild_raid_battle
 from scripts.shared.events.main_stage.base import main_stage_finish_custom
-from scripts.shared.events.advent_stage.base import advent_stage_battle
+from scripts.shared.events.advent_stage.base import run_advent_stage
 from scripts.shared.events.bingo.base import bingo_attempt
 from scripts.shared.events.lab.base import complete_lab_quest
 from scripts.shared.events.season_pass.sec import claim_season_pass
@@ -45,7 +45,7 @@ class AdventJob(BaseJob):
         super().__init__(name="Advent Stage", mode_name="advent")
 
     def run(self, ctx: GameContext):
-        advent_stage_battle(ctx.serial, repeat=3)
+        run_advent_stage(ctx.serial)
 
 
 class MainStageJob(BaseJob):
@@ -69,9 +69,7 @@ class PvPJob(BaseJob):
         super().__init__(name="PVP Arena", mode_name="pvp")
 
     def run(self, ctx: GameContext):
-        for i in range(5):
-            if not pvp_loop_battle(ctx.serial):
-                break
+        pvp_loop_battle(ctx)
 
 
 class SpecialStageJob(BaseJob):

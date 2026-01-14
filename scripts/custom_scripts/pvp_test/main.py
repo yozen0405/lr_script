@@ -7,7 +7,7 @@ from scripts.shared.utils.hacks import apply_mode
 from scripts.shared.events.special_stage.selector import special_stage_single_game, special_stage_loop_game, special_stage_conquer_planet
 from scripts.shared.events.special_stage.enum import Planet
 from scripts.shared.events.special_stage.enum import SpecialStage
-from scripts.shared.events.pvp.enum import PvP
+from scripts.shared.events.pvp.enum import PvPImg
 from scripts.shared.events.guild.enum import Guild
 from scripts.shared.events.advent_stage.enum import AdventImg
 from scripts.shared.events.advent_stage.enum import AdventStageName
@@ -18,8 +18,7 @@ from scripts.shared.events.season_pass.enum import SeasonPassImg
 from scripts.shared.events.main_stage.enum import MainStageImg
 from scripts.shared.events.teams.enum import GearImg
 from scripts.shared.events.guild.base import guild_raid_battle
-from scripts.shared.events.advent_stage.base import advent_stage_battle
-from scripts.shared.events.bingo.base import bingo_attempt
+=from scripts.shared.events.bingo.base import bingo_attempt
 from scripts.shared.events.lab.base import complete_lab_quest
 from scripts.shared.events.wheel.base import wheel_attempt
 from scripts.shared.events.train.base import train_stage_battle

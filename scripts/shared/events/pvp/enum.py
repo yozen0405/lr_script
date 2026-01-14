@@ -1,6 +1,6 @@
 from enum import Enum
 
-class PvP(str, Enum):
+class PvPImg(str, Enum):
     MATCHED = "pvp_opponent_selected.png"
     CHALLENGE = "pvp_opponent_challenge.png"
     TEXT = "pvp_text.png"
@@ -14,4 +14,4 @@ class PvP(str, Enum):
     LVL_DOWN = "pvp_lvl_downgrade.png"
     SEASON_END_TEXT = "pvp_season_end_text.png"
     CLOSE_TIPS = "close_lose_tips.png"
-    PRE_START_PAGE = "pre_start_page_high.png"
+    PRE_START_PAGE = "main_stage/preperation_page/bg/high.png"

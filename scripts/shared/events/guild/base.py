@@ -3,7 +3,7 @@ from scripts.shared.constants import Settlement, Confirm, Battle, Retry, MainVie
 from scripts.shared.events.guild.enum import Guild, GuildRaidSide
 from scripts.shared.events.main_stage.enum import MainStageImg
 from scripts.shared.utils.retry import connection_retry
-from scripts.shared.events.pvp.enum import PvP
+from scripts.shared.events.pvp.enum import PvPImg
 from core.base.exceptions import GameError
 from core.system.logging.logger import log_msg
 from scripts.shared.utils.hacks import apply_mode

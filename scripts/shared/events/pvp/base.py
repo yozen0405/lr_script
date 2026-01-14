@@ -3,7 +3,7 @@ from scripts.shared.constants import Settlement, Confirm, Battle, Retry, MainVie
 from scripts.shared.constants.view import GameView
 from scripts.shared.events.main_stage.enum import MainStageImg
 from scripts.shared.utils.retry import connection_retry
-from scripts.shared.events.pvp.enum import PvP
+from scripts.shared.events.pvp.enum import PvPImg
 from core.base.exceptions import GameError
 from core.system.logging.logger import log_msg
 from scripts.shared.utils.hacks import apply_mode
@@ -14,14 +14,14 @@ class BasePvP:
         self.serial = serial
 
     def _close_pvp_in(self):
-        loc = get_pos(self.serial, PvP.TEXT.value, threshold=0.9, return_center=False)
+        loc = get_pos(self.serial, PvPImg.TEXT.value, threshold=0.9, return_center=False)
         if loc:
             if check_region_brightness(self.serial, region=loc, threshold=50):
                 return
 
         cnt = 0
         while True:
-            if exist_click(self.serial, PvP.LVL_DOWN.value):
+            if exist_click(self.serial, PvPImg.LVL_DOWN.value):
                 cnt = 0
                 continue
             if exist_click(self.serial, Leonard.TP_POINT.value):
@@ -30,33 +30,33 @@ class BasePvP:
             if exist_click(self.serial, Leonard.TP_JUMP.value):
                 cnt = 0
                 continue
-            if exist_click(self.serial, PvP.CLOSE_TIPS.value):
+            if exist_click(self.serial, PvPImg.CLOSE_TIPS.value):
                 cnt = 0
                 continue
-            if exist(self.serial, PvP.SEASON_END_TEXT.value, threshold=0.9):
+            if exist(self.serial, PvPImg.SEASON_END_TEXT.value, threshold=0.9):
                 cnt = 0
                 exist_click(self.serial, Confirm.SMALL.value)
                 continue
-            if exist(self.serial, PvP.TEXT.value, threshold=0.9):
+            if exist(self.serial, PvPImg.TEXT.value, threshold=0.9):
                 cnt += 1
                 if cnt >= 2:
                     return
             
 
     def enter_menu(self):
-        if exist(self.serial, PvP.TEXT.value, threshold=0.999):
+        if exist(self.serial, PvPImg.TEXT.value, threshold=0.999):
             return
         
         for _ in range(5):
-            if wait_click(self.serial, PvP.BTN.value):
-                connection_retry(self.serial, vanish=[(PvP.BTN.value)], timeout=40.0)
+            if wait_click(self.serial, PvPImg.BTN.value):
+                connection_retry(self.serial, vanish=[(PvPImg.BTN.value)], timeout=40.0)
                 self._close_pvp_in()
                 # 判賽季結算(或聯盟初始化) 跟 pvp介紹 跟 屬性關卡介紹 跟 降級
                 return
             elif exist(self.serial, MainStageImg.BTN.value):
                 drag(self.serial, (800, 400), (200, 400))
                 drag(self.serial, (800, 400), (200, 400))
-            elif exist(self.serial, PvP.TEXT.value):
+            elif exist(self.serial, PvPImg.TEXT.value):
                 self._close_pvp_in()
                 return
 
@@ -69,19 +69,19 @@ class BasePvP:
             if exist(self.serial, Retry.TEXT1.value):
                 exist_click(self.serial, Retry.BTN.value)
 
-            if exist_click(self.serial, PvP.BATTLE.value):
+            if exist_click(self.serial, PvPImg.BATTLE.value):
                 pass
 
-            if exist(self.serial, PvP.MATCHING_TEXT.value, threshold=0.8):
-                wait_click(self.serial, PvP.CHALLENGE.value)
+            if exist(self.serial, PvPImg.MATCHING_TEXT.value, threshold=0.8):
+                wait_click(self.serial, PvPImg.CHALLENGE.value)
                 found = True
 
-            if exist(self.serial, PvP.BLIND_MATCH.value, threshold=0.8):
-                wait_click(self.serial, PvP.CHALLENGE.value)
+            if exist(self.serial, PvPImg.BLIND_MATCH.value, threshold=0.8):
+                wait_click(self.serial, PvPImg.CHALLENGE.value)
                 found = True
 
             if found:
-                if exist(self.serial, PvP.PRE_START_PAGE.value, threshold=0.9):
+                if exist(self.serial, PvPImg.PRE_START_PAGE.value, threshold=0.9):
                     return
         raise GameError("無法進入PVP戰鬥頁面")
                 
@@ -89,7 +89,7 @@ class BasePvP:
         wait_click(self.serial, Confirm.CANCEL_SMALL.value)
         wait_click(self.serial, MainView.BACK.value)
         wait_click(self.serial, MainView.BACK.value)
-        connection_retry(self.serial, appear=PvP.TEXT.value, timeout=40.0)
+        connection_retry(self.serial, appear=PvPImg.TEXT.value, timeout=40.0)
 
     def run(self):
         log_msg(self.serial, "PVP 任務開始")
@@ -105,7 +105,7 @@ class BasePvP:
                 return False
             if exist(self.serial, Battle.PAUSE.value, threshold=0.9):
                 break
-            if exist(self.serial, PvP.SETTLEMENT_TEXT.value):
+            if exist(self.serial, PvPImg.SETTLEMENT_TEXT.value):
                 break
             if exist(self.serial, GameView.ICON.value):
                 raise GameError("遊戲回到主畫面，可能因為斷線或異常退出")
@@ -120,22 +120,22 @@ class BasePvP:
         return True
 
     def settlement(self):
-        connection_retry(self.serial, appear=PvP.SETTLEMENT_TEXT.value, timeout=40.0)
+        connection_retry(self.serial, appear=PvPImg.SETTLEMENT_TEXT.value, timeout=40.0)
 
         start_time = time.time()
         while time.time() - start_time < 120.0:
-            if not exist(self.serial, PvP.SETTLEMENT_TEXT.value, wait_time=1.5):
+            if not exist(self.serial, PvPImg.SETTLEMENT_TEXT.value, wait_time=1.5):
                 if exist(self.serial, Settlement.PUZZLE_FOUND_TEXT.value):
                     exist_click(self.serial, Confirm.BIG2.value)
                     continue
 
-                if not exist(self.serial, PvP.TEXT.value, wait_time=3.0, threshold=0.9):
+                if not exist(self.serial, PvPImg.TEXT.value, wait_time=3.0, threshold=0.9):
                     continue
                 else:
-                    wait_click(self.serial, PvP.LVL_UP.value, timeout=3.0, wait_time=2.0)
+                    wait_click(self.serial, PvPImg.LVL_UP.value, timeout=3.0, wait_time=2.0)
                     return
             else:
-                exist_click(self.serial, PvP.SETTLEMENT_TEXT.value)
+                exist_click(self.serial, PvPImg.SETTLEMENT_TEXT.value)
             if exist(self.serial, Retry.TEXT1.value):
                 exist_click(self.serial, Retry.TEXT1.value)
         raise GameError("結算過程異常")

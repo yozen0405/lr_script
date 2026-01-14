@@ -8,7 +8,7 @@ from typing import Optional, Tuple
 from scripts.shared.events.main_stage.enum import MainStageImg
 from core.system.config import Config
 from scripts.shared.constants import Leonard, Battle
-from scripts.shared.events.pvp.enum import PvP
+from scripts.shared.events.pvp.enum import PvPImg
 
 class BaseTrainStage:
     def __init__(self, serial):
@@ -50,8 +50,8 @@ class BaseTrainStage:
 
         if self.enter_pos is not None:
             wait_click(self.serial, self.enter_pos)
-        elif exist(self.serial, PvP.BATTLE.value):
-            wait_click(self.serial, PvP.BATTLE.value)
+        elif exist(self.serial, PvPImg.BATTLE.value):
+            wait_click(self.serial, PvPImg.BATTLE.value)
         else:
             raise GameError("無法進入train關卡戰鬥")
         

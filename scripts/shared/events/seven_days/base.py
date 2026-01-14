@@ -8,7 +8,7 @@ from typing import Optional, Tuple
 from scripts.shared.events.main_stage.enum import MainStageImg
 from core.system.config import Config
 from scripts.shared.constants import Leonard, Battle
-from scripts.shared.events.pvp.enum import PvP
+from scripts.shared.events.pvp.enum import PvPImg
 from scripts.shared.events.seven_days.enum import SevenDaysImg
 from scripts.shared.controller.context import GameContext
 
