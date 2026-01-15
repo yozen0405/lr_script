@@ -6,7 +6,7 @@ from scripts.shared.constants import Settlement, Confirm, Battle, Leonard, Retry
 from scripts.shared.utils.retry import connection_retry
 from scripts.shared.events.pvp.sec import pvp_loop_battle
 from scripts.shared.utils.hacks import apply_mode
-from scripts.shared.events.special_stage.selector import special_stage_single_game, special_stage_loop_game, special_stage_conquer_planet
+from scripts.shared.events.special_stage.base import special_stage_single_game, special_stage_loop_game, special_stage_conquer_planet
 from scripts.shared.events.special_stage.enum import Planet
 from scripts.shared.events.main_stage.enum import MainStageImg
 from scripts.shared.events.special_stage.enum import SpecialStage
@@ -77,10 +77,10 @@ class SpecialStageJob(BaseJob):
         super().__init__(name="Special Stage", mode_name="special_stage")
 
     def run(self, ctx: GameContext):
-        # special_stage_loop_game(ctx.serial, planet=Planet.COLLAB.value, stage=6)
+        special_stage_loop_game(ctx, planet=Planet.EVO_MINE.value, stage=6)
         # special_stage_conquer_planet(ctx, planet=Planet.COLLAB.value)
-        for stage in range(4, 7):
-            special_stage_loop_game(ctx, planet=Planet.IMMORTAL_SKULL.value, stage=stage)
+        # for stage in range(4, 7):
+        #     special_stage_loop_game(ctx, planet=Planet.IMMORTAL_SKULL.value, stage=stage)
 
 
 class SeasonPassJob(BaseJob):

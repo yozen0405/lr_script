@@ -18,7 +18,7 @@ from scripts.shared.events.season_pass.enum import SeasonPassImg
 from scripts.shared.events.main_stage.enum import MainStageImg
 from scripts.shared.events.teams.enum import GearImg
 from scripts.shared.events.guild.base import guild_raid_battle
-=from scripts.shared.events.bingo.base import bingo_attempt
+from scripts.shared.events.bingo.base import bingo_attempt
 from scripts.shared.events.lab.base import complete_lab_quest
 from scripts.shared.events.wheel.base import wheel_attempt
 from scripts.shared.events.train.base import train_stage_battle
@@ -38,20 +38,20 @@ def check_brightness(serial):
         print("Main View Detected")
 
 def detect(serial):
-    if exist_click(serial, MainStageImg.PRE_START_TEXT.value):
+    if exist_click(serial, Leonard.TP_POINT.value):
         print("Detect No Avatar Popup")
 
 def normal_stage(serial):
     runner = JobRunner(serial)
 
-    initialize_environment(serial)
+    # initialize_environment(serial)
 
     # runner.start_game()
 
     # detect(serial)
     # check_brightness(serial)
     
-    apply_mode(serial, mode_name="pvp", state="off")
+    # apply_mode(serial, mode_name="tower_normal", state="on")
     apply_mode(serial, mode_name="speedx6", state="on")
 
     # apply_mode(serial, mode_name="special_stage", state="off")

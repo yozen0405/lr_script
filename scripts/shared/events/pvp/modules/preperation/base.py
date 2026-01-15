@@ -46,7 +46,7 @@ class StagePreperation:
 
     def run(self):
         log_msg(self.ctx.serial, "PVP 任務開始")
-        exist_click(self.ctx.serial, Battle.AUTO_BTN_OFF2.value, threshold=0.99)
+        wait_click(self.ctx.serial, MainStageImg.AUTO_BTN_HIGH_OFF.value, threshold=0.95, timeout=3.0)
 
         start_time = time.time()
         pressed_start = False
@@ -72,7 +72,8 @@ class StagePreperation:
                 cnt += 1
                 if cnt >= 2:
                     return
-                if exist(self.ctx.serial, Battle.NO_FEATHER.value):
+                if exist(self.ctx.serial, PvPImg.NO_SPECIAL_FEATHER_TEXT.value, threshold=0.9):
+                    wait_click(self.ctx.serial, Confirm.CANCEL_SMALL.value)
                     self.leave_page()
                     self.session.end = True
                     return

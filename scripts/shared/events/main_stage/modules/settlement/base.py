@@ -85,7 +85,7 @@ class StageSettlement:
                 exist_click(self.ctx.serial, Retry.BTN.value)
                 continue
 
-            if exist(self.ctx.serial, MainStageImg.LOSE_TEXT.value, threshold=0.9):
+            if exist(self.ctx.serial, Settlement.LOSE_TEXT.value, threshold=0.9):
                 wait_click(self.ctx.serial, Confirm.MID.value, threshold=0.95)
                 cnt = 0
                 continue

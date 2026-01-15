@@ -25,7 +25,7 @@ class StageBattle:
                 exist_click(self.ctx.serial, Retry.BTN.value)
 
             if exist(self.ctx.serial, PvPImg.SETTLEMENT_TEXT.value, threshold=0.9):
-                break
+                return
 
             # if exist error found text, mark lose
 

@@ -4,7 +4,6 @@ from core.actions.vision import (
     wait_click, exist_click, exist,
       wait, wait_vanish, drag, get_pos, 
       check_region_brightness,
-      get_text
 )
 from core.actions.vision import get_main_stage_num
 from core.base.exceptions import GameError

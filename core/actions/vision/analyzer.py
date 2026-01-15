@@ -1,8 +1,10 @@
 import cv2
 import numpy as np
 from typing import List, Optional, Tuple, Union
-
+from .config import TMP_DIR
 from core.system.logging.logger import log_msg
+import time
+import os 
 
 class ImageAnalyzer:
     """純影像處理邏輯，不涉及設備操作"""
@@ -25,6 +27,16 @@ class ImageAnalyzer:
             x2, y2 = min(w, x2), min(h, y2)
             search_img = screen[y1:y2, x1:x2]
             offset_x, offset_y = x1, y1
+
+            try:
+                save_dir = TMP_DIR
+                    
+                timestamp = int(time.time() * 1000)
+                region_str = f"_{region}"
+                filename = f"{save_dir}/search_area_{timestamp}{region_str}.png"
+                cv2.imwrite(filename, search_img)
+            except Exception as e:
+                print(f"Debug save failed: {e}")
 
         try:
             res = cv2.matchTemplate(search_img, template, cv2.TM_CCOEFF_NORMED)
@@ -65,7 +77,7 @@ class ImageAnalyzer:
             x2, y2 = min(w, x2), min(h, y2)
             search_img = screen[y1:y2, x1:x2]
             offset_x, offset_y = x1, y1
-
+            
         results = []
         
         try:

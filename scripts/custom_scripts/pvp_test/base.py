@@ -95,4 +95,4 @@ class JobRunner:
                         
                         if job.name != "Main Stage Farming":
                             wait_click(self.serial, "back.png")
-                        ensure_main_view(self.ctx, timeout=30.0)
+                        ensure_main_view(self.ctx)

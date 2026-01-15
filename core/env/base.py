@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from core.system.adb import adb_cmd
 from core.system.logging.logger import log_msg
 from core.env.exceptions import ModFrameworkError
+from core.base.exceptions import AdbError
 
 @dataclass
 class GameConfig:
@@ -99,7 +100,10 @@ class EnvironmentManager:
             raise ModFrameworkError(f"找不到本地安裝檔: {xapk_path}")
 
         log_msg(self.serial, f"正在解除安裝: {self.cfg.PACKAGE_NAME}")
-        self._shell(f"pm uninstall {self.cfg.PACKAGE_NAME}")
+        try:
+            self._shell(f"pm uninstall {self.cfg.PACKAGE_NAME}")
+        except AdbError:
+            pass
 
         safe_serial = self.serial.replace(":", "_").replace(".", "_")
         tmp_extract_dir = os.path.join("bin", "tmp", f"xapk_{safe_serial}")
@@ -128,8 +132,11 @@ class EnvironmentManager:
                 shutil.rmtree(tmp_extract_dir)
 
     def _parse_game_paths(self) -> bool:
-        output = self._shell(f"pm path {self.cfg.PACKAGE_NAME}")
-        if not output:
+        try:
+            output = self._shell(f"pm path {self.cfg.PACKAGE_NAME}")
+            if not output:
+                return False
+        except AdbError:
             return False
 
         for line in output.splitlines():
@@ -190,7 +197,7 @@ class EnvironmentManager:
         try:
             os.makedirs(os.path.dirname(target_bin_path), exist_ok=True)
 
-            log_msg(self.serial, f"正在從 Mod APK 提取 binary ({internal_path})...")
+            # log_msg(self.serial, f"正在從 Mod APK 提取 binary ({internal_path})...")
             
             with zipfile.ZipFile(apk_path, 'r') as z:
                 if internal_path not in z.namelist():
@@ -202,7 +209,7 @@ class EnvironmentManager:
                 with z.open(internal_path) as source, open(target_bin_path, "wb") as target:
                     shutil.copyfileobj(source, target)
                 
-            log_msg(self.serial, f"Binary 提取成功: {target_bin_path}")
+            # log_msg(self.serial, f"Binary 提取成功: {target_bin_path}")
 
         except zipfile.BadZipFile:
             raise ModFrameworkError(f"Mod APK 檔案損毀，無法讀取: {apk_path}")

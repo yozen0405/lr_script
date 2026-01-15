@@ -15,7 +15,7 @@ class Leonard(str, Enum):
     TP_CLAP2 = "leonard_tp_clap_2.png"
     TP_HAPPY = "leonard_teacher_switch_team2.png"
     TP_HAPPY2 = "leonard_tp_happy_2.png"
-    TP_JUMP = "leonard_teacher_jump.png"
+    TP_JUMP = "shared/leonard/tp_jump.png"
     TP_THUMBS_UP = "leonard_tp_thumbs_up.png"
     TP_GIFT = "leonard_tp_gift.png"
     DIALOGUE_TAG = "shared/leonard/leonard_dialogue_tag.png"

@@ -36,6 +36,8 @@ class MainStageImg(Base):
     SETTLEMENT = "main_stage/settlement/edge.png"
     PREPERATION_PAGE_BG_LOW = "main_stage/preperation_page/bg/low.png"
     PREPERATION_PAGE_BG_HIGH = "main_stage/preperation_page/bg/high.png"
+    CYCLE_HIGH = "main_stage/preperation_page/cycle/high_off.png"
+    CYCLE_LOW = "main_stage/preperation_page/cycle/low_off.png"
 
 class MainStageSettlementImg(Base):
     AGAIN = "main_stage/settlement/again_btn.png"

@@ -24,19 +24,25 @@ class StageSettlement:
         self.session.loop += 1
 
         start_time = time.time()
+        cnt = 0
         while time.time() - start_time < 120.0:
             if exist(self.ctx.serial, Retry.TEXT1.value):
                 exist_click(self.ctx.serial, Retry.TEXT1.value)
 
             if exist(self.ctx.serial, Settlement.PUZZLE_FOUND_TEXT.value):
-                exist_click(self.ctx.serial, Confirm.BIG2.value)
+                exist_click(self.ctx.serial, Confirm.BIG3.value)
+                cnt = 0
                 continue
 
             if exist_click(self.ctx.serial, PvPImg.SETTLEMENT_TEXT.value):
+                cnt = 0
                 continue
-
+            
+            cnt += 1
+            if cnt >= 2:
+                return
+            
             if exist(self.ctx.serial, PvPImg.TEXT.value, wait_time=3.0, threshold=0.9):
-                wait_click(self.ctx.serial, PvPImg.LVL_UP.value, timeout=3.0, wait_time=2.0) # change
                 return
 
         raise GameError("結算過程異常")

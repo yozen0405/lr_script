@@ -13,9 +13,6 @@ from scripts.custom_scripts.pvp_test.main import normal_stage
 if __name__ == "__main__":    
     try:
         devices = connect_all_mumu_instances(goal=1)
-        # devices = [
-        #     "127.0.0.1:16480"
-        # ]
 
         print("發現裝置:", devices)
         if not devices:

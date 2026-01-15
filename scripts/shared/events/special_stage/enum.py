@@ -2,7 +2,7 @@ from enum import Enum
 from scripts.shared.constants.base import Base
 
 class Planet(str, Enum):
-    EVO_MINE = "special_stage_evo_mine.png"
+    EVO_MINE = "special_stage/planets/evo_mine.png"
     WIZARD_CUBE = "special_stage_wizard_cube.png"
     IMMORTAL_SKULL = "special_stage_immortal_skull.png"
     COLLAB = "special_stage_collab_planet.png"
@@ -11,13 +11,9 @@ class Planet(str, Enum):
     CHRISTMAS = "special_stage_christmas_planet.png"
 
 class SpecialStage(Base):
-    TEXT = "special_stage_text.png"
-    BTN = "special_stage_btn.png"
-    ENTER = "enter_special_stage.png"
-    CIRCLE = "leonard_teacher_circle_special_stage.png"
-    STAGE = "special_stage_num{stage}.png"
-    LIMITED = "special_stage_limited_text.png"
-    LAB = "special_stage_lab_icon.png"
-    TEAM_BTN = "main_stage_team_btn_high.png"
-    TEAM_NUM_OFF = "main_stage_team_num_high_off_{num}.png"
-    TEAM_NUM_ON = "main_stage_team_num_high_on_{num}.png"
+    TEXT = "special_stage/text.png"
+    BTN = "special_stage/btn.png"
+    ENTER = "special_stage/menu/enter.png"
+    STAGE = "special_stage/stages/{stage}.png"
+    LIMITED = "special_stage/menu/limit_text.png"
+    LAB = "special_stage/menu/lab.png"
